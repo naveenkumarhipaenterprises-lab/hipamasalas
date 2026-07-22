@@ -119,6 +119,8 @@ p{ margin:0; }
 
 .brand{ display:flex; align-items:center; gap:10px; color:var(--gold-light); flex-shrink:0; }
 .brand-mark{ width:34px; height:34px; color:var(--gold); flex-shrink:0; }
+.brand-logo-img{ height:46px; width:auto; flex-shrink:0; display:block; }
+@media(max-width:900px){ .brand-logo-img{ height:38px; } }
 .brand-text{ display:flex; flex-direction:column; line-height:1.1; }
 .brand-name{ font-family:var(--font-display); font-size:20px; font-weight:700; letter-spacing:.04em; color:#fff; }
 .brand-sub{ font-size:9.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold-light); margin-top:2px; }
