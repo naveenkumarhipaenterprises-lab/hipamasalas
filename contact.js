@@ -8,6 +8,11 @@
    integrated yet, per project instructions.
    ========================================================= */
 
+'use strict';
+
+emailjs.init(window.SITE_CONFIG.EMAILJS.PUBLIC_KEY);
+
+
 document.addEventListener('DOMContentLoaded', () => {
 
   const form = document.getElementById('contactForm');
@@ -79,11 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Sending...';
 
-    /* -----------------------------------------------------
-       EmailJS integration point (currently disabled).
-       Once config.js EMAILJS values are filled in and the
-       EmailJS SDK script tag is added to contact.html, this
-       block can be uncommented to send the form.
+    
+      // EmailJS integration point (currently disabled).
+      // Once config.js EMAILJS values are filled in and the
+      // EmailJS SDK script tag is added to contact.html, this
+       //block can be uncommented to send the form.
 
     emailjs.send(
       window.SITE_CONFIG.EMAILJS.SERVICE_ID,
@@ -103,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // error UI
     });
 
-    ----------------------------------------------------- */
+   
 
     // Front-end only demo behaviour until EmailJS is wired up.
     setTimeout(() => {
