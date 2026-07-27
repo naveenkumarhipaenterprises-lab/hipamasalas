@@ -710,6 +710,14 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 }
 .form-success.show{ display:flex; }
 
+.form-error{
+  display:none; align-items:center; gap:10px;
+  background:rgba(181,72,47,.08); border:1px solid rgba(181,72,47,.25);
+  color:#b5482f; border-radius:var(--radius-sm);
+  padding:14px 18px; font-size:13.5px; margin-bottom:20px;
+}
+.form-error.show{ display:flex; }
+
 /* Side column: map + WhatsApp CTA */
 .contact-side{ display:flex; flex-direction:column; gap:24px; }
 
