@@ -47,6 +47,21 @@ window.SITE_CONFIG = {
     SERVICE_ID: "service_r4j4199",
     TEMPLATE_ID: "template_zzox0g7",
     PUBLIC_KEY: "_h2SZ5lHGo7fotRew"
-  }
+  },
+
+  /* ---------- WordPress Blog CMS ----------
+     Only the Blog section reads this. WordPress is used purely as a
+     headless CMS for blog content via its public REST API — no admin
+     credentials are ever used here.
+
+     REPLACE_WITH_REAL_VALUE: put your real WordPress site's REST API
+     base URL here once WordPress is installed, e.g.
+       "https://blog.hipamasalas.com/wp-json/wp/v2"
+     or
+       "https://your-wp-host.com/wp-json/wp/v2"
+
+     Do NOT put a WordPress admin username/password/API secret here —
+     only the public REST API base URL. */
+  WORDPRESS_API_URL: "REPLACE_WITH_REAL_VALUE"
 
 };

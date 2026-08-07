@@ -25,7 +25,7 @@
 <meta property="og:title"content="HIPA Traditional Masala | Authentic Indian Spices & Masala Powder">
 <meta property="og:description" content="Discover HIPA Traditional Masala's authentic Indian spices including Sambar Powder, Rasam Powder, Coriander Powder, Pepper Powder and more. Freshly crafted for rich flavour and homemade taste.">
 <meta property="og:url" content="https://www.hipamasalas.com/">
-<meta property="og:image" content="https://www.hipamasalas.com/images/og-image.png">
+<meta property="og:image" content="https://www.hipamasalas.com/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 
@@ -34,7 +34,7 @@
 <meta name="twitter:title" content="Hipa Traditional Masala |  Authentic Indian Spices & Masala Powder">
 <meta name="twitter:descriptio
 n" content="Discover HIPA Traditional Masala's authentic Indian spices including Sambar Powder, Rasam Powder, Coriander Powder, Pepper Powder and more. Freshly crafted for rich flavour and homemade taste.">
-<meta name="twitter:image" content="https://www.hipamasalas.com/images/og-image.png">
+<meta name="twitter:image" content="https://www.hipamasalas.com/og-image.png">
 
 <!-- ============ FONTS ============ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -153,25 +153,39 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <nav class="main-nav" id="mainNav">
       <ul>
         <li><a href="#home" class="active">Home</a></li>
-        <li><a href="#story">Our Story</a></li>
         <li class="has-dropdown">
           <a href="#products">Products <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
           <ul class="dropdown">
-            <li><a href="#products">Sambar Powder</a></li>
-            <li><a href="#products">Rasam Powder</a></li>
-            <li><a href="#products">Garam Masala</a></li>
-            <li><a href="#products">Coriander Powder</a></li>
-            <li><a href="#products">Pepper Powder</a></li>
+            <li><a href="products.html#sambar-powder">Sambar Powder</a></li>
+            <li><a href="products.html#rasam-powder">Rasam Powder</a></li>
+            <li><a href="products.html#garam-masala">Garam Masala</a></li>
+            <li><a href="products.html#coriander-powder">Coriander Powder</a></li>
+            <li><a href="products.html#pepper-powder">Pepper Powder</a></li>
           </ul>
         </li>
-        <li><a href="#why-us">Why Us</a></li>
-        <li><a href="#process">Recipes</a></li>
         <li><a href="#reviews">Reviews</a></li>
+        <li><a href="blog.html">Blog</a></li>
         <li><a href="contact.html">Contact</a></li>
       </ul>
     </nav>
 
     <div class="header-actions">
+      <div class="product-search" id="productSearch">
+        <button type="button" class="icon-btn product-search-toggle" id="productSearchToggle" aria-label="Search products" aria-expanded="false" aria-controls="productSearchBox">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <div class="product-search-box" id="productSearchBox">
+          <div class="product-search-box-inner">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <label for="productSearchInput" class="visually-hidden">Search products</label>
+            <input type="search" id="productSearchInput" name="product-q" placeholder="Search products..." autocomplete="off">
+            <button type="button" class="product-search-clear" id="productSearchClear" aria-label="Close search">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <div class="product-search-results" id="productSearchResults" role="listbox" aria-label="Product search results"></div>
+        </div>
+      </div>
       <button class="icon-btn cart-btn" id="cartBtn" aria-label="View cart">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 3H5L5.4 5M5.4 5H21L18 14H7L5.4 5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="currentColor"/><circle cx="17" cy="19" r="1.4" fill="currentColor"/></svg>
         <span class="cart-count" id="cartCount">0</span>
@@ -310,7 +324,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
       <article class="product-card reveal">
         <div class="product-media">
-          <img src="images/products/Pepper-powder.png" alt="Hipa's Pepper Powder, 200g pack">
+          <img src="images/products/pepper-powderr.png" alt="Hipa's Pepper Powder, 200g pack">
         </div>
         <h3 class="product-name">Pepper Powder</h3>
         <p class="product-weight">200g &middot; Pure &amp; Natural</p>
@@ -460,9 +474,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <h5>Explore</h5>
       <ul>
         <li><a href="#home">Home</a></li>
-        <li><a href="#story">Our Story</a></li>
         <li><a href="#products">Products</a></li>
-        <li><a href="#why-us">Why Us</a></li>
+        <li><a href="blog.html">Blog</a></li>
         <li><a href="contact.html">Contact</a></li>
       </ul>
     </div>
@@ -510,6 +523,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 
 <script src="config.js"></script>
+<script src="product-data.js"></script>
+<script src="product-search.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

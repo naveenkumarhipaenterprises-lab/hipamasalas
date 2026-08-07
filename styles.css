@@ -759,3 +759,63 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .form-row{ grid-template-columns:1fr; gap:0; }
   .map-card iframe{ height:220px; }
 }
+
+/* =========================================================
+   GLOBAL PRODUCT SEARCH (header, all pages)
+   ---------------------------------------------------------
+   Separate from the blog search inside blog.html — see blog.css
+   for that. Reuses the header's icon-btn look so it matches the
+   existing cart/hamburger icons exactly.
+   ========================================================= */
+.product-search{ position:relative; }
+.product-search-toggle{ background:transparent; border:none; cursor:pointer; }
+
+.product-search-box{
+  position:absolute; top:calc(100% + 14px); right:0;
+  width:320px; max-width:calc(100vw - 32px);
+  background:#fff; border-radius:var(--radius-sm); box-shadow:var(--shadow-md);
+  padding:10px;
+  opacity:0; visibility:hidden; transform:translateY(6px);
+  transition:opacity .2s ease, transform .2s ease, visibility .2s ease;
+  z-index:1200;
+}
+.product-search.open .product-search-box{
+  opacity:1; visibility:visible; transform:translateY(0); pointer-events:auto;
+}
+
+.product-search-box-inner{ display:flex; align-items:center; gap:8px; padding:6px 10px; border:1.5px solid rgba(30,58,23,.14); border-radius:var(--radius-sm); }
+.product-search-box-inner svg{ color:var(--ink-soft); flex-shrink:0; }
+.product-search-box input{
+  flex:1; border:none; outline:none; font-family:inherit; font-size:14px; color:var(--ink); background:transparent; min-width:0;
+}
+.product-search-box input::placeholder{ color:var(--ink-soft); }
+.product-search-clear{
+  background:transparent; border:none; color:var(--ink-soft); cursor:pointer;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  width:22px; height:22px; border-radius:50%; transition:background .2s ease, color .2s ease;
+}
+.product-search-clear:hover{ background:var(--cream-2); color:var(--green-700); }
+
+.product-search-results{
+  display:none; margin-top:8px; max-height:320px; overflow-y:auto;
+}
+.product-search-results.show{ display:block; }
+
+.product-search-result{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  width:100%; text-align:left; padding:11px 12px; border-radius:8px;
+  background:transparent; border:none; cursor:pointer;
+  font-family:inherit; font-size:13.5px; color:var(--ink); text-decoration:none;
+  transition:background .15s ease;
+}
+.product-search-result svg{ color:var(--ink-soft); flex-shrink:0; }
+.product-search-result:hover, .product-search-result.is-active{ background:var(--cream-2); color:var(--green-700); }
+
+.product-search-empty{ padding:20px 12px; text-align:center; }
+.product-search-empty p{ font-size:13.5px; color:var(--ink-soft); margin-bottom:10px; }
+.product-search-view-all{ font-size:13px; font-weight:600; color:var(--green-700); }
+.product-search-view-all:hover{ color:var(--green-900); }
+
+@media (max-width:480px){
+  .product-search-box{ position:fixed; top:calc(var(--header-h) + 8px); left:16px; right:16px; width:auto; }
+}

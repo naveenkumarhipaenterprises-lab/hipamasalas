@@ -131,6 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const successBox = document.getElementById('distributorFormSuccess');
   const errorBox = document.getElementById('distributorFormError');
   const submitBtn = form.querySelector('.form-submit');
+  let isSubmitting = false;
 
   const fields = {
     fullName: {
@@ -186,6 +187,8 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
+    if (isSubmitting) return; // Prevent duplicate submissions (double-click / double-tap)
+
     if (!validateForm()) {
       const firstInvalid = form.querySelector('.field-error.show');
       if (firstInvalid) {
@@ -195,9 +198,19 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    if (!window.emailjs || !cfg.EMAILJS) {
+      if (errorBox) {
+        errorBox.classList.add('show');
+        errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
+    isSubmitting = true;
     const originalText = submitBtn.innerHTML;
     submitBtn.disabled = true;
     submitBtn.textContent = 'Sending...';
+    if (successBox) successBox.classList.remove('show');
     if (errorBox) errorBox.classList.remove('show');
 
     // EmailJS integration — reuses the exact same service/template/public
@@ -219,21 +232,23 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       cfg.EMAILJS.PUBLIC_KEY
     ).then(() => {
+      // Only shown when EmailJS actually confirms the send.
       successBox.classList.add('show');
       form.reset();
       Object.values(fields).forEach(field => {
         if (field.el) field.el.removeAttribute('data-touched');
       });
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = originalText;
       successBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }).catch(() => {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = originalText;
+      // EmailJS failed — show the error state, never the success state.
       if (errorBox) {
         errorBox.classList.add('show');
         errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
+    }).finally(() => {
+      isSubmitting = false;
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
     });
   });
 

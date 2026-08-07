@@ -1,25 +1,28 @@
 /* =========================================================
    HIPA MASALA — CONTACT FORM
    ---------------------------------------------------------
-   Vanilla JS validation for contact.html.
-   The form is structured and ready for EmailJS — see the
-   commented block at the bottom for how to wire it up once
-   config.js EMAILJS values are filled in. EmailJS is NOT
-   integrated yet, per project instructions.
+   Vanilla JS validation + EmailJS submission for contact.html.
+   Success is only shown when EmailJS actually confirms the
+   send; failures show an inline error and never silently
+   pass. Mirrors the distributor form pattern in products.js.
    ========================================================= */
 
 'use strict';
 
-emailjs.init(window.SITE_CONFIG.EMAILJS.PUBLIC_KEY);
-
+if (window.emailjs && window.SITE_CONFIG && window.SITE_CONFIG.EMAILJS) {
+  emailjs.init(window.SITE_CONFIG.EMAILJS.PUBLIC_KEY);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
 
   const form = document.getElementById('contactForm');
   if (!form) return;
 
+  const cfg = window.SITE_CONFIG || {};
   const successBox = document.getElementById('formSuccess');
+  const errorBox = document.getElementById('formError');
   const submitBtn = form.querySelector('.form-submit');
+  let isSubmitting = false;
 
   const fields = {
     fullName: {
@@ -71,6 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
+    if (isSubmitting) return; // Prevent duplicate submissions (double-click / double-tap)
+
     if (!validateForm()) {
       const firstInvalid = form.querySelector('.field-error.show');
       if (firstInvalid) {
@@ -80,19 +85,24 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    if (!window.emailjs || !cfg.EMAILJS) {
+      if (errorBox) {
+        errorBox.classList.add('show');
+        errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
+    isSubmitting = true;
     const originalText = submitBtn.innerHTML;
     submitBtn.disabled = true;
     submitBtn.textContent = 'Sending...';
-
-    
-      // EmailJS integration point (currently disabled).
-      // Once config.js EMAILJS values are filled in and the
-      // EmailJS SDK script tag is added to contact.html, this
-       //block can be uncommented to send the form.
+    if (successBox) successBox.classList.remove('show');
+    if (errorBox) errorBox.classList.remove('show');
 
     emailjs.send(
-      window.SITE_CONFIG.EMAILJS.SERVICE_ID,
-      window.SITE_CONFIG.EMAILJS.TEMPLATE_ID,
+      cfg.EMAILJS.SERVICE_ID,
+      cfg.EMAILJS.TEMPLATE_ID,
       {
         full_name: fields.fullName.el.value,
         mobile_number: fields.mobileNumber.el.value,
@@ -101,26 +111,26 @@ document.addEventListener('DOMContentLoaded', () => {
         product_interested: document.getElementById('productInterested').value,
         message: document.getElementById('message').value
       },
-      window.SITE_CONFIG.EMAILJS.PUBLIC_KEY
+      cfg.EMAILJS.PUBLIC_KEY
     ).then(() => {
-      // success UI (see below)
-    }).catch(() => {
-      // error UI
-    });
-
-   
-
-    // Front-end only demo behaviour until EmailJS is wired up.
-    setTimeout(() => {
+      // Only shown when EmailJS actually confirms the send.
       successBox.classList.add('show');
       form.reset();
       Object.values(fields).forEach(field => {
         if (field.el) field.el.removeAttribute('data-touched');
       });
+      successBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }).catch(() => {
+      // EmailJS failed — show the error state, never the success state.
+      if (errorBox) {
+        errorBox.classList.add('show');
+        errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }).finally(() => {
+      isSubmitting = false;
       submitBtn.disabled = false;
       submitBtn.innerHTML = originalText;
-      successBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 900);
+    });
   });
 
 });

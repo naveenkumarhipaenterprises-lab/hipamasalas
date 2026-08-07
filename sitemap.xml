@@ -18,4 +18,17 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://www.hipamasalas.com/blog.html</loc>
+    <lastmod>2026-08-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- Individual blog-details.html?slug=... article URLs are not listed
+       here because this sitemap.xml is static and the articles live in
+       WordPress. Once WordPress is connected, either (a) let the WordPress
+       site's own /wp-sitemap.xml cover the articles and reference it
+       separately in Search Console, or (b) generate additional <url>
+       entries here for each published slug as part of your publish
+       workflow. See WORDPRESS-SETUP.md. -->
 </urlset>
