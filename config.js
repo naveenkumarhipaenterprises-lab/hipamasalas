@@ -49,19 +49,19 @@ window.SITE_CONFIG = {
     PUBLIC_KEY: "_h2SZ5lHGo7fotRew"
   },
 
-  /* ---------- WordPress Blog CMS ----------
-     Only the Blog section reads this. WordPress is used purely as a
-     headless CMS for blog content via its public REST API — no admin
-     credentials are ever used here.
+  /* ---------- Google Sheets Blog CMS ----------
+     The blog system reads from a Google Sheet via two secure Vercel
+     serverless functions:
 
-     REPLACE_WITH_REAL_VALUE: put your real WordPress site's REST API
-     base URL here once WordPress is installed, e.g.
-       "https://blog.hipamasalas.com/wp-json/wp/v2"
-     or
-       "https://your-wp-host.com/wp-json/wp/v2"
+       GET /api/blogs              → blog listing   (blog.js)
+       GET /api/blog?slug=...      → single post     (blog-details.js)
 
-     Do NOT put a WordPress admin username/password/API secret here —
-     only the public REST API base URL. */
-  WORDPRESS_API_URL: "REPLACE_WITH_REAL_VALUE"
+     The Google Sheets API key is stored ONLY in Vercel Environment
+     Variables (GOOGLE_SHEETS_API_KEY + GOOGLE_SHEET_ID).
+     It is NEVER placed here or in any client-side file.
+
+     This value ("/api") is the base URL for both functions and
+     should not need to change after initial deployment. */
+  SHEETS_API_URL: "/api"
 
 };
