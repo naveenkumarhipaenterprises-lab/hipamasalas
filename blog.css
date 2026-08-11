@@ -68,7 +68,7 @@
   background:linear-gradient(180deg, var(--cream-2), #fff);
   overflow:hidden; position:relative;
 }
-.blog-card-media img{ width:100%; height:100%; object-fit:cover; transition:transform .4s ease; }
+.blog-card-media img{ width:100%; height:100%; object-fit:contain; object-position:center; transition:transform .4s ease; }
 .blog-card:hover .blog-card-media img{ transform:scale(1.06); }
 /* Applied by blog.js / blog-details.js when a Google Drive cover image fails
    to load (e.g. sharing permission not set to "Anyone with the link") — shows
