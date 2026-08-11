@@ -1,0 +1,12 @@
+{
+  "functions": {
+    "api/blogs.js": {
+      "memory": 128,
+      "maxDuration": 10
+    },
+    "api/blog.js": {
+      "memory": 128,
+      "maxDuration": 10
+    }
+  }
+}

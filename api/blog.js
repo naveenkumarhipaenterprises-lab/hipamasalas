@@ -1,21 +1,36 @@
 /* =========================================================
    HIPA MASALA — /api/blog  (Vercel Serverless Function)
    ---------------------------------------------------------
-   Returns a single published blog post by ?slug=  plus up
+   Returns a single published blog post by ?slug= plus up
    to 3 related posts from the same category.
 
    ENVIRONMENT VARIABLES required in Vercel:
      GOOGLE_SHEETS_API_KEY  — your Google Cloud API key
      GOOGLE_SHEET_ID        — the ID from your Sheet URL
 
-   The API key NEVER reaches client-side code.
+   Supports columns:
+     Published | Title | Slug | Category | Author | Banner Image | Alt Text | Google Doc Link / Content | Meta Description | Focus Keywords | Keywords
    ========================================================= */
 
 'use strict';
 
 const SHEET_NAME = 'Blogs';
 
-/* ---------- Shared helpers (same as blogs.js) ---------- */
+/* ---------- Convert Google Drive view links to direct image URLs ---------- */
+function convertGoogleDriveUrl(url) {
+  if (!url) return '';
+  const str = String(url).trim();
+  if (!str) return '';
+  if (str.includes('lh3.googleusercontent.com')) return str;
+
+  const match = str.match(/\/d\/([a-zA-Z0-9_-]+)/) || str.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (match && match[1] && (str.includes('drive.google.com') || str.includes('docs.google.com'))) {
+    return `https://lh3.googleusercontent.com/d/${match[1]}`;
+  }
+  return str;
+}
+
+/* ---------- Fetch raw rows from Google Sheets ---------- */
 async function fetchSheetRows() {
   const apiKey  = process.env.GOOGLE_SHEETS_API_KEY;
   const sheetId = process.env.GOOGLE_SHEET_ID;
@@ -24,7 +39,7 @@ async function fetchSheetRows() {
     throw new Error('Missing GOOGLE_SHEETS_API_KEY or GOOGLE_SHEET_ID env vars.');
   }
 
-  const range = encodeURIComponent(`${SHEET_NAME}!A:M`);
+  const range = encodeURIComponent(`${SHEET_NAME}!A:Z`);
   const url   = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
 
   const res = await fetch(url);
@@ -45,32 +60,72 @@ async function fetchSheetRows() {
   });
 }
 
-function sanitiseHtml(html) {
-  if (!html) return '';
-  return html
+/* ---------- Format content (HTML or plain text fallback) ---------- */
+function formatContent(raw) {
+  if (!raw) return '';
+  let text = String(raw).trim();
+  if (!text) return '';
+
+  // If user pasted a Google Doc URL directly
+  if (/^https?:\/\/docs\.google\.com\/document\/d\//i.test(text)) {
+    return `<p>Read full document on Google Docs: <a href="${text}" target="_blank" rel="noopener noreferrer">${text}</a></p>`;
+  }
+
+  // Strip dangerous tags/scripts
+  text = text
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
     .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
     .replace(/<embed\b[^>]*\/?>/gi, '')
     .replace(/\s+on\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)/gi, '')
     .replace(/href\s*=\s*(?:"javascript:[^"]*"|'javascript:[^']*')/gi, 'href="#"')
     .replace(/src\s*=\s*(?:"javascript:[^"]*"|'javascript:[^']*')/gi, '');
+
+  // If plain text (no HTML tags present), wrap double-newlines in <p> tags
+  if (!/<[a-z][\s\S]*>/i.test(text)) {
+    const paragraphs = text.split(/\r?\n\r?\n/).map(p => p.trim()).filter(Boolean);
+    return paragraphs.map(p => `<p>${p.replace(/\r?\n/g, '<br>')}</p>`).join('');
+  }
+
+  return text;
 }
 
-function transform(row) {
+/* ---------- Check published status ---------- */
+function isPublishedRow(r) {
+  const pub = (r.published || r.status || '').trim().toLowerCase();
+  return pub === 'true' || pub === 'published' || pub === '1' || pub === 'yes';
+}
+
+/* ---------- Transform a raw sheet row → clean post object ---------- */
+function transform(row, index) {
+  const title       = row['title'] || '';
+  const slug        = row['slug'] || '';
+  const category    = row['category'] || '';
+  const author      = row['author'] || 'HIPA Masala Team';
+  const rawImage    = row['banner image'] || row['banner_image'] || row['featured_image'] || row['image'] || '';
+  const bannerImage = convertGoogleDriveUrl(rawImage);
+  const altText     = row['alt text'] || row['alt_text'] || title;
+  const metaDesc    = row['meta description'] || row['meta_description'] || row['excerpt'] || '';
+  const excerpt     = row['excerpt'] || metaDesc;
+  const rawContent  = row['content'] || row['google doc link'] || row['google_doc_link'] || row['google doc id'] || row['sample text id'] || metaDesc;
+  const content     = formatContent(rawContent);
+  const keywords    = row['focus keywords'] || row['focus_keywords'] || row['keywords'] || '';
+  const metaTitle   = row['meta title'] || row['meta_title'] || title;
+  const publishDate = row['publish_date'] || row['publish date'] || row['date'] || new Date().toISOString().split('T')[0];
+
   return {
-    id:               row.id               || '',
-    title:            row.title            || '',
-    slug:             row.slug             || '',
-    excerpt:          row.excerpt          || '',
-    content:          sanitiseHtml(row.content || ''),
-    featured_image:   row.featured_image   || '',
-    category:         row.category         || '',
-    author:           row.author           || 'HIPA Masala Team',
-    publish_date:     row.publish_date     || '',
-    meta_title:       row.meta_title       || row.title || '',
-    meta_description: row.meta_description || row.excerpt || '',
-    keywords:         row.keywords         || ''
+    id:               row['id'] || String(index + 1),
+    title:            title,
+    slug:             slug,
+    excerpt:          excerpt,
+    content:          content,
+    featured_image:   bannerImage,
+    alt_text:         altText,
+    category:         category,
+    author:           author,
+    publish_date:     publishDate,
+    meta_title:       metaTitle,
+    meta_description: metaDesc,
+    keywords:         keywords
   };
 }
 
@@ -90,38 +145,41 @@ module.exports = async function handler(req, res) {
     const allRows = await fetchSheetRows();
 
     /* Only published rows, must have title + slug */
-    const published = allRows.filter(r =>
-      r.status && r.status.trim().toLowerCase() === 'published' &&
-      r.title  && r.title.trim()  !== '' &&
-      r.slug   && r.slug.trim()   !== ''
-    );
+    const published = allRows
+      .map((r, i) => ({ row: r, idx: i }))
+      .filter(({ row }) =>
+        isPublishedRow(row) &&
+        row.title && row.title.trim() !== '' &&
+        row.slug  && row.slug.trim()  !== ''
+      );
 
-    const postRow = published.find(r => r.slug.trim().toLowerCase() === slug);
-    if (!postRow) {
+    const matchItem = published.find(({ row }) => row.slug.trim().toLowerCase() === slug);
+    if (!matchItem) {
       return res.status(404).json({ error: 'Post not found.' });
     }
 
-    const post = transform(postRow);
+    const post = transform(matchItem.row, matchItem.idx);
 
-    /* Related posts: same category, not the current slug, newest-first, max 3 */
+    /* Related posts: same category, not current slug, max 3 */
     const related = published
-      .filter(r =>
-        r.slug.trim().toLowerCase() !== slug &&
-        r.category &&
-        r.category.trim().toLowerCase() === (postRow.category || '').trim().toLowerCase()
+      .filter(({ row }) =>
+        row.slug.trim().toLowerCase() !== slug &&
+        row.category &&
+        row.category.trim().toLowerCase() === (matchItem.row.category || '').trim().toLowerCase()
       )
       .sort((a, b) => {
-        const da = a.publish_date ? new Date(a.publish_date) : null;
-        const db = b.publish_date ? new Date(b.publish_date) : null;
-        if (!da && !db) return 0;
-        if (!da) return 1;
-        if (!db) return -1;
-        return db - da;
+        const dateA = a.row.publish_date || a.row['publish date'] || a.row.date;
+        const dateB = b.row.publish_date || b.row['publish date'] || b.row.date;
+        const da = dateA && !isNaN(new Date(dateA)) ? new Date(dateA) : null;
+        const db = dateB && !isNaN(new Date(dateB)) ? new Date(dateB) : null;
+        if (da && db) return db - da;
+        if (da) return -1;
+        if (db) return 1;
+        return b.idx - a.idx;
       })
       .slice(0, 3)
-      .map(transform);
+      .map(({ row, idx }) => transform(row, idx));
 
-    /* Cache for 10 minutes at the CDN edge, serve stale for 20 while revalidating */
     res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=1200');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
