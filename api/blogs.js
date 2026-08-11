@@ -85,10 +85,10 @@ function transform(row, index) {
   const slug        = row['slug'] || '';
   const category    = row['category'] || '';
   const author      = row['author'] || 'HIPA Masala Team';
-  const rawImage    = row['banner image'] || row['banner_image'] || row['featured_image'] || row['image'] || '';
+  const rawImage    = row['banner image'] || row['banner_image'] || row['featured_image'] || row['cover image'] || row['cover_image'] || row['image'] || '';
   const bannerImage = convertGoogleDriveUrl(rawImage);
   const altText     = row['alt text'] || row['alt_text'] || title;
-  const metaDesc    = row['meta description'] || row['meta_description'] || '';
+  const metaDesc    = row['meta description'] || row['meta_description'] || row['description'] || '';
   const excerptVal  = row['excerpt'] || '';
   const excerpt     = cleanExcerpt(metaDesc, excerptVal, title);
   const keywords    = row['focus keywords'] || row['focus_keywords'] || row['keywords'] || '';

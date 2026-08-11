@@ -158,10 +158,10 @@ async function transform(row, index, fetchFullContent = true) {
   const slug        = row['slug'] || '';
   const category    = row['category'] || '';
   const author      = row['author'] || 'HIPA Masala Team';
-  const rawImage    = row['banner image'] || row['banner_image'] || row['featured_image'] || row['image'] || '';
+  const rawImage    = row['banner image'] || row['banner_image'] || row['featured_image'] || row['cover image'] || row['cover_image'] || row['image'] || '';
   const bannerImage = convertGoogleDriveUrl(rawImage);
   const altText     = row['alt text'] || row['alt_text'] || title;
-  const metaDesc    = row['meta description'] || row['meta_description'] || row['excerpt'] || '';
+  const metaDesc    = row['meta description'] || row['meta_description'] || row['description'] || row['excerpt'] || '';
   const excerpt     = row['excerpt'] || metaDesc;
   const rawContent  = row['content'] || row['google doc link'] || row['google_doc_link'] || row['google doc id'] || row['sample text id'] || metaDesc;
 
