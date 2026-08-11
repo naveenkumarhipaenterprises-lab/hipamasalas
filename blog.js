@@ -61,6 +61,63 @@ document.addEventListener('DOMContentLoaded', () => {
   const escapeAttr = (str) =>
     String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
+  /* ---------- Google Drive / Docs link helpers ---------- *
+   * The /api/blogs endpoint already converts Banner Image links to direct
+   * lh3.googleusercontent.com URLs server-side. These client-side helpers are
+   * a safety net so cover images still work even if a raw Drive/Docs share
+   * link ever reaches the browser untouched (manual data overrides, a future
+   * direct-Sheets integration, etc.), and so a broken share permission
+   * doesn't leave a dead <img> on the card. */
+  const extractDriveFileId = (url) => {
+    const str = String(url || '').trim();
+    if (!str) return null;
+    const patterns = [
+      /\/d\/([a-zA-Z0-9_-]{15,})/,     // drive.google.com/file/d/FILE_ID/view, docs.google.com/document/d/FILE_ID/...
+      /[?&]id=([a-zA-Z0-9_-]{15,})/    // drive.google.com/open?id=FILE_ID, uc?id=FILE_ID
+    ];
+    for (const re of patterns) {
+      const m = str.match(re);
+      if (m && m[1]) return m[1];
+    }
+    return null;
+  };
+
+  const isGoogleDocLink = (url) => /docs\.google\.com\/document\//i.test(String(url || ''));
+
+  /* Converts a standard Google Drive "share" link into a directly-loadable
+     image URL (https://lh3.googleusercontent.com/d/FILE_ID), instead of the
+     Drive preview page the raw share link would otherwise load. Leaves
+     non-Drive URLs (e.g. already-hosted images) untouched. */
+  const toDriveImageUrl = (url) => {
+    const str = String(url || '').trim();
+    if (!str) return '';
+    if (!/drive\.google\.com|docs\.google\.com/i.test(str)) return str;
+    if (str.includes('lh3.googleusercontent.com')) return str;
+    if (isGoogleDocLink(str)) return str; // a Doc link, not an image — leave as-is
+    const id = extractDriveFileId(str);
+    return id ? `https://lh3.googleusercontent.com/d/${id}` : str;
+  };
+
+  /* If the lh3 URL 404s (e.g. sharing permission not set to "Anyone with the
+     link"), fall back once to Drive's thumbnail endpoint before giving up
+     and hiding the broken image rather than showing a broken-image icon. */
+  const attachDriveImageFallback = (img, originalUrl) => {
+    const id = extractDriveFileId(originalUrl);
+    if (!id) return;
+    let stage = 0;
+    img.addEventListener('error', function onError() {
+      stage += 1;
+      if (stage === 1) {
+        img.src = `https://drive.google.com/thumbnail?id=${id}&sz=w1000`;
+      } else {
+        img.removeEventListener('error', onError);
+        const wrap = img.closest('.blog-card-media');
+        if (wrap) wrap.classList.add('blog-img-fallback');
+        img.remove();
+      }
+    });
+  };
+
   const formatDate = (dateStr) => {
     try {
       if (!dateStr) return '';
@@ -114,11 +171,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- Build a single blog card ---------- */
   const buildCard = (post) => {
-    const category = post.category  || '';
-    const image    = post.featured_image || '';
-    const excerpt  = (post.excerpt  || '').slice(0, 130);
-    const title    = post.title     || '';
-    const slug     = post.slug      || '';
+    const category  = post.category  || '';
+    const rawImage  = post.featured_image || '';
+    const image     = toDriveImageUrl(rawImage);
+    const excerpt   = (post.excerpt  || '').slice(0, 130);
+    const title     = post.title     || '';
+    const slug      = post.slug      || '';
 
     const card = document.createElement('article');
     card.className = 'blog-card reveal in-view';
@@ -150,6 +208,11 @@ document.addEventListener('DOMContentLoaded', () => {
         pushEvent('blog_article_click', { article_title: title, article_slug: slug });
       });
     });
+
+    if (image) {
+      const imgEl = card.querySelector('.blog-card-media img');
+      if (imgEl) attachDriveImageFallback(imgEl, rawImage);
+    }
 
     return card;
   };

@@ -51,6 +51,89 @@ document.addEventListener('DOMContentLoaded', () => {
   const escapeAttr = (str) =>
     String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
+  /* ---------- Google Drive / Docs link helpers ---------- *
+   * The /api/blog endpoint already converts Banner Image links to direct
+   * lh3.googleusercontent.com URLs, and already resolves Google Doc links
+   * into rendered HTML/iframe content, server-side. These client-side
+   * helpers are a safety net: they keep the hero image and any related-post
+   * thumbnails working even if a raw Drive/Docs share link ever reaches the
+   * browser untouched, and make sure article content never shows a bare,
+   * unclickable-looking Google Doc URL instead of the document itself. */
+  const extractDriveFileId = (url) => {
+    const str = String(url || '').trim();
+    if (!str) return null;
+    const patterns = [
+      /\/d\/([a-zA-Z0-9_-]{15,})/,     // drive.google.com/file/d/FILE_ID/view, docs.google.com/document/d/FILE_ID/...
+      /[?&]id=([a-zA-Z0-9_-]{15,})/    // drive.google.com/open?id=FILE_ID, uc?id=FILE_ID
+    ];
+    for (const re of patterns) {
+      const m = str.match(re);
+      if (m && m[1]) return m[1];
+    }
+    return null;
+  };
+
+  const isGoogleDocLink = (url) => /docs\.google\.com\/document\//i.test(String(url || ''));
+
+  /* Converts a standard Google Drive "share" link into a directly-loadable
+     image URL (https://lh3.googleusercontent.com/d/FILE_ID), instead of the
+     Drive preview page the raw share link would otherwise load. Leaves
+     non-Drive URLs (e.g. already-hosted images) untouched. */
+  const toDriveImageUrl = (url) => {
+    const str = String(url || '').trim();
+    if (!str) return '';
+    if (!/drive\.google\.com|docs\.google\.com/i.test(str)) return str;
+    if (str.includes('lh3.googleusercontent.com')) return str;
+    if (isGoogleDocLink(str)) return str; // a Doc link, not an image — leave as-is
+    const id = extractDriveFileId(str);
+    return id ? `https://lh3.googleusercontent.com/d/${id}` : str;
+  };
+
+  /* If the lh3 URL 404s (e.g. sharing permission not set to "Anyone with the
+     link"), fall back once to Drive's thumbnail endpoint before giving up
+     and hiding the broken image rather than showing a broken-image icon. */
+  const attachDriveImageFallback = (img, originalUrl, wrapSelector) => {
+    const id = extractDriveFileId(originalUrl);
+    if (!id) return;
+    let stage = 0;
+    img.addEventListener('error', function onError() {
+      stage += 1;
+      if (stage === 1) {
+        img.src = `https://drive.google.com/thumbnail?id=${id}&sz=w1000`;
+      } else {
+        img.removeEventListener('error', onError);
+        const wrap = wrapSelector ? img.closest(wrapSelector) : null;
+        if (wrap) wrap.classList.add('blog-img-fallback');
+        img.remove();
+      }
+    });
+  };
+
+  /* Rewrites any <img src="..."> inside already-rendered article HTML that
+     still points at a raw Drive share link, so inline images pasted into the
+     sheet/doc also load correctly. */
+  const fixDriveImagesInHtml = (html) => {
+    if (!html) return html;
+    return html.replace(/<img([^>]*?)src=(["'])(.*?)\2([^>]*)>/gi, (match, pre, quote, src, post) => {
+      const fixedSrc = toDriveImageUrl(src);
+      return `<img${pre}src=${quote}${fixedSrc}${quote}${post}>`;
+    });
+  };
+
+  /* If the content field itself is nothing but a bare Google Doc link (the
+     API normally resolves this server-side, but this covers the field ever
+     arriving unresolved), embed the document instead of showing a raw URL. */
+  const normaliseArticleContent = (html) => {
+    const trimmed = String(html || '').trim();
+    const bareDocMatch = trimmed.match(/^https?:\/\/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/i);
+    if (bareDocMatch) {
+      return `<div class="blog-doc-embed" style="width:100%;margin:20px 0;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);background:#fff;">
+        <iframe src="https://docs.google.com/document/d/${bareDocMatch[1]}/preview" style="width:100%;height:850px;border:none;display:block;" loading="lazy" title="Article content"></iframe>
+      </div>`;
+    }
+    return fixDriveImagesInHtml(trimmed);
+  };
+
   const stripHtml = (html) => {
     const tmp = document.createElement('div');
     tmp.innerHTML = html || '';
@@ -89,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const title       = post.meta_title       || post.title   || '';
     const description = (post.meta_description || post.excerpt || '').slice(0, 160);
     const canonicalUrl = 'https://www.hipamasalas.com/blog-details.html?slug=' + encodeURIComponent(post.slug);
-    const image       = post.featured_image   || 'https://www.hipamasalas.com/og-image.png';
+    const image       = toDriveImageUrl(post.featured_image) || 'https://www.hipamasalas.com/og-image.png';
 
     document.title = `${title} | HIPA Traditional Masala Blog`;
     setMeta('meta[name="description"]',        'content', description);
@@ -177,9 +260,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     relatedGrid.innerHTML = '';
     relatedPosts.forEach(p => {
-      const excerpt = (p.excerpt || '').slice(0, 110);
-      const pTitle  = p.title   || '';
-      const pImage  = p.featured_image || '';
+      const excerpt   = (p.excerpt || '').slice(0, 110);
+      const pTitle    = p.title   || '';
+      const rawImage  = p.featured_image || '';
+      const pImage    = toDriveImageUrl(rawImage);
 
       const card = document.createElement('article');
       card.className = 'blog-card reveal in-view';
@@ -194,15 +278,22 @@ document.addEventListener('DOMContentLoaded', () => {
           <p class="blog-card-excerpt">${escapeHtml(excerpt)}${excerpt.length >= 110 ? '…' : ''}</p>
         </div>
       `;
+
+      if (pImage) {
+        const imgEl = card.querySelector('.blog-card-media img');
+        if (imgEl) attachDriveImageFallback(imgEl, rawImage, '.blog-card-media');
+      }
+
       relatedGrid.appendChild(card);
     });
   };
 
   /* ---------- Render the article ---------- */
   const renderArticle = (post, related) => {
-    const title    = post.title          || '';
-    const category = post.category       || '';
-    const image    = post.featured_image || '';
+    const title      = post.title          || '';
+    const category   = post.category       || '';
+    const rawImage   = post.featured_image || '';
+    const image      = toDriveImageUrl(rawImage);
 
     if (titleEl)    titleEl.textContent    = title;
     if (categoryEl) categoryEl.textContent = category || 'Uncategorised';
@@ -216,11 +307,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (readTimeEl) readTimeEl.textContent = estimateReadTime(post.content || '');
 
     /* Content is HTML that has already been sanitised by the server.
-       This is intentional — blog articles contain formatted HTML. */
-    if (contentEl) contentEl.innerHTML = post.content || '';
+       This is intentional — blog articles contain formatted HTML.
+       normaliseArticleContent() is a client-side safety net on top of that:
+       it embeds a bare Google Doc link instead of showing raw URL text, and
+       fixes any inline <img> tags still pointing at a raw Drive share link. */
+    if (contentEl) contentEl.innerHTML = normaliseArticleContent(post.content || '');
 
     if (heroMedia && image) {
       heroMedia.innerHTML = `<img src="${escapeAttr(image)}" alt="${escapeAttr(title)}" loading="lazy">`;
+      const heroImg = heroMedia.querySelector('img');
+      if (heroImg) attachDriveImageFallback(heroImg, rawImage, '.blog-details-hero-media');
     } else if (heroMedia && !image) {
       /* Keep the existing placeholder SVG intact by doing nothing here */
     }
