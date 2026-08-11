@@ -64,33 +64,13 @@ async function fetchSheetRows() {
   });
 }
 
-/* ---------- Format content (HTML or plain text fallback) ---------- */
-function formatContent(raw) {
-  if (!raw) return '';
-  let text = String(raw).trim();
-  if (!text) return '';
-
-  // If user pasted a Google Doc URL directly
-  if (/^https?:\/\/docs\.google\.com\/document\/d\//i.test(text)) {
-    return `<p>Read full document on Google Docs: <a href="${text}" target="_blank" rel="noopener noreferrer">${text}</a></p>`;
+/* ---------- Format excerpt (ensures raw Google Doc link is never displayed as text) ---------- */
+function cleanExcerpt(metaDesc, excerptVal, titleVal) {
+  let val = excerptVal || metaDesc || titleVal || '';
+  if (val.includes('docs.google.com') || val.includes('drive.google.com')) {
+    val = metaDesc || titleVal || '';
   }
-
-  // Strip dangerous tags/scripts
-  text = text
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
-    .replace(/<embed\b[^>]*\/?>/gi, '')
-    .replace(/\s+on\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)/gi, '')
-    .replace(/href\s*=\s*(?:"javascript:[^"]*"|'javascript:[^']*')/gi, 'href="#"')
-    .replace(/src\s*=\s*(?:"javascript:[^"]*"|'javascript:[^']*')/gi, '');
-
-  // If plain text (no HTML tags present), wrap double-newlines in <p> tags
-  if (!/<[a-z][\s\S]*>/i.test(text)) {
-    const paragraphs = text.split(/\r?\n\r?\n/).map(p => p.trim()).filter(Boolean);
-    return paragraphs.map(p => `<p>${p.replace(/\r?\n/g, '<br>')}</p>`).join('');
-  }
-
-  return text;
+  return val;
 }
 
 /* ---------- Check published status ---------- */
@@ -108,10 +88,9 @@ function transform(row, index) {
   const rawImage    = row['banner image'] || row['banner_image'] || row['featured_image'] || row['image'] || '';
   const bannerImage = convertGoogleDriveUrl(rawImage);
   const altText     = row['alt text'] || row['alt_text'] || title;
-  const metaDesc    = row['meta description'] || row['meta_description'] || row['excerpt'] || '';
-  const excerpt     = row['excerpt'] || metaDesc;
-  const rawContent  = row['content'] || row['google doc link'] || row['google_doc_link'] || row['google doc id'] || row['sample text id'] || metaDesc;
-  const content     = formatContent(rawContent);
+  const metaDesc    = row['meta description'] || row['meta_description'] || '';
+  const excerptVal  = row['excerpt'] || '';
+  const excerpt     = cleanExcerpt(metaDesc, excerptVal, title);
   const keywords    = row['focus keywords'] || row['focus_keywords'] || row['keywords'] || '';
   const metaTitle   = row['meta title'] || row['meta_title'] || title;
   const publishDate = row['publish_date'] || row['publish date'] || row['date'] || new Date().toISOString().split('T')[0];
@@ -121,14 +100,13 @@ function transform(row, index) {
     title:            title,
     slug:             slug,
     excerpt:          excerpt,
-    content:          content,
     featured_image:   bannerImage,
     alt_text:         altText,
     category:         category,
     author:           author,
     publish_date:     publishDate,
     meta_title:       metaTitle,
-    meta_description: metaDesc,
+    meta_description: metaDesc || excerpt,
     keywords:         keywords
   };
 }
@@ -154,7 +132,7 @@ module.exports = async function handler(req, res) {
         row.title && row.title.trim() !== '' &&
         row.slug  && row.slug.trim()  !== ''
       )
-      /* Sort: newest date first, or highest sheet row index first */
+      /* Sort newest-first */
       .sort((a, b) => {
         const dateA = a.row.publish_date || a.row['publish date'] || a.row.date;
         const dateB = b.row.publish_date || b.row['publish date'] || b.row.date;

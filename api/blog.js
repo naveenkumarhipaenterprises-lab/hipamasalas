@@ -3,6 +3,7 @@
    ---------------------------------------------------------
    Returns a single published blog post by ?slug= plus up
    to 3 related posts from the same category.
+   Renders full Google Doc content directly (NEVER just a text link).
 
    ENVIRONMENT VARIABLES required in Vercel:
      GOOGLE_SHEETS_API_KEY  — your Google Cloud API key
@@ -60,33 +61,89 @@ async function fetchSheetRows() {
   });
 }
 
-/* ---------- Format content (HTML or plain text fallback) ---------- */
-function formatContent(raw) {
-  if (!raw) return '';
-  let text = String(raw).trim();
-  if (!text) return '';
-
-  // If user pasted a Google Doc URL directly
-  if (/^https?:\/\/docs\.google\.com\/document\/d\//i.test(text)) {
-    return `<p>Read full document on Google Docs: <a href="${text}" target="_blank" rel="noopener noreferrer">${text}</a></p>`;
-  }
-
-  // Strip dangerous tags/scripts
-  text = text
+/* ---------- Strip dangerous tags / attributes from HTML ---------- */
+function sanitiseHtml(html) {
+  if (!html) return '';
+  return html
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
     .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
     .replace(/<embed\b[^>]*\/?>/gi, '')
     .replace(/\s+on\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)/gi, '')
     .replace(/href\s*=\s*(?:"javascript:[^"]*"|'javascript:[^']*')/gi, 'href="#"')
     .replace(/src\s*=\s*(?:"javascript:[^"]*"|'javascript:[^']*')/gi, '');
+}
 
-  // If plain text (no HTML tags present), wrap double-newlines in <p> tags
-  if (!/<[a-z][\s\S]*>/i.test(text)) {
-    const paragraphs = text.split(/\r?\n\r?\n/).map(p => p.trim()).filter(Boolean);
-    return paragraphs.map(p => `<p>${p.replace(/\r?\n/g, '<br>')}</p>`).join('');
+/* ---------- Format / Fetch Full Document Content (NEVER displays plain link) ---------- */
+async function resolveBlogContent(rawContent, metaDesc) {
+  let text = String(rawContent || '').trim();
+  if (!text) {
+    text = String(metaDesc || '').trim();
   }
 
-  return text;
+  // 1. If it's a Google Doc URL
+  const docMatch = text.match(/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/i);
+  if (docMatch && docMatch[1]) {
+    const docId = docMatch[1];
+    
+    // Attempt 1: Fetch raw exported HTML directly from Google Docs
+    try {
+      let htmlRes = await fetch(`https://docs.google.com/document/d/${docId}/pub`);
+      if (!htmlRes.ok) {
+        htmlRes = await fetch(`https://docs.google.com/document/d/${docId}/export?format=html`);
+      }
+      
+      if (htmlRes.ok) {
+        const rawHtml = await htmlRes.text();
+        const bodyMatch = rawHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+        if (bodyMatch && bodyMatch[1]) {
+          let bodyHtml = bodyMatch[1];
+          
+          // Remove Google Docs inline styles & classes so website theme styles apply
+          bodyHtml = bodyHtml
+            .replace(/style="[^"]*"/gi, '')
+            .replace(/class="[^"]*"/gi, '')
+            .replace(/id="[^"]*"/gi, '')
+            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+            .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+
+          // Responsive image styling
+          bodyHtml = bodyHtml.replace(/<img\s+([^>]+)>/gi, (m, attrs) => {
+            if (!attrs.includes('style=')) {
+              return `<img ${attrs} style="max-width:100%; height:auto; border-radius:8px; margin:16px 0;" />`;
+            }
+            return m;
+          });
+
+          const sanitised = sanitiseHtml(bodyHtml).trim();
+          if (sanitised.length > 30 && !sanitised.includes('accounts.google.com') && !sanitised.includes('Sign in')) {
+            return sanitised;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Google Doc HTML extraction fallback to viewer:', e.message);
+    }
+
+    // Attempt 2: Full Document Viewer Embed (Renders full document cleanly on the page, NO link text!)
+    return `
+      <div class="blog-doc-container" style="width:100%; margin:20px 0; border-radius:12px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.06); background:#fff;">
+        <iframe src="https://docs.google.com/document/d/${docId}/preview" style="width:100%; height:850px; border:none; display:block;" title="Full Blog Document" loading="lazy"></iframe>
+      </div>
+    `;
+  }
+
+  // 2. If direct HTML content was pasted into Column H
+  if (/<[a-z][\s\S]*>/i.test(text)) {
+    return sanitiseHtml(text);
+  }
+
+  // 3. If plain text was written into Column H, wrap paragraphs in <p> tags
+  const paragraphs = text.split(/\r?\n\r?\n/).map(p => p.trim()).filter(Boolean);
+  if (paragraphs.length > 0) {
+    return paragraphs.map(p => `<p>${sanitiseHtml(p).replace(/\r?\n/g, '<br>')}</p>`).join('');
+  }
+
+  return '<p>No content available for this article.</p>';
 }
 
 /* ---------- Check published status ---------- */
@@ -96,7 +153,7 @@ function isPublishedRow(r) {
 }
 
 /* ---------- Transform a raw sheet row → clean post object ---------- */
-function transform(row, index) {
+async function transform(row, index, fetchFullContent = true) {
   const title       = row['title'] || '';
   const slug        = row['slug'] || '';
   const category    = row['category'] || '';
@@ -107,7 +164,11 @@ function transform(row, index) {
   const metaDesc    = row['meta description'] || row['meta_description'] || row['excerpt'] || '';
   const excerpt     = row['excerpt'] || metaDesc;
   const rawContent  = row['content'] || row['google doc link'] || row['google_doc_link'] || row['google doc id'] || row['sample text id'] || metaDesc;
-  const content     = formatContent(rawContent);
+
+  const content = fetchFullContent
+    ? await resolveBlogContent(rawContent, metaDesc)
+    : (typeof rawContent === 'string' && rawContent.includes('docs.google.com') ? metaDesc : sanitiseHtml(rawContent));
+
   const keywords    = row['focus keywords'] || row['focus_keywords'] || row['keywords'] || '';
   const metaTitle   = row['meta title'] || row['meta_title'] || title;
   const publishDate = row['publish_date'] || row['publish date'] || row['date'] || new Date().toISOString().split('T')[0];
@@ -158,10 +219,10 @@ module.exports = async function handler(req, res) {
       return res.status(404).json({ error: 'Post not found.' });
     }
 
-    const post = transform(matchItem.row, matchItem.idx);
+    const post = await transform(matchItem.row, matchItem.idx, true);
 
     /* Related posts: same category, not current slug, max 3 */
-    const related = published
+    const relatedItems = published
       .filter(({ row }) =>
         row.slug.trim().toLowerCase() !== slug &&
         row.category &&
@@ -177,8 +238,9 @@ module.exports = async function handler(req, res) {
         if (db) return 1;
         return b.idx - a.idx;
       })
-      .slice(0, 3)
-      .map(({ row, idx }) => transform(row, idx));
+      .slice(0, 3);
+
+    const related = await Promise.all(relatedItems.map(({ row, idx }) => transform(row, idx, false)));
 
     res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=1200');
     res.setHeader('Access-Control-Allow-Origin', '*');
