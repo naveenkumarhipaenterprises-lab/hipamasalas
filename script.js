@@ -176,6 +176,73 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  /* ---------- Hero product slider ---------- */
+  const heroSlider = document.getElementById('heroProductSlider');
+  if (heroSlider) {
+    // Sambar Powder must stay index 0 (default/first slide).
+    const heroProducts = [
+      { name: 'Sambar Powder',     image: 'images/products/Sambar-masala-powder.png', alt: 'HIPA Sambar Powder pack' },
+      { name: 'Rasam Powder',      image: 'images/products/Rasam-masala.png',          alt: 'HIPA Rasam Powder pack' },
+      { name: 'Garam Masala',      image: 'images/products/Garam-Masala.png',          alt: 'HIPA Garam Masala pack' },
+      { name: 'Coriander Powder',  image: 'images/products/Corainder-powder.png',      alt: 'HIPA Coriander Powder pack' },
+      { name: 'Pepper Powder',     image: 'images/products/pepper-powderr.png',        alt: 'HIPA Pepper Powder pack' },
+      { name: 'Red Chilli Powder', image: 'images/products/red-chilli-powder.png',     alt: 'HIPA Red Chilli Powder pack' },
+      { name: 'Turmeric Powder',   image: 'images/products/Turmeric-Powder.png',       alt: 'HIPA Turmeric Powder pack' },
+      { name: 'Cumin Powder',      image: 'images/products/Cumin-powder.png',          alt: 'HIPA Cumin Powder pack' }
+    ];
+
+    let currentHeroProduct = 0;
+    const slides = Array.from(heroSlider.querySelectorAll('.hero-pack'));
+    const dotsWrap = document.getElementById('heroDots');
+    const prevBtn = document.getElementById('heroPrev');
+    const nextBtn = document.getElementById('heroNext');
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Build subtle dot indicators to match heroProducts order
+    const dots = heroProducts.map((product, i) => {
+      if (!dotsWrap) return null;
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'hero-dot' + (i === 0 ? ' is-active' : '');
+      dot.setAttribute('aria-label', `Show ${product.name}`);
+      dot.addEventListener('click', () => { goToHeroSlide(i); restartHeroAuto(); });
+      dotsWrap.appendChild(dot);
+      return dot;
+    });
+
+    function goToHeroSlide(index) {
+      const next = (index + slides.length) % slides.length;
+      if (next === currentHeroProduct) return;
+      slides[currentHeroProduct].classList.remove('is-active');
+      if (dots[currentHeroProduct]) dots[currentHeroProduct].classList.remove('is-active');
+      currentHeroProduct = next;
+      slides[currentHeroProduct].classList.add('is-active');
+      if (dots[currentHeroProduct]) dots[currentHeroProduct].classList.add('is-active');
+    }
+
+    let heroAutoTimer = null;
+    function startHeroAuto() {
+      if (prefersReducedMotion) return; // respect reduced-motion preference
+      heroAutoTimer = setInterval(() => goToHeroSlide(currentHeroProduct + 1), 3500);
+    }
+    function stopHeroAuto() {
+      if (heroAutoTimer) clearInterval(heroAutoTimer);
+    }
+    function restartHeroAuto() {
+      stopHeroAuto();
+      startHeroAuto();
+    }
+
+    if (prevBtn) prevBtn.addEventListener('click', () => { goToHeroSlide(currentHeroProduct - 1); restartHeroAuto(); });
+    if (nextBtn) nextBtn.addEventListener('click', () => { goToHeroSlide(currentHeroProduct + 1); restartHeroAuto(); });
+
+    // Pause on hover/focus so shoppers can look without it changing under them
+    heroSlider.addEventListener('mouseenter', stopHeroAuto);
+    heroSlider.addEventListener('mouseleave', startHeroAuto);
+
+    startHeroAuto();
+  }
+
   /* ---------- Newsletter form (front-end only demo) ---------- */
   const form = document.getElementById('newsletterForm');
   if (form) {
