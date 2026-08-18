@@ -181,13 +181,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (heroCarouselTrack) {
     // 7 products only (Red Chilli Powder is EXCLUDED from hero carousel)
     const heroProducts = [
-      { id: 'sambar-powder',    name: 'Sambar Powder',    image: 'images/products/Sambar-masala-powder.png', alt: 'HIPA Sambar Powder' },
-      { id: 'rasam-powder',     name: 'Rasam Powder',     image: 'images/products/Rasam-masala.png',          alt: 'HIPA Rasam Powder' },
-      { id: 'turmeric-powder',  name: 'Turmeric Powder',  image: 'images/products/Turmeric-Powder.png',       alt: 'HIPA Turmeric Powder' },
-      { id: 'coriander-powder', name: 'Coriander Powder', image: 'images/products/Corainder-powder.png',      alt: 'HIPA Coriander Powder' },
-      { id: 'cumin-powder',     name: 'Cumin Powder',     image: 'images/products/Cumin-powder.png',          alt: 'HIPA Cumin Powder' },
-      { id: 'pepper-powder',    name: 'Pepper Powder',    image: 'images/products/pepper-powderr.png',        alt: 'HIPA Pepper Powder' },
-      { id: 'garam-masala',     name: 'Garam Masala',     image: 'images/products/Garam-Masala.png',          alt: 'HIPA Garam Masala' }
+      { id: 'sambar-powder',    name: 'Sambar Powder',    image: 'images/products/Sambar-masala-powder.png',  alt: 'HIPA Sambar Powder' },
+      { id: 'rasam-powder',     name: 'Rasam Powder',     image: 'images/products/Rasam-masala-h.png',        alt: 'HIPA Rasam Powder' },
+      { id: 'turmeric-powder',  name: 'Turmeric Powder',  image: 'images/products/Turmeric-Powder-h.png',     alt: 'HIPA Turmeric Powder' },
+      { id: 'coriander-powder', name: 'Coriander Powder', image: 'images/products/Corainder-powder-h.png',    alt: 'HIPA Coriander Powder' },
+      { id: 'cumin-powder',     name: 'Cumin Powder',     image: 'images/products/Cumin-powder-h.png',        alt: 'HIPA Cumin Powder' },
+      { id: 'pepper-powder',    name: 'Pepper Powder',    image: 'images/products/pepper-powderr-h.png',      alt: 'HIPA Pepper Powder' },
+      { id: 'garam-masala',     name: 'Garam Masala',     image: 'images/products/Garam-Masala-h.png',        alt: 'HIPA Garam Masala' }
     ];
 
     const totalItems = heroProducts.length; // 7
