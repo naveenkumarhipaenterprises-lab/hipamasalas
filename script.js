@@ -176,71 +176,160 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /* ---------- Hero product slider ---------- */
-  const heroSlider = document.getElementById('heroProductSlider');
-  if (heroSlider) {
-    // Sambar Powder must stay index 0 (default/first slide).
+  /* ---------- Hero 3-Product Horizontal Carousel (7 Products Only) ---------- */
+  const heroCarouselTrack = document.getElementById('heroCarouselTrack');
+  if (heroCarouselTrack) {
+    // 7 products only (Red Chilli Powder is EXCLUDED from hero carousel)
     const heroProducts = [
-      { name: 'Sambar Powder',     image: 'images/products/Sambar-masala-powder.png', alt: 'HIPA Sambar Powder pack' },
-      { name: 'Rasam Powder',      image: 'images/products/Rasam-masala.png',          alt: 'HIPA Rasam Powder pack' },
-      { name: 'Garam Masala',      image: 'images/products/Garam-Masala.png',          alt: 'HIPA Garam Masala pack' },
-      { name: 'Coriander Powder',  image: 'images/products/Corainder-powder.png',      alt: 'HIPA Coriander Powder pack' },
-      { name: 'Pepper Powder',     image: 'images/products/pepper-powderr.png',        alt: 'HIPA Pepper Powder pack' },
-      { name: 'Red Chilli Powder', image: 'images/products/red-chilli-powder.png',     alt: 'HIPA Red Chilli Powder pack' },
-      { name: 'Turmeric Powder',   image: 'images/products/Turmeric-Powder.png',       alt: 'HIPA Turmeric Powder pack' },
-      { name: 'Cumin Powder',      image: 'images/products/Cumin-powder.png',          alt: 'HIPA Cumin Powder pack' }
+      { id: 'sambar-powder',    name: 'Sambar Powder',    image: 'images/products/Sambar-masala-powder.png', alt: 'HIPA Sambar Powder' },
+      { id: 'rasam-powder',     name: 'Rasam Powder',     image: 'images/products/Rasam-masala.png',          alt: 'HIPA Rasam Powder' },
+      { id: 'turmeric-powder',  name: 'Turmeric Powder',  image: 'images/products/Turmeric-Powder.png',       alt: 'HIPA Turmeric Powder' },
+      { id: 'coriander-powder', name: 'Coriander Powder', image: 'images/products/Corainder-powder.png',      alt: 'HIPA Coriander Powder' },
+      { id: 'cumin-powder',     name: 'Cumin Powder',     image: 'images/products/Cumin-powder.png',          alt: 'HIPA Cumin Powder' },
+      { id: 'pepper-powder',    name: 'Pepper Powder',    image: 'images/products/pepper-powderr.png',        alt: 'HIPA Pepper Powder' },
+      { id: 'garam-masala',     name: 'Garam Masala',     image: 'images/products/Garam-Masala.png',          alt: 'HIPA Garam Masala' }
     ];
 
-    let currentHeroProduct = 0;
-    const slides = Array.from(heroSlider.querySelectorAll('.hero-pack'));
+    const totalItems = heroProducts.length; // 7
     const dotsWrap = document.getElementById('heroDots');
     const prevBtn = document.getElementById('heroPrev');
     const nextBtn = document.getElementById('heroNext');
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Build subtle dot indicators to match heroProducts order
+    // Render list with clones at the end for continuous infinite loop
+    const renderList = [
+      ...heroProducts,
+      heroProducts[0],
+      heroProducts[1],
+      heroProducts[2]
+    ];
+
+    heroCarouselTrack.innerHTML = renderList.map((item, idx) => `
+      <div class="hero-carousel-item" data-index="${idx % totalItems}">
+        <a href="products.html#${item.id}" class="hero-carousel-card">
+          <img class="hero-carousel-img" src="${item.image}" alt="${item.alt}">
+          <span class="hero-carousel-title">${item.name}</span>
+        </a>
+      </div>
+    `).join('');
+
+    let currentIndex = 0;
+    let isTransitioning = false;
+
+    // Build 7 dot indicators
     const dots = heroProducts.map((product, i) => {
       if (!dotsWrap) return null;
       const dot = document.createElement('button');
       dot.type = 'button';
       dot.className = 'hero-dot' + (i === 0 ? ' is-active' : '');
       dot.setAttribute('aria-label', `Show ${product.name}`);
-      dot.addEventListener('click', () => { goToHeroSlide(i); restartHeroAuto(); });
+      dot.addEventListener('click', () => {
+        if (isTransitioning) return;
+        goToSlide(i);
+        restartAuto();
+      });
       dotsWrap.appendChild(dot);
       return dot;
     });
 
-    function goToHeroSlide(index) {
-      const next = (index + slides.length) % slides.length;
-      if (next === currentHeroProduct) return;
-      slides[currentHeroProduct].classList.remove('is-active');
-      if (dots[currentHeroProduct]) dots[currentHeroProduct].classList.remove('is-active');
-      currentHeroProduct = next;
-      slides[currentHeroProduct].classList.add('is-active');
-      if (dots[currentHeroProduct]) dots[currentHeroProduct].classList.add('is-active');
+    function getItemsPerPage() {
+      if (window.innerWidth <= 560) return 1;
+      if (window.innerWidth <= 900) return 2;
+      return 3;
     }
 
-    let heroAutoTimer = null;
-    function startHeroAuto() {
-      if (prefersReducedMotion) return; // respect reduced-motion preference
-      heroAutoTimer = setInterval(() => goToHeroSlide(currentHeroProduct + 1), 3500);
-    }
-    function stopHeroAuto() {
-      if (heroAutoTimer) clearInterval(heroAutoTimer);
-    }
-    function restartHeroAuto() {
-      stopHeroAuto();
-      startHeroAuto();
+    function updateTrackPosition(animate = true) {
+      const itemsPerPage = getItemsPerPage();
+      const stepPercent = 100 / itemsPerPage;
+      if (animate) {
+        heroCarouselTrack.style.transition = 'transform 0.7s cubic-bezier(0.25, 1, 0.5, 1)';
+      } else {
+        heroCarouselTrack.style.transition = 'none';
+      }
+      heroCarouselTrack.style.transform = `translateX(-${currentIndex * stepPercent}%)`;
     }
 
-    if (prevBtn) prevBtn.addEventListener('click', () => { goToHeroSlide(currentHeroProduct - 1); restartHeroAuto(); });
-    if (nextBtn) nextBtn.addEventListener('click', () => { goToHeroSlide(currentHeroProduct + 1); restartHeroAuto(); });
+    function updateDots() {
+      const activeDotIndex = currentIndex % totalItems;
+      dots.forEach((dot, i) => {
+        if (dot) dot.classList.toggle('is-active', i === activeDotIndex);
+      });
+    }
 
-    // Pause on hover/focus so shoppers can look without it changing under them
-    heroSlider.addEventListener('mouseenter', stopHeroAuto);
-    heroSlider.addEventListener('mouseleave', startHeroAuto);
+    function goToNext() {
+      if (isTransitioning) return;
+      isTransitioning = true;
+      currentIndex++;
+      updateTrackPosition(true);
+      updateDots();
 
-    startHeroAuto();
+      if (currentIndex >= totalItems) {
+        setTimeout(() => {
+          currentIndex = 0;
+          updateTrackPosition(false);
+          updateDots();
+          isTransitioning = false;
+        }, 700);
+      } else {
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 700);
+      }
+    }
+
+    function goToPrev() {
+      if (isTransitioning) return;
+      isTransitioning = true;
+      if (currentIndex === 0) {
+        currentIndex = totalItems;
+        updateTrackPosition(false);
+        heroCarouselTrack.offsetHeight; // Force reflow
+        currentIndex = totalItems - 1;
+        updateTrackPosition(true);
+      } else {
+        currentIndex--;
+        updateTrackPosition(true);
+      }
+      updateDots();
+      setTimeout(() => {
+        isTransitioning = false;
+      }, 700);
+    }
+
+    function goToSlide(index) {
+      currentIndex = index % totalItems;
+      updateTrackPosition(true);
+      updateDots();
+    }
+
+    let autoTimer = null;
+    function startAuto() {
+      if (prefersReducedMotion) return;
+      autoTimer = setInterval(goToNext, 3500);
+    }
+    function stopAuto() {
+      if (autoTimer) clearInterval(autoTimer);
+    }
+    function restartAuto() {
+      stopAuto();
+      startAuto();
+    }
+
+    if (nextBtn) nextBtn.addEventListener('click', () => { goToNext(); restartAuto(); });
+    if (prevBtn) prevBtn.addEventListener('click', () => { goToPrev(); restartAuto(); });
+
+    const heroArtContainer = document.getElementById('heroCarouselContainer');
+    if (heroArtContainer) {
+      heroArtContainer.addEventListener('mouseenter', stopAuto);
+      heroArtContainer.addEventListener('mouseleave', startAuto);
+    }
+
+    window.addEventListener('resize', () => {
+      updateTrackPosition(false);
+    });
+
+    updateTrackPosition(false);
+    startAuto();
   }
 
   /* ---------- Newsletter form (front-end only demo) ---------- */
