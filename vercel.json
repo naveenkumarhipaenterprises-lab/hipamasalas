@@ -10,6 +10,7 @@
     "api/enquiries.js": { "memory": 128, "maxDuration": 10 }
   },
   "rewrites": [
+    { "source": "/blog/:slug*",                "destination": "/blog-details.html" },
     { "source": "/faq",                        "destination": "/faq.html" },
     { "source": "/admin",                      "destination": "/admin/index.html" },
     { "source": "/admin/",                     "destination": "/admin/index.html" },

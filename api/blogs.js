@@ -1,16 +1,7 @@
 /* =========================================================
-   HIPA MASALA — /api/blogs  (Vercel Serverless Function)
+   HIPA MASALA � /api/blogs (Vercel Serverless Function)
    ---------------------------------------------------------
-   Fetches ALL rows from the "Blogs" sheet in Google Sheets,
-   filters to Published === true/published, sorts newest-first,
-   paginates, and returns clean JSON to the frontend.
-
-   ENVIRONMENT VARIABLES required in Vercel:
-     GOOGLE_SHEETS_API_KEY  — your Google Cloud API key
-     GOOGLE_SHEET_ID        — the ID from your Sheet URL
-
-   Supports columns:
-     Published | Title | Slug | Category | Author | Banner Image | Alt Text | Google Doc Link / Content | Meta Description | Focus Keywords | Keywords
+   Fetches ALL published posts from the "Blogs" Google Sheet.
    ========================================================= */
 
 'use strict';
@@ -19,7 +10,13 @@ const SHEET_NAME  = 'Blogs';
 const DEFAULT_PER = 9;
 const MAX_PER     = 50;
 
-/* ---------- Convert Google Drive view links to direct image URLs ---------- */
+function normSlug(str) {
+  if (!str) return '';
+  let s = String(str).trim().toLowerCase();
+  try { s = decodeURIComponent(s); } catch (e) {}
+  return s.replace(/^\/+|\/+$/g, '');
+}
+
 function convertGoogleDriveUrl(url) {
   if (!url) return '';
   const str = String(url).trim();
@@ -33,7 +30,6 @@ function convertGoogleDriveUrl(url) {
   return str;
 }
 
-/* ---------- Fetch raw rows from Google Sheets ---------- */
 async function fetchSheetRows() {
   const apiKey  = process.env.GOOGLE_SHEETS_API_KEY;
   const sheetId = process.env.GOOGLE_SHEET_ID;
@@ -55,7 +51,6 @@ async function fetchSheetRows() {
   const rows = data.values;
   if (!rows || rows.length < 2) return [];
 
-  /* Row 0 = headers; rows 1+ = data. */
   const headers = rows[0].map(h => (h || '').trim().toLowerCase());
   return rows.slice(1).map(row => {
     const obj = {};
@@ -64,25 +59,26 @@ async function fetchSheetRows() {
   });
 }
 
-/* ---------- Format excerpt (ensures raw Google Doc link is never displayed as text) ---------- */
 function cleanExcerpt(metaDesc, excerptVal, titleVal) {
-  let val = excerptVal || metaDesc || titleVal || '';
-  if (val.includes('docs.google.com') || val.includes('drive.google.com')) {
+  let val = (excerptVal || '').trim();
+  if (!val) {
+    val = (metaDesc || '').trim();
+  }
+  if (!val || val.toLowerCase() === (titleVal || '').trim().toLowerCase()) {
     val = metaDesc || titleVal || '';
   }
   return val;
 }
 
-/* ---------- Check published status ---------- */
 function isPublishedRow(r) {
   const pub = (r.published || r.status || '').trim().toLowerCase();
   return pub === 'true' || pub === 'published' || pub === '1' || pub === 'yes';
 }
 
-/* ---------- Transform a raw sheet row → clean post object ---------- */
 function transform(row, index) {
   const title       = row['title'] || '';
-  const slug        = row['slug'] || '';
+  const rawSlug     = row['slug'] || '';
+  const cleanSlug   = normSlug(rawSlug);
   const category    = row['category'] || '';
   const author      = row['author'] || 'HIPA Masala Team';
   const rawImage    = row['banner image'] || row['banner_image'] || row['featured_image'] || row['cover image'] || row['cover_image'] || row['image'] || '';
@@ -98,7 +94,7 @@ function transform(row, index) {
   return {
     id:               row['id'] || String(index + 1),
     title:            title,
-    slug:             slug,
+    slug:             cleanSlug,
     excerpt:          excerpt,
     featured_image:   bannerImage,
     alt_text:         altText,
@@ -111,52 +107,45 @@ function transform(row, index) {
   };
 }
 
-/* ---------- Handler ---------- */
 module.exports = async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const page    = Math.max(1, parseInt(req.query.page    || '1',              10));
-    const perPage = Math.min(MAX_PER, Math.max(1, parseInt(req.query.per_page  || String(DEFAULT_PER), 10)));
+    const page  = Math.max(1, parseInt(req.query.page, 10)  || 1);
+    let perPage = Math.max(1, parseInt(req.query.per_page, 10) || DEFAULT_PER);
+    if (perPage > MAX_PER) perPage = MAX_PER;
 
     const allRows = await fetchSheetRows();
 
-    /* Filter: published only, must have title + slug */
     const published = allRows
-      .map((r, i) => ({ row: r, idx: i }))
-      .filter(({ row }) =>
-        isPublishedRow(row) &&
-        row.title && row.title.trim() !== '' &&
-        row.slug  && row.slug.trim()  !== ''
-      )
-      /* Sort newest-first */
-      .sort((a, b) => {
-        const dateA = a.row.publish_date || a.row['publish date'] || a.row.date;
-        const dateB = b.row.publish_date || b.row['publish date'] || b.row.date;
-        const da = dateA && !isNaN(new Date(dateA)) ? new Date(dateA) : null;
-        const db = dateB && !isNaN(new Date(dateB)) ? new Date(dateB) : null;
-        if (da && db) return db - da;
-        if (da) return -1;
-        if (db) return 1;
-        return b.idx - a.idx;
-      })
-      .map(({ row, idx }) => transform(row, idx));
+      .map((r, i) => transform(r, i))
+      .filter(p => p.title && p.slug);
+
+    published.reverse();
 
     const total      = published.length;
-    const totalPages = Math.max(1, Math.ceil(total / perPage));
-    const start      = (page - 1) * perPage;
-    const posts      = published.slice(start, start + perPage);
+    const totalPages = Math.ceil(total / perPage) || 1;
+    const startIndex = (page - 1) * perPage;
+    const posts      = published.slice(startIndex, startIndex + perPage);
 
-    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-
-    return res.status(200).json({ posts, total, page, per_page: perPage, total_pages: totalPages });
-
+    return res.status(200).json({
+      success: true,
+      page,
+      per_page: perPage,
+      total,
+      total_pages: totalPages,
+      posts
+    });
   } catch (err) {
-    console.error('[/api/blogs]', err.message);
-    return res.status(500).json({ error: 'Failed to load blog posts. Please try again shortly.' });
+    console.error('API /api/blogs error:', err);
+    return res.status(500).json({ error: 'Failed to fetch blogs.', details: err.message });
   }
 };

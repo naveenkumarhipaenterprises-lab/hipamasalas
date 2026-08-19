@@ -1,21 +1,21 @@
 /* =========================================================
-   HIPA MASALA — /api/blog  (Vercel Serverless Function)
+   HIPA MASALA � /api/blog (Vercel Serverless Function)
    ---------------------------------------------------------
    Returns a single published blog post by ?slug= plus up
    to 3 related posts from the same category.
-   Renders full Google Doc content directly (NEVER just a text link).
-
-   ENVIRONMENT VARIABLES required in Vercel:
-     GOOGLE_SHEETS_API_KEY  — your Google Cloud API key
-     GOOGLE_SHEET_ID        — the ID from your Sheet URL
-
-   Supports columns:
-     Published | Title | Slug | Category | Author | Banner Image | Alt Text | Google Doc Link / Content | Meta Description | Focus Keywords | Keywords
+   Renders full Google Doc content directly.
    ========================================================= */
 
 'use strict';
 
 const SHEET_NAME = 'Blogs';
+
+function normSlug(str) {
+  if (!str) return '';
+  let s = String(str).trim().toLowerCase();
+  try { s = decodeURIComponent(s); } catch (e) {}
+  return s.replace(/^\/+|\/+$/g, '');
+}
 
 /* ---------- Convert Google Drive view links to direct image URLs ---------- */
 function convertGoogleDriveUrl(url) {
@@ -61,7 +61,7 @@ async function fetchSheetRows() {
   });
 }
 
-/* ---------- Strip dangerous tags / attributes from HTML ---------- */
+/* ---------- Sanitise HTML ---------- */
 function sanitiseHtml(html) {
   if (!html) return '';
   return html
@@ -73,40 +73,29 @@ function sanitiseHtml(html) {
     .replace(/src\s*=\s*(?:"javascript:[^"]*"|'javascript:[^']*')/gi, '');
 }
 
-/* ---------- Format / Fetch Full Document Content (NEVER displays plain link) ---------- */
+/* ---------- Format / Fetch Full Document Content ---------- */
 async function resolveBlogContent(rawContent, metaDesc) {
   let text = String(rawContent || '').trim();
-  if (!text) {
-    text = String(metaDesc || '').trim();
-  }
+  if (!text) text = String(metaDesc || '').trim();
 
-  // 1. If it's a Google Doc URL
   const docMatch = text.match(/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/i);
   if (docMatch && docMatch[1]) {
     const docId = docMatch[1];
-    
-    // Attempt 1: Fetch raw exported HTML directly from Google Docs
     try {
       let htmlRes = await fetch(`https://docs.google.com/document/d/${docId}/pub`);
-      if (!htmlRes.ok) {
-        htmlRes = await fetch(`https://docs.google.com/document/d/${docId}/export?format=html`);
-      }
+      if (!htmlRes.ok) htmlRes = await fetch(`https://docs.google.com/document/d/${docId}/export?format=html`);
       
       if (htmlRes.ok) {
         const rawHtml = await htmlRes.text();
         const bodyMatch = rawHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
         if (bodyMatch && bodyMatch[1]) {
-          let bodyHtml = bodyMatch[1];
-          
-          // Remove Google Docs inline styles & classes so website theme styles apply
-          bodyHtml = bodyHtml
+          let bodyHtml = bodyMatch[1]
             .replace(/style="[^"]*"/gi, '')
             .replace(/class="[^"]*"/gi, '')
             .replace(/id="[^"]*"/gi, '')
             .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
             .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
 
-          // Responsive image styling
           bodyHtml = bodyHtml.replace(/<img\s+([^>]+)>/gi, (m, attrs) => {
             if (!attrs.includes('style=')) {
               return `<img ${attrs} style="max-width:100%; height:auto; border-radius:8px; margin:16px 0;" />`;
@@ -121,10 +110,9 @@ async function resolveBlogContent(rawContent, metaDesc) {
         }
       }
     } catch (e) {
-      console.warn('Google Doc HTML extraction fallback to viewer:', e.message);
+      console.warn('Google Doc HTML extraction fallback:', e.message);
     }
 
-    // Attempt 2: Full Document Viewer Embed (Renders full document cleanly on the page, NO link text!)
     return `
       <div class="blog-doc-container" style="width:100%; margin:20px 0; border-radius:12px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.06); background:#fff;">
         <iframe src="https://docs.google.com/document/d/${docId}/preview" style="width:100%; height:850px; border:none; display:block;" title="Full Blog Document" loading="lazy"></iframe>
@@ -132,12 +120,8 @@ async function resolveBlogContent(rawContent, metaDesc) {
     `;
   }
 
-  // 2. If direct HTML content was pasted into Column H
-  if (/<[a-z][\s\S]*>/i.test(text)) {
-    return sanitiseHtml(text);
-  }
+  if (/<[a-z][\s\S]*>/i.test(text)) return sanitiseHtml(text);
 
-  // 3. If plain text was written into Column H, wrap paragraphs in <p> tags
   const paragraphs = text.split(/\r?\n\r?\n/).map(p => p.trim()).filter(Boolean);
   if (paragraphs.length > 0) {
     return paragraphs.map(p => `<p>${sanitiseHtml(p).replace(/\r?\n/g, '<br>')}</p>`).join('');
@@ -146,16 +130,15 @@ async function resolveBlogContent(rawContent, metaDesc) {
   return '<p>No content available for this article.</p>';
 }
 
-/* ---------- Check published status ---------- */
 function isPublishedRow(r) {
   const pub = (r.published || r.status || '').trim().toLowerCase();
   return pub === 'true' || pub === 'published' || pub === '1' || pub === 'yes';
 }
 
-/* ---------- Transform a raw sheet row → clean post object ---------- */
 async function transform(row, index, fetchFullContent = true) {
   const title       = row['title'] || '';
-  const slug        = row['slug'] || '';
+  const rawSlug     = row['slug'] || '';
+  const cleanSlug   = normSlug(rawSlug);
   const category    = row['category'] || '';
   const author      = row['author'] || 'HIPA Masala Team';
   const rawImage    = row['banner image'] || row['banner_image'] || row['featured_image'] || row['cover image'] || row['cover_image'] || row['image'] || '';
@@ -176,7 +159,7 @@ async function transform(row, index, fetchFullContent = true) {
   return {
     id:               row['id'] || String(index + 1),
     title:            title,
-    slug:             slug,
+    slug:             cleanSlug,
     excerpt:          excerpt,
     content:          content,
     featured_image:   bannerImage,
@@ -190,22 +173,25 @@ async function transform(row, index, fetchFullContent = true) {
   };
 }
 
-/* ---------- Handler ---------- */
 module.exports = async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const slug = (req.query.slug || '').trim().toLowerCase();
-  if (!slug) {
+  const reqSlug = normSlug(req.query.slug);
+  if (!reqSlug) {
     return res.status(400).json({ error: 'slug query parameter is required.' });
   }
 
   try {
     const allRows = await fetchSheetRows();
 
-    /* Only published rows, must have title + slug */
     const published = allRows
       .map((r, i) => ({ row: r, idx: i }))
       .filter(({ row }) =>
@@ -214,41 +200,25 @@ module.exports = async function handler(req, res) {
         row.slug  && row.slug.trim()  !== ''
       );
 
-    const matchItem = published.find(({ row }) => row.slug.trim().toLowerCase() === slug);
+    const matchItem = published.find(({ row }) => normSlug(row.slug) === reqSlug);
     if (!matchItem) {
       return res.status(404).json({ error: 'Post not found.' });
     }
 
     const post = await transform(matchItem.row, matchItem.idx, true);
 
-    /* Related posts: same category, not current slug, max 3 */
-    const relatedItems = published
-      .filter(({ row }) =>
-        row.slug.trim().toLowerCase() !== slug &&
-        row.category &&
-        row.category.trim().toLowerCase() === (matchItem.row.category || '').trim().toLowerCase()
-      )
-      .sort((a, b) => {
-        const dateA = a.row.publish_date || a.row['publish date'] || a.row.date;
-        const dateB = b.row.publish_date || b.row['publish date'] || b.row.date;
-        const da = dateA && !isNaN(new Date(dateA)) ? new Date(dateA) : null;
-        const db = dateB && !isNaN(new Date(dateB)) ? new Date(dateB) : null;
-        if (da && db) return db - da;
-        if (da) return -1;
-        if (db) return 1;
-        return b.idx - a.idx;
-      })
+    const categoryName = (matchItem.row['category'] || '').trim().toLowerCase();
+    const relatedRows = published
+      .filter(({ row }) => normSlug(row.slug) !== reqSlug && (row.category || '').trim().toLowerCase() === categoryName)
       .slice(0, 3);
 
-    const related = await Promise.all(relatedItems.map(({ row, idx }) => transform(row, idx, false)));
+    const related = await Promise.all(
+      relatedRows.map(({ row, idx }) => transform(row, idx, false))
+    );
 
-    res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=1200');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-
-    return res.status(200).json({ post, related });
-
+    return res.status(200).json({ success: true, post, related });
   } catch (err) {
-    console.error('[/api/blog]', err.message);
-    return res.status(500).json({ error: 'Failed to load blog post. Please try again shortly.' });
+    console.error('API /api/blog error:', err);
+    return res.status(500).json({ error: 'Failed to fetch article details.', details: err.message });
   }
 };

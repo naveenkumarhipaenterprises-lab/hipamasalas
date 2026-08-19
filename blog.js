@@ -1,26 +1,8 @@
 /* =========================================================
-   HIPA MASALA — BLOG LISTING PAGE
+   HIPA MASALA � BLOG LISTING PAGE
    ---------------------------------------------------------
-   Page-specific behaviour for blog.html only:
-     1. Fetch published posts from the Google Sheets API
-        via the secure Vercel serverless function at /api/blogs
-        (window.SITE_CONFIG.SHEETS_API_URL, see config.js)
-     2. Render them as .blog-card cards, with loading / error /
-        empty states
-     3. Category tabs — built from the categories actually
-        present on the fetched posts (no hardcoded list)
-     4. "Load More" pagination
-     5. Inline blog search (#blogSearchInput) — filters the
-        posts already loaded in the browser. This is a BLOG
-        search only; it is completely separate from the global
-        header PRODUCT search in product-search.js.
-     6. blog_article_click GTM/GA4 event on card click
-     7. Newsletter form validation (front-end only, no backend)
-
-   Shared behaviour (header, mobile nav, scroll reveal,
-   back-to-top, footer year, top-bar/floating-button config,
-   the global product search) already lives in script.js /
-   product-search.js and is reused as-is.
+   Fetches published posts from /api/blogs and renders cards
+   with clean URLs (/blog/{slug}).
    ========================================================= */
 
 'use strict';
@@ -39,19 +21,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!grid) return;
 
-  let allPosts      = [];
-  let currentPage   = 1;
-  let totalPages    = 1;
+  let allPosts       = [];
+  let currentPage    = 1;
+  let totalPages     = 1;
   let activeCategory = 'all';
   let activeQuery    = '';
 
-  /* ---------- GTM / GA4 dataLayer push ---------- */
+  const getCleanSlug = (str) => {
+    if (!str) return '';
+    let s = String(str).trim().toLowerCase();
+    try { s = decodeURIComponent(s); } catch (e) {}
+    return s.replace(/^\/+|\/+$/g, '');
+  };
+
   const pushEvent = (eventName, params) => {
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push(Object.assign({ event: eventName }, params));
   };
 
-  /* ---------- Helpers ---------- */
   const escapeHtml = (str) => {
     const div = document.createElement('div');
     div.textContent = String(str || '');
@@ -61,19 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const escapeAttr = (str) =>
     String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-  /* ---------- Google Drive / Docs link helpers ---------- *
-   * The /api/blogs endpoint already converts Banner Image links to direct
-   * lh3.googleusercontent.com URLs server-side. These client-side helpers are
-   * a safety net so cover images still work even if a raw Drive/Docs share
-   * link ever reaches the browser untouched (manual data overrides, a future
-   * direct-Sheets integration, etc.), and so a broken share permission
-   * doesn't leave a dead <img> on the card. */
   const extractDriveFileId = (url) => {
     const str = String(url || '').trim();
     if (!str) return null;
     const patterns = [
-      /\/d\/([a-zA-Z0-9_-]{15,})/,     // drive.google.com/file/d/FILE_ID/view, docs.google.com/document/d/FILE_ID/...
-      /[?&]id=([a-zA-Z0-9_-]{15,})/    // drive.google.com/open?id=FILE_ID, uc?id=FILE_ID
+      /\/d\/([a-zA-Z0-9_-]{15,})/,
+      /[?&]id=([a-zA-Z0-9_-]{15,})/
     ];
     for (const re of patterns) {
       const m = str.match(re);
@@ -84,23 +64,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const isGoogleDocLink = (url) => /docs\.google\.com\/document\//i.test(String(url || ''));
 
-  /* Converts a standard Google Drive "share" link into a directly-loadable
-     image URL (https://lh3.googleusercontent.com/d/FILE_ID), instead of the
-     Drive preview page the raw share link would otherwise load. Leaves
-     non-Drive URLs (e.g. already-hosted images) untouched. */
   const toDriveImageUrl = (url) => {
     const str = String(url || '').trim();
     if (!str) return '';
     if (!/drive\.google\.com|docs\.google\.com/i.test(str)) return str;
     if (str.includes('lh3.googleusercontent.com')) return str;
-    if (isGoogleDocLink(str)) return str; // a Doc link, not an image — leave as-is
+    if (isGoogleDocLink(str)) return str;
     const id = extractDriveFileId(str);
     return id ? `https://lh3.googleusercontent.com/d/${id}` : str;
   };
 
-  /* If the lh3 URL 404s (e.g. sharing permission not set to "Anyone with the
-     link"), fall back once to Drive's thumbnail endpoint before giving up
-     and hiding the broken image rather than showing a broken-image icon. */
   const attachDriveImageFallback = (img, originalUrl) => {
     const id = extractDriveFileId(originalUrl);
     if (!id) return;
@@ -125,16 +98,14 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) { return ''; }
   };
 
-  /* Produces a lowercase hyphen-slug from a string — used to key category tabs. */
   const slugify = (str) =>
     (str || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-  /* ---------- Render states ---------- */
   const showLoading = () => {
     grid.innerHTML = `
       <div class="blog-loading-state">
         <div class="blog-loading-spinner" aria-hidden="true"></div>
-        <p>Loading the latest articles…</p>
+        <p>Loading the latest articles�</p>
       </div>
     `;
     if (loadMoreWrap) loadMoreWrap.style.display = 'none';
@@ -169,23 +140,23 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loadMoreWrap) loadMoreWrap.style.display = 'none';
   };
 
-  /* ---------- Build a single blog card ---------- */
   const buildCard = (post) => {
     const category  = post.category  || '';
     const rawImage  = post.featured_image || '';
     const image     = toDriveImageUrl(rawImage);
     const excerpt   = (post.excerpt  || '').slice(0, 130);
     const title     = post.title     || '';
-    const slug      = post.slug      || '';
+    const cleanSlug = getCleanSlug(post.slug);
+    const blogHref  = `/blog/${cleanSlug}`;
 
     const card = document.createElement('article');
     card.className = 'blog-card reveal in-view';
     card.setAttribute('data-category', category ? slugify(category) : 'uncategorised');
     card.setAttribute('data-title',    title);
-    card.setAttribute('data-slug',     slug);
+    card.setAttribute('data-slug',     cleanSlug);
 
     card.innerHTML = `
-      <a class="blog-card-media" href="blog-details.html?slug=${encodeURIComponent(slug)}">
+      <a class="blog-card-media" href="${blogHref}">
         ${image
           ? `<img src="${escapeAttr(image)}" alt="${escapeAttr(title)}" loading="lazy">`
           : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);">HIPA Masala</div>`}
@@ -193,19 +164,18 @@ document.addEventListener('DOMContentLoaded', () => {
       </a>
       <div class="blog-card-body">
         <div class="blog-card-meta"><time>${formatDate(post.publish_date)}</time></div>
-        <h3 class="blog-card-title"><a href="blog-details.html?slug=${encodeURIComponent(slug)}">${escapeHtml(title)}</a></h3>
-        <p class="blog-card-excerpt">${escapeHtml(excerpt)}${excerpt.length >= 130 ? '…' : ''}</p>
-        <a class="blog-card-link" href="blog-details.html?slug=${encodeURIComponent(slug)}">
+        <h3 class="blog-card-title"><a href="${blogHref}">${escapeHtml(title)}</a></h3>
+        <p class="blog-card-excerpt">${escapeHtml(excerpt)}${excerpt.length >= 130 ? '�' : ''}</p>
+        <a class="blog-card-link" href="${blogHref}">
           Read More
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
       </div>
     `;
 
-    /* GTM / GA4 event — unchanged from original */
-    card.querySelectorAll('a[href^="blog-details.html"]').forEach(link => {
+    card.querySelectorAll('a[href^="/blog/"]').forEach(link => {
       link.addEventListener('click', () => {
-        pushEvent('blog_article_click', { article_title: title, article_slug: slug });
+        pushEvent('blog_article_click', { article_title: title, article_slug: cleanSlug });
       });
     });
 
@@ -217,7 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return card;
   };
 
-  /* ---------- Category tabs — built from fetched category strings ---------- */
   const knownCategorySlugs = new Set(['all']);
 
   const buildCategoryTabs = (posts) => {
@@ -231,143 +200,105 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const btn = document.createElement('button');
       btn.className = 'category-tab' + (slug === activeCategory ? ' is-active' : '');
-      btn.setAttribute('data-filter',    slug);
-      btn.setAttribute('role',           'tab');
-      btn.setAttribute('aria-selected',  slug === activeCategory ? 'true' : 'false');
+      btn.setAttribute('data-filter',   slug);
+      btn.setAttribute('role',          'tab');
+      btn.setAttribute('aria-selected', slug === activeCategory ? 'true' : 'false');
       btn.textContent = catName;
       btn.addEventListener('click', () => setActiveCategory(slug, btn));
       categoryTabs.appendChild(btn);
-
-      if (slug === activeCategory) {
-        const allTab = categoryTabs.querySelector('[data-filter="all"]');
-        if (allTab) { allTab.classList.remove('is-active'); allTab.setAttribute('aria-selected', 'false'); }
-      }
     });
   };
 
-  const setActiveCategory = (filter, clickedBtn) => {
-    activeCategory = filter;
-    categoryTabs.querySelectorAll('.category-tab').forEach(t => {
-      t.classList.remove('is-active');
-      t.setAttribute('aria-selected', 'false');
-    });
-    if (clickedBtn) {
-      clickedBtn.classList.add('is-active');
-      clickedBtn.setAttribute('aria-selected', 'true');
+  const setActiveCategory = (categorySlug, tabBtn) => {
+    activeCategory = categorySlug;
+    if (categoryTabs) {
+      categoryTabs.querySelectorAll('.category-tab').forEach(b => {
+        b.classList.remove('is-active');
+        b.setAttribute('aria-selected', 'false');
+      });
     }
-    renderGrid();
+    if (tabBtn) {
+      tabBtn.classList.add('is-active');
+      tabBtn.setAttribute('aria-selected', 'true');
+    }
+    renderFilteredPosts();
   };
 
-  if (categoryTabs) {
-    const allTab = categoryTabs.querySelector('[data-filter="all"]');
-    if (allTab) allTab.addEventListener('click', () => setActiveCategory('all', allTab));
-  }
+  const getFilteredPosts = () => {
+    return allPosts.filter(post => {
+      const matchCat = activeCategory === 'all' || slugify(post.category || '') === activeCategory;
+      const q = activeQuery.toLowerCase().trim();
+      const matchSearch = !q ||
+        (post.title || '').toLowerCase().includes(q) ||
+        (post.excerpt || '').toLowerCase().includes(q) ||
+        (post.category || '').toLowerCase().includes(q);
 
-  /* ---------- Render the grid from allPosts, applying active filters ---------- */
-  const renderGrid = () => {
-    const filtered = allPosts.filter(post => {
-      const catSlug       = post.category ? slugify(post.category) : 'uncategorised';
-      const matchCat      = activeCategory === 'all' || catSlug === activeCategory;
-      const matchQuery    = activeQuery === '' || (post.title || '').toLowerCase().includes(activeQuery.toLowerCase());
-      return matchCat && matchQuery;
+      return matchCat && matchSearch;
     });
+  };
 
-    grid.innerHTML = '';
-
+  const renderFilteredPosts = () => {
+    const filtered = getFilteredPosts();
     if (filtered.length === 0) {
-      if (allPosts.length === 0) {
-        showEmpty('Coming Soon', 'Our latest blogs will appear here.');
-      } else if (activeQuery) {
-        showEmpty('No articles found', `We couldn't find any posts matching "${activeQuery}".`);
+      if (activeQuery) {
+        showEmpty('No matching articles found', `We couldn't find any articles matching "${activeQuery}". Try a different keyword or view all categories.`);
       } else {
-        showEmpty('No articles in this category yet', 'Check back soon or browse another category.');
+        showEmpty('No articles in this category', 'There are no published articles in this category yet. Check back soon!');
       }
       return;
     }
 
-    filtered.forEach(post => grid.appendChild(buildCard(post)));
+    grid.innerHTML = '';
+    const slice = filtered.slice(0, currentPage * PER_PAGE);
+    slice.forEach(post => grid.appendChild(buildCard(post)));
 
     if (loadMoreWrap) {
-      loadMoreWrap.style.display =
-        (currentPage < totalPages && activeCategory === 'all' && !activeQuery) ? 'flex' : 'none';
+      loadMoreWrap.style.display = slice.length < filtered.length ? 'block' : 'none';
     }
   };
 
-  /* ---------- Fetch from the Google Sheets API via /api/blogs ---------- */
-  const loadPosts = (page, replace) => {
-    showLoading();
+  const loadPosts = (page = 1, isInitial = false) => {
+    if (isInitial) showLoading();
 
-    const url = `${SHEETS_API}/blogs?per_page=${PER_PAGE}&page=${page}`;
-
-    fetch(url)
+    fetch(`${SHEETS_API}/blogs?page=1&per_page=50`)
       .then(res => {
-        if (!res.ok) throw new Error('API error: ' + res.status);
+        if (!res.ok) throw new Error('API network error: ' + res.status);
         return res.json();
       })
       .then(data => {
-        totalPages  = data.total_pages || 1;
-        const posts = data.posts || [];
-        allPosts    = replace ? posts : allPosts.concat(posts);
-        currentPage = page;
-        buildCategoryTabs(posts);
-        renderGrid();
+        if (!data || !Array.isArray(data.posts)) {
+          showEmpty('No articles available', 'No blog articles have been published yet. Please check back later!');
+          return;
+        }
+
+        allPosts = data.posts;
+        buildCategoryTabs(allPosts);
+        renderFilteredPosts();
       })
-      .catch(() => showError());
+      .catch(err => {
+        console.error('Failed loading blogs:', err);
+        showError();
+      });
   };
 
-  if (loadMoreBtn) {
-    loadMoreBtn.addEventListener('click', () => loadPosts(currentPage + 1, false));
-  }
-
-  /* ---------- Blog search (separate from the global product search) ---------- */
-  const params = new URLSearchParams(window.location.search);
-  const initialQuery    = params.get('q') || '';
-  const initialCategory = params.get('category') || '';
-
-  if (initialQuery)    { activeQuery    = initialQuery;    if (searchInput) searchInput.value = initialQuery; }
-  if (initialCategory) { activeCategory = initialCategory; }
-
   if (searchInput) {
-    let debounceId;
+    let timer;
     searchInput.addEventListener('input', () => {
-      clearTimeout(debounceId);
-      debounceId = setTimeout(() => {
-        activeQuery = searchInput.value.trim();
-        renderGrid();
-      }, 200);
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        activeQuery = searchInput.value;
+        currentPage = 1;
+        renderFilteredPosts();
+      }, 250);
     });
   }
 
-  /* ---------- Kick off ---------- */
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', () => {
+      currentPage += 1;
+      renderFilteredPosts();
+    });
+  }
+
   loadPosts(1, true);
-
-  /* ---------- Newsletter form (front-end only) ---------- */
-  const form = document.getElementById('blogNewsletterForm');
-  if (form) {
-    const emailInput = document.getElementById('blogNewsletterEmail');
-    const emailError = document.getElementById('blogNewsletterEmailError');
-    const note       = document.getElementById('blogNewsletterNote');
-    const submitBtn  = form.querySelector('.btn-primary');
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((emailInput.value || '').trim());
-      if (emailError) emailError.classList.toggle('show', !emailValid);
-      if (!emailValid) { emailInput.focus(); return; }
-
-      const originalText = submitBtn.textContent;
-      submitBtn.disabled  = true;
-      submitBtn.textContent = 'Subscribing...';
-
-      setTimeout(() => {
-        submitBtn.disabled   = false;
-        submitBtn.textContent = originalText;
-        if (note) note.classList.add('show');
-        form.reset();
-        setTimeout(() => { if (note) note.classList.remove('show'); }, 4000);
-      }, 900);
-    });
-  }
-
 });
