@@ -1,5 +1,5 @@
 /* =========================================================
-   HIPA MASALA — PRODUCTS & AVAILABILITY LOGIC
+   HIPA MASALA — PRODUCTS & STICKY AVAILABILITY LOGIC
    ========================================================= */
 
 'use strict';
@@ -46,12 +46,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /* ---------- Apply Unavailable Badges & Alerts ---------- */
-  function applyProductStatuses(statusMap) {
-    if (!statusMap) return;
+  /* ---------- Apply Sticky Product Availability Badges & Alerts ---------- */
+  function applyProductStatuses(incomingStatusMap) {
+    if (!incomingStatusMap) return;
 
-    Object.keys(statusMap).forEach(slug => {
-      const status = statusMap[slug];
+    // Merge with existing localStorage statuses to keep status sticky
+    let localStatuses = {};
+    try {
+      localStatuses = JSON.parse(localStorage.getItem('hipa_product_statuses') || '{}');
+    } catch (e) {}
+
+    // Combined status map (local admin setting takes precedence over default API fallbacks)
+    const combinedStatuses = { ...incomingStatusMap, ...localStatuses };
+
+    Object.keys(combinedStatuses).forEach(slug => {
+      const status = combinedStatuses[slug];
 
       // 1. Grid product card on products.html
       const card = document.getElementById(slug);
@@ -72,13 +81,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // 2. Individual product landing page
-      const currentPath = window.location.pathname;
-      if (currentPath.includes(slug) && status === 'unavailable') {
+      // 2. Individual product landing page (/products/sambar-powder or sambar-powder.html)
+      const currentPath = window.location.pathname.toLowerCase();
+      if ((currentPath.includes(slug) || currentPath.includes(slug.replace('-', ''))) && status === 'unavailable') {
         const actionsBox = document.querySelector('.product-lp-actions');
         if (actionsBox && !document.querySelector('.unavailable-alert')) {
           const alert = document.createElement('div');
           alert.className = 'unavailable-alert';
+          alert.style.cssText = 'background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:14px 18px; border-radius:10px; font-size:14px; font-weight:600; margin-bottom:24px; display:flex; align-items:center; gap:10px; width:100%;';
           alert.innerHTML = '?? <strong>CURRENTLY UNAVAILABLE:</strong> This product is temporarily out of stock. You can still submit an enquiry for future batch reservations.';
           actionsBox.parentNode.insertBefore(alert, actionsBox);
         }
@@ -86,20 +96,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Load from localStorage immediately
+  // 1. Apply sticky status from localStorage immediately (no flicker!)
   try {
     const localStatuses = JSON.parse(localStorage.getItem('hipa_product_statuses') || '{}');
     applyProductStatuses(localStatuses);
   } catch (e) {}
 
-  // Fetch from API for dynamic sync
+  // 2. Fetch API for server sync and merge
   fetch('/api/products')
     .then(r => r.json())
     .then(res => {
       if (res.success && Array.isArray(res.data)) {
-        const statusMap = {};
-        res.data.forEach(p => statusMap[p.slug] = p.status);
-        applyProductStatuses(statusMap);
+        const serverStatusMap = {};
+        res.data.forEach(p => {
+          if (p.slug && p.status) serverStatusMap[p.slug] = p.status;
+        });
+        applyProductStatuses(serverStatusMap);
       }
     })
     .catch(() => {});
