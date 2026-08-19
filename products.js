@@ -253,3 +253,25 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 });
+
+
+  /* ---------- Fetch Product Status & Availability from API ---------- */
+  fetch('/api/products')
+    .then(r => r.json())
+    .then(res => {
+      if (res.success && Array.isArray(res.data)) {
+        res.data.forEach(prod => {
+          const card = document.getElementById(prod.slug);
+          if (card && prod.status === 'unavailable') {
+            card.classList.add('is-unavailable');
+            if (!card.querySelector('.unavailable-badge')) {
+              const badge = document.createElement('span');
+              badge.className = 'unavailable-badge';
+              badge.textContent = 'CURRENTLY UNAVAILABLE';
+              card.querySelector('.pdp-media').appendChild(badge);
+            }
+          }
+        });
+      }
+    })
+    .catch(() => {});

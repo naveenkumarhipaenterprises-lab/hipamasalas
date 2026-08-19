@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HIPA Masala Admin Dashboard</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- AUTH MODAL/SCREEN -->
+<div id="authScreen" class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <img src="/images/logo.png" alt="HIPA Masala Logo">
+      <h2>HIPA Admin</h2>
+      <p>Content & Enquiry Management System</p>
+    </div>
+    <form id="loginForm" class="auth-form">
+      <div class="form-group">
+        <label for="adminEmail">Email Address</label>
+        <input type="email" id="adminEmail" placeholder="admin@hipamasalas.com" required>
+      </div>
+      <div class="form-group">
+        <label for="adminPass">Password</label>
+        <input type="password" id="adminPass" placeholder="••••••••" required>
+      </div>
+      <p id="loginError" style="color: #dc2626; font-size: 0.85rem; margin-bottom: 12px; display: none;"></p>
+      <button type="submit" class="btn-admin-primary" id="loginBtn">Login to CMS</button>
+    </form>
+  </div>
+</div>
+
+<!-- MAIN ADMIN APPLICATION -->
+<div id="adminApp" style="display: none; flex-direction: column; min-height: 100vh;">
+  <!-- HEADER -->
+  <header class="admin-header">
+    <a href="/admin" class="admin-logo">
+      <img src="/images/logo.png" width="30" height="35" alt="Logo">
+      <span>HIPA CMS</span>
+    </a>
+    <nav class="admin-nav">
+      <button class="admin-nav-btn active" data-target="tabDashboard">Dashboard</button>
+      <button class="admin-nav-btn" data-target="tabProducts">Products</button>
+      <button class="admin-nav-btn" data-target="tabEnquiries">Enquiries</button>
+      <button class="admin-nav-btn" data-target="tabFaqs">FAQs</button>
+      <button class="admin-nav-btn" id="logoutBtn" style="color: #f87171;">Logout</button>
+    </nav>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="admin-main">
+
+    <!-- 1. DASHBOARD TAB -->
+    <div id="tabDashboard" class="tab-pane">
+      <div class="section-header">
+        <h3>Overview</h3>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="label">Total Products</span>
+          <span class="val" id="statTotalProducts">8</span>
+        </div>
+        <div class="stat-card">
+          <span class="label">Available</span>
+          <span class="val" id="statAvailableProducts" style="color: #10b981;">8</span>
+        </div>
+        <div class="stat-card">
+          <span class="label">Unavailable</span>
+          <span class="val" id="statUnavailableProducts" style="color: #dc2626;">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="label">New Enquiries</span>
+          <span class="val" id="statNewEnquiries" style="color: #2563eb;">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. PRODUCTS TAB -->
+    <div id="tabProducts" class="tab-pane" style="display: none;">
+      <div class="section-header">
+        <h3>Products Catalogue</h3>
+        <button class="btn-admin-primary" id="openAddProductModal" style="width: auto; padding: 10px 20px;">+ Add New Product</button>
+      </div>
+      <div class="table-card">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Slug</th>
+              <th>Status / Availability</th>
+              <th>Featured</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productsTableBody">
+            <!-- Dynamic product rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3. ENQUIRIES TAB -->
+    <div id="tabEnquiries" class="tab-pane" style="display: none;">
+      <div class="section-header">
+        <h3>B2B Customer Enquiries</h3>
+      </div>
+      <div class="table-card">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Customer Name</th>
+              <th>Company</th>
+              <th>Product</th>
+              <th>Phone</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="enquiriesTableBody">
+            <!-- Dynamic enquiry rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 4. FAQS TAB -->
+    <div id="tabFaqs" class="tab-pane" style="display: none;">
+      <div class="section-header">
+        <h3>FAQ Management</h3>
+        <button class="btn-admin-primary" id="openAddFaqModal" style="width: auto; padding: 10px 20px;">+ Add New FAQ</button>
+      </div>
+      <div class="table-card">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Question</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="faqsTableBody">
+            <!-- Dynamic FAQ rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h4 id="productModalTitle">Add Product</h4>
+      <button class="modal-close" id="closeProductModal">&times;</button>
+    </div>
+    <form id="productForm">
+      <input type="hidden" id="editProductId">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Product Name</label>
+          <input type="text" id="prodName" required>
+        </div>
+        <div class="form-group">
+          <label>Slug (URL key)</label>
+          <input type="text" id="prodSlug" placeholder="e.g. sambar-powder" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Short Description</label>
+        <input type="text" id="prodShortDesc" required>
+      </div>
+      <div class="form-group">
+        <label>Full Description</label>
+        <textarea id="prodFullDesc" rows="3"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Image URL</label>
+          <input type="text" id="prodImageUrl" placeholder="/images/products/Sambar-masala.png" required>
+        </div>
+        <div class="form-group">
+          <label>Availability Status</label>
+          <select id="prodStatus">
+            <option value="available">AVAILABLE</option>
+            <option value="unavailable">CURRENTLY UNAVAILABLE</option>
+            <option value="draft">DRAFT</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Availability Custom Message (Optional)</label>
+        <input type="text" id="prodAvailMsg" placeholder="Currently unavailable. Please contact us for enquiry.">
+      </div>
+      <div class="form-group">
+        <label>Features (Comma separated)</label>
+        <input type="text" id="prodFeatures" placeholder="Stone-ground freshness, No artificial colour">
+      </div>
+      <div class="form-group">
+        <label>Pack Sizes (Comma separated)</label>
+        <input type="text" id="prodPackSizes" placeholder="100g, 200g, 500g, 1kg">
+      </div>
+      <button type="submit" class="btn-admin-primary">Save Product</button>
+    </form>
+  </div>
+</div>
+
+<script src="/config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

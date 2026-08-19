@@ -1,0 +1,143 @@
+-- Seed Data for HIPA Masalas Database
+
+INSERT INTO public.products (name, slug, short_description, description, image_url, image_alt, category, features, pack_sizes, status, is_featured, sort_order, seo_title, seo_description)
+VALUES
+(
+  'Sambar Powder',
+  'sambar-powder',
+  'A perfectly balanced blend of roasted lentils and spices for that authentic South Indian sambar aroma.',
+  'Handcrafted using traditional stone-ground techniques. Roasted lentils and whole aromatic spices combine to create an authentic, flavorful sambar experience.',
+  '/images/products/Sambar-masala.png',
+  'Hipa Sambar Powder pack',
+  'powders',
+  '["Stone-ground freshness", "No artificial colour", "Balanced heat & aroma"]'::jsonb,
+  '["100g", "200g", "500g", "1kg"]'::jsonb,
+  'available',
+  true,
+  1,
+  'Sambar Powder | HIPA Masala — Taste of Tradition',
+  'Buy Sambar Powder from HIPA Masala — stone-ground, no artificial colours or preservatives.'
+),
+(
+  'Rasam Powder',
+  'rasam-powder',
+  'Tangy, aromatic rasam powder crafted the traditional way for a comforting South Indian classic.',
+  'Made with roasted coriander, cumin, pepper, and regional herbs for a warming, digestive rasam.',
+  '/images/products/Rasam-masala-h.png',
+  'Hipa Rasam Powder pack',
+  'powders',
+  '["Traditional roasted spice mix", "Rich, tangy aroma", "Perfect everyday flavour"]'::jsonb,
+  '["100g", "200g", "500g", "1kg"]'::jsonb,
+  'available',
+  true,
+  2,
+  'Rasam Powder | HIPA Masala — Taste of Tradition',
+  'Buy Rasam Powder from HIPA Masala — stone-ground, traditional roasted spice blend.'
+),
+(
+  'Turmeric Powder',
+  'turmeric-powder',
+  'Pure, high-curcumin turmeric powder with rich golden colour and earthy aroma.',
+  'Sourced from prime turmeric roots, sun-dried and ground to preserve natural curcumin potency and vibrant color.',
+  '/images/products/Turmeric-Powder-h.png',
+  'Hipa Turmeric Powder pack',
+  'powders',
+  '["High curcumin content", "No polishing agents", "Naturally earthy aroma"]'::jsonb,
+  '["100g", "200g", "500g", "1kg"]'::jsonb,
+  'available',
+  true,
+  3,
+  'Turmeric Powder | HIPA Masala — Taste of Tradition',
+  'Pure high-curcumin Turmeric Powder by HIPA Masala. 100% natural, no additives.'
+),
+(
+  'Red Chilli Powder',
+  'red-chilli-powder',
+  'Vibrant, deep-red chilli powder ground from handpicked chillies for natural colour and controlled heat.',
+  'Finely ground from selected red chillies without artificial dyes or oils. Delivers rich color and authentic heat.',
+  '/images/products/Redchilli-powder.png',
+  'Hipa Red Chilli Powder pack',
+  'powders',
+  '["Natural colour, no dye", "Balanced spice level", "Stone-ground texture"]'::jsonb,
+  '["100g", "200g", "500g", "1kg"]'::jsonb,
+  'available',
+  false,
+  4,
+  'Red Chilli Powder | HIPA Masala — Taste of Tradition',
+  'Vibrant Red Chilli Powder ground from handpicked chillies by HIPA Masala.'
+),
+(
+  'Coriander Powder',
+  'coriander-powder',
+  'Freshly ground coriander seeds with a naturally sweet, earthy aroma for everyday cooking.',
+  'Slow-milled from premium coriander seeds to retain natural essential oils and fresh citrusy-earthy aroma.',
+  '/images/products/Corainder-powder-h.png',
+  'Hipa Coriander Powder pack',
+  'powders',
+  '["100% pure coriander", "No fillers or additives", "Locks in natural oils"]'::jsonb,
+  '["100g", "200g", "500g", "1kg"]'::jsonb,
+  'available',
+  false,
+  5,
+  'Coriander Powder | HIPA Masala — Taste of Tradition',
+  'Freshly ground Coriander Powder by HIPA Masala with natural sweet and earthy aroma.'
+),
+(
+  'Cumin Powder',
+  'cumin-powder',
+  'Roasted cumin seeds ground fresh for a warm, nutty flavour in every dish.',
+  'Cleaned cumin seeds gently roasted before grinding to unlock maximum warm essential oils.',
+  '/images/products/Cumin-powder-h.png',
+  'Hipa Cumin Powder pack',
+  'powders',
+  '["Slow-roasted for aroma", "No preservatives", "Fine, even texture"]'::jsonb,
+  '["100g", "200g", "500g"]'::jsonb,
+  'available',
+  false,
+  6,
+  'Cumin Powder | HIPA Masala — Taste of Tradition',
+  'Roasted Cumin Powder ground fresh for a warm, nutty flavor by HIPA Masala.'
+),
+(
+  'Pepper Powder',
+  'pepper-powder',
+  'Sun-dried black pepper, freshly ground to retain its sharp aroma and natural pungency.',
+  'Single-origin black peppercorns coarse-ground for bold heat and aromatic spice.',
+  '/images/products/pepper-powderr-h.png',
+  'Hipa Pepper Powder pack',
+  'powders',
+  '["Single-origin pepper", "Freshly milled", "Strong natural aroma"]'::jsonb,
+  '["50g", "100g", "200g", "500g"]'::jsonb,
+  'available',
+  false,
+  7,
+  'Pepper Powder | HIPA Masala — Taste of Tradition',
+  'Sun-dried black Pepper Powder freshly ground by HIPA Masala.'
+),
+(
+  'Garam Masala',
+  'garam-masala',
+  'A festive blend of whole spices, roasted and ground in small batches for a rich, warming aroma.',
+  'A master blend of cardamom, cinnamon, cloves, star anise, and whole spices for rich gravies and curries.',
+  '/images/products/Garam-Masala-h.png',
+  'Hipa Garam Masala pack',
+  'powders',
+  '["12+ whole spices", "Small-batch roasted", "No artificial flavouring"]'::jsonb,
+  '["100g", "200g", "500g"]'::jsonb,
+  'available',
+  true,
+  8,
+  'Garam Masala | HIPA Masala — Taste of Tradition',
+  'Festive small-batch Garam Masala crafted from 12+ whole roasted spices by HIPA Masala.'
+)
+ON CONFLICT (slug) DO NOTHING;
+
+-- Seed FAQs
+INSERT INTO public.faqs (question, answer, category, sort_order, is_active)
+VALUES
+('Are HIPA Masala powders free from artificial colours and preservatives?', 'Yes. Every HIPA Masala blend is made from pure, handpicked spices with no artificial colours, fillers or preservatives — just traditional stone-ground preparation.', 'quality', 1, true),
+('What pack sizes are available?', 'Most products are available in 100g, 200g, 500g and 1kg packs. Bulk and custom pack sizes are available for distributors and wholesalers on request.', 'products', 2, true),
+('Do you supply to distributors, wholesalers and retailers?', 'Yes. We work with distributors, wholesalers, supermarkets and restaurants across India. Fill in the enquiry form or WhatsApp us for pricing and minimum order quantities.', 'business', 3, true),
+('How long do the masala powders stay fresh?', 'Stored in a cool, dry place in an airtight container, our masala powders stay fresh and aromatic for up to 6-9 months from the date of packing.', 'storage', 4, true),
+('Do you deliver across India?', 'Yes, we ship pan-India. For bulk and distributor orders, delivery timelines and logistics are confirmed after your enquiry is reviewed by our team.', 'shipping', 5, true),
+('Is there a minimum order quantity for bulk orders?', 'Bulk orders typically start from a minimum quantity that varies by product. Share your requirement over WhatsApp or the enquiry form and our team will confirm the MOQ and pricing.', 'business', 6, true);

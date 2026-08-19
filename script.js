@@ -334,3 +334,42 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 });
+
+/* ---------- GSAP + ScrollTrigger Hero Motion Graphics ---------- */
+if (typeof gsap !== 'undefined' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  if (typeof ScrollTrigger !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+  }
+
+  // Hero text animation
+  gsap.from('.hero-copy .eyebrow', { opacity: 0, y: 15, duration: 0.8, delay: 0.2 });
+  gsap.from('.hero-copy h1', { opacity: 0, y: 25, duration: 0.9, delay: 0.35, ease: 'power2.out' });
+  gsap.from('.hero-copy .hero-desc', { opacity: 0, y: 20, duration: 0.8, delay: 0.5 });
+  gsap.from('.hero-btns', { opacity: 0, y: 15, duration: 0.7, delay: 0.65 });
+
+  // Hero image subtle floating & parallax
+  const heroBadge = document.querySelector('.hero-badge');
+  if (heroBadge) {
+    gsap.to(heroBadge, {
+      y: -8,
+      duration: 2.5,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut'
+    });
+  }
+
+  const heroBgImg = document.querySelector('.hero-bg-img');
+  if (heroBgImg && typeof ScrollTrigger !== 'undefined') {
+    gsap.to(heroBgImg, {
+      yPercent: 12,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.hero',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: true
+      }
+    });
+  }
+}
