@@ -15,28 +15,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const cfg        = window.SITE_CONFIG || {};
   const SHEETS_API = cfg.SHEETS_API_URL || '/api';
 
-  const getCleanSlug = (str) => {
+  const slugify = (str) => {
     if (!str) return '';
     let s = String(str).trim().toLowerCase();
     try { s = decodeURIComponent(s); } catch (e) {}
-    return s.replace(/^\/+|\/+$/g, '');
+    return s.replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   };
 
   const getSlugFromUrl = () => {
     const path = window.location.pathname;
-    const match = path.match(/\/blog\/(.+)/i);
+    const match = path.match(/\/blog\/(.+)/i) || path.match(/\/blog-details\/(.+)/i);
     if (match && match[1]) {
-      return getCleanSlug(match[1]);
+      return slugify(match[1]);
     }
     const params = new URLSearchParams(window.location.search);
     const qSlug = params.get('slug');
     if (qSlug) {
-      return getCleanSlug(qSlug);
+      return slugify(qSlug);
     }
     return '';
   };
 
   const slug = getSlugFromUrl();
+
+  // Task 6 Temporary Debugging Logs
+  console.log("[Blog Details Debug] Current pathname:", window.location.pathname);
+  console.log("[Blog Details Debug] Extracted clean blog slug:", slug);
 
   // If accessed via legacy query string, normalize browser URL silently
   if (slug && (window.location.search.includes('slug=') || window.location.pathname.includes('blog-details'))) {
@@ -163,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const updateSEO = (post) => {
     const title       = post.meta_title       || post.title   || '';
     const description = (post.meta_description || post.excerpt || '').slice(0, 160);
-    const cleanSlug   = getCleanSlug(post.slug);
+    const cleanSlug   = slugify(post.slug);
     const canonicalUrl = `https://www.hipamasalas.com/blog/${cleanSlug}`;
     const image       = toDriveImageUrl(post.featured_image) || 'https://www.hipamasalas.com/og-image.png';
 
@@ -214,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const renderShareLinks = (post) => {
-    const pageUrl   = `https://www.hipamasalas.com/blog/${getCleanSlug(post.slug)}`;
+    const pageUrl   = `https://www.hipamasalas.com/blog/${slugify(post.slug)}`;
     const pageTitle = post.title || '';
 
     const links = {
@@ -251,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const pTitle    = p.title   || '';
       const rawImage  = p.featured_image || '';
       const pImage    = toDriveImageUrl(rawImage);
-      const cleanSlug = getCleanSlug(p.slug);
+      const cleanSlug = slugify(p.slug);
       const blogHref  = `/blog/${cleanSlug}`;
 
       const card = document.createElement('article');
@@ -278,6 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const renderArticle = (post, related) => {
+    console.log("[Blog Details Debug] Matched blog article post:", post);
     const title      = post.title          || '';
     const category   = post.category       || '';
     const rawImage   = post.featured_image || '';

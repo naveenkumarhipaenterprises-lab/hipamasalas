@@ -3,18 +3,17 @@
    ---------------------------------------------------------
    Returns a single published blog post by ?slug= plus up
    to 3 related posts from the same category.
-   Renders full Google Doc content directly.
    ========================================================= */
 
 'use strict';
 
 const SHEET_NAME = 'Blogs';
 
-function normSlug(str) {
+function slugify(str) {
   if (!str) return '';
   let s = String(str).trim().toLowerCase();
   try { s = decodeURIComponent(s); } catch (e) {}
-  return s.replace(/^\/+|\/+$/g, '');
+  return s.replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
 /* ---------- Convert Google Drive view links to direct image URLs ---------- */
@@ -137,8 +136,8 @@ function isPublishedRow(r) {
 
 async function transform(row, index, fetchFullContent = true) {
   const title       = row['title'] || '';
-  const rawSlug     = row['slug'] || '';
-  const cleanSlug   = normSlug(rawSlug);
+  const rawSlug     = row['slug'] || row['url'] || row['link'] || row['permalink'] || title;
+  const cleanSlug   = slugify(rawSlug);
   const category    = row['category'] || '';
   const author      = row['author'] || 'HIPA Masala Team';
   const rawImage    = row['banner image'] || row['banner_image'] || row['featured_image'] || row['cover image'] || row['cover_image'] || row['image'] || '';
@@ -184,7 +183,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const reqSlug = normSlug(req.query.slug);
+  const reqSlug = slugify(req.query.slug);
   if (!reqSlug) {
     return res.status(400).json({ error: 'slug query parameter is required.' });
   }
@@ -196,20 +195,27 @@ module.exports = async function handler(req, res) {
       .map((r, i) => ({ row: r, idx: i }))
       .filter(({ row }) =>
         isPublishedRow(row) &&
-        row.title && row.title.trim() !== '' &&
-        row.slug  && row.slug.trim()  !== ''
+        row.title && row.title.trim() !== ''
       );
 
-    const matchItem = published.find(({ row }) => normSlug(row.slug) === reqSlug);
+    const matchItem = published.find(({ row }) => {
+      const rowSlug = row['slug'] || row['url'] || row['link'] || row['permalink'] || row['title'] || '';
+      return slugify(rowSlug) === reqSlug;
+    });
+
     if (!matchItem) {
-      return res.status(404).json({ error: 'Post not found.' });
+      console.warn(`[API /api/blog] No match found for requested slug "${reqSlug}". Available published slugs:`, published.map(p => slugify(p.row['slug'] || p.row['title'])));
+      return res.status(404).json({ error: 'Post not found.', requested_slug: reqSlug });
     }
 
     const post = await transform(matchItem.row, matchItem.idx, true);
 
     const categoryName = (matchItem.row['category'] || '').trim().toLowerCase();
     const relatedRows = published
-      .filter(({ row }) => normSlug(row.slug) !== reqSlug && (row.category || '').trim().toLowerCase() === categoryName)
+      .filter(({ row }) => {
+        const rowSlug = row['slug'] || row['url'] || row['link'] || row['permalink'] || row['title'] || '';
+        return slugify(rowSlug) !== reqSlug && (row.category || '').trim().toLowerCase() === categoryName;
+      })
       .slice(0, 3);
 
     const related = await Promise.all(
