@@ -1,12 +1,16 @@
 {
   "functions": {
-    "api/blogs.js": {
-      "memory": 128,
-      "maxDuration": 10
-    },
-    "api/blog.js": {
-      "memory": 128,
-      "maxDuration": 10
-    }
-  }
+    "api/blogs.js": { "memory": 128, "maxDuration": 10 },
+    "api/blog.js":  { "memory": 128, "maxDuration": 10 }
+  },
+  "rewrites": [
+    { "source": "/products/sambar-powder",     "destination": "/products/sambar-powder.html" },
+    { "source": "/products/rasam-powder",      "destination": "/products/rasam-powder.html" },
+    { "source": "/products/turmeric-powder",   "destination": "/products/turmeric-powder.html" },
+    { "source": "/products/red-chilli-powder", "destination": "/products/red-chilli-powder.html" },
+    { "source": "/products/coriander-powder",  "destination": "/products/coriander-powder.html" },
+    { "source": "/products/cumin-powder",      "destination": "/products/cumin-powder.html" },
+    { "source": "/products/pepper-powder",     "destination": "/products/pepper-powder.html" },
+    { "source": "/products/garam-masala",      "destination": "/products/garam-masala.html" }
+  ]
 }

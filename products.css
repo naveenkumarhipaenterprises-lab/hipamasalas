@@ -122,11 +122,29 @@
   background:var(--cream-2); border:1px solid rgba(30,58,23,.12);
   padding:5px 11px; border-radius:999px;
 }
-.pdp-actions{ display:flex; gap:10px; margin-top:auto; }
-.pdp-actions .btn{ flex:1; justify-content:center; padding:12px 14px; font-size:12px; }
+.pdp-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:auto;
+}
+.pdp-actions .btn{
+  flex:1 1 auto;
+  min-width:0;
+  justify-content:center;
+  padding:10px 12px;
+  font-size:12px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+@media (max-width:380px){
+  .pdp-actions{ flex-direction:column; }
+  .pdp-actions .btn{ width:100%; flex:none; }
+}
 .btn-whatsapp{ background:#25D366; color:#fff; box-shadow:var(--shadow-sm); }
 .btn-whatsapp:hover{ background:#22c15e; transform:translateY(-2px); box-shadow:var(--shadow-md); }
-.btn-whatsapp svg{ width:15px; height:15px; }
+.btn-whatsapp svg{ width:15px; height:15px; flex-shrink:0; }
 
 /* -------------------- Why Choose (dark strip, product page variant) -------------------- */
 .why-choose{ background:var(--green-800); padding:80px 0; }

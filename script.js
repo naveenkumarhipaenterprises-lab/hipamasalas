@@ -160,21 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { threshold: 0.15 });
   revealEls.forEach(el => revealObserver.observe(el));
 
-  /* ---------- Cart counter ---------- */
-  const cartCount = document.getElementById('cartCount');
-  let count = 0;
-  document.querySelectorAll('.add-to-cart').forEach(btn => {
-    btn.addEventListener('click', () => {
-      count++;
-      cartCount.textContent = count;
-      btn.textContent = 'Added ✓';
-      btn.disabled = true;
-      setTimeout(() => {
-        btn.textContent = 'Shop Now';
-        btn.disabled = false;
-      }, 1400);
-    });
-  });
 
   /* ---------- Hero 3-Product Horizontal Carousel (7 Products Only) ---------- */
   const heroCarouselTrack = document.getElementById('heroCarouselTrack');
@@ -206,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     heroCarouselTrack.innerHTML = renderList.map((item, idx) => `
       <div class="hero-carousel-item" data-index="${idx % totalItems}">
-        <a href="${item.id}.html" class="hero-carousel-card">
+        <a href="/products/${item.id}" class="hero-carousel-card">
           <img class="hero-carousel-img" src="${item.image}" alt="${item.alt}">
           <span class="hero-carousel-title">${item.name}</span>
         </a>
