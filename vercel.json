@@ -1,4 +1,6 @@
 {
+  "cleanUrls": true,
+  "trailingSlash": false,
   "functions": {
     "api/blogs.js":     { "memory": 128, "maxDuration": 10 },
     "api/blog.js":      { "memory": 128, "maxDuration": 10 },
@@ -9,6 +11,7 @@
   "rewrites": [
     { "source": "/faq",                        "destination": "/faq.html" },
     { "source": "/admin",                      "destination": "/admin/index.html" },
+    { "source": "/admin/",                     "destination": "/admin/index.html" },
     { "source": "/products/sambar-powder",     "destination": "/products/sambar-powder.html" },
     { "source": "/products/rasam-powder",      "destination": "/products/rasam-powder.html" },
     { "source": "/products/turmeric-powder",   "destination": "/products/turmeric-powder.html" },
