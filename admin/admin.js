@@ -1,4 +1,4 @@
-// HIPA Masala Admin CMS Logic (Full Functionality: Products, FAQs & Lead/Enquiry Management)
+// HIPA Masala Admin CMS Logic (Modal CRUD, Permanent Availability Sync & Lead Tracking)
 
 document.addEventListener('DOMContentLoaded', () => {
   const authScreen = document.getElementById('authScreen');
@@ -48,28 +48,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let enquiries = [];
 
-  // Restore saved product status, custom products, FAQs, and enquiries from localStorage
-  try {
-    const savedStatuses = JSON.parse(localStorage.getItem('hipa_product_statuses') || '{}');
-    products.forEach(p => {
-      if (savedStatuses[p.slug]) p.status = savedStatuses[p.slug];
-    });
+  function loadLocalState() {
+    try {
+      const savedStatuses = JSON.parse(localStorage.getItem('hipa_product_statuses') || '{}');
+      products.forEach(p => {
+        if (savedStatuses[p.slug]) p.status = savedStatuses[p.slug];
+      });
 
-    const customProds = JSON.parse(localStorage.getItem('hipa_custom_products') || '[]');
-    if (Array.isArray(customProds) && customProds.length > 0) {
-      products = [...products, ...customProds];
-    }
+      const customProds = JSON.parse(localStorage.getItem('hipa_custom_products') || '[]');
+      if (Array.isArray(customProds) && customProds.length > 0) {
+        customProds.forEach(cp => {
+          if (!products.some(p => p.slug === cp.slug)) products.push(cp);
+        });
+      }
 
-    const savedFaqs = JSON.parse(localStorage.getItem('hipa_faqs') || '[]');
-    if (Array.isArray(savedFaqs) && savedFaqs.length > 0) {
-      faqs = savedFaqs;
-    }
+      const savedFaqs = JSON.parse(localStorage.getItem('hipa_faqs') || '[]');
+      if (Array.isArray(savedFaqs) && savedFaqs.length > 0) faqs = savedFaqs;
 
-    const savedEnquiries = JSON.parse(localStorage.getItem('hipa_enquiries') || '[]');
-    if (Array.isArray(savedEnquiries) && savedEnquiries.length > 0) {
-      enquiries = savedEnquiries;
-    }
-  } catch (e) {}
+      const savedEnquiries = JSON.parse(localStorage.getItem('hipa_enquiries') || '[]');
+      if (Array.isArray(savedEnquiries) && savedEnquiries.length > 0) enquiries = savedEnquiries;
+    } catch (e) {}
+  }
+
+  loadLocalState();
 
   // Check login session
   const isLoggedIn = sessionStorage.getItem('hipa_admin_auth') === 'true';
@@ -270,8 +271,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const { data: fData } = await supabase.from('faqs').select('*').order('sort_order');
         if (fData) faqs = fData;
       } catch (err) {}
+    } else {
+      try {
+        const res = await fetch('/api/products').then(r => r.json());
+        if (res.success && Array.isArray(res.data)) {
+          // Merge API data without overwriting local admin statuses
+          const statusMap = JSON.parse(localStorage.getItem('hipa_product_statuses') || '{}');
+          res.data.forEach(p => {
+            const idx = products.findIndex(item => item.slug === p.slug);
+            if (idx !== -1) {
+              products[idx] = { ...products[idx], ...p, status: statusMap[p.slug] || p.status };
+            }
+          });
+        }
+      } catch (err) {}
     }
 
+    loadLocalState();
     renderProducts();
     renderEnquiries();
     renderFaqs();
