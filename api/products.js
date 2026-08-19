@@ -1,4 +1,4 @@
-// Vercel Serverless Function: /api/products
+// Vercel Serverless Function: /api/products (Zero-dependency Supabase REST API integration)
 
 const FALLBACK_PRODUCTS = [
   {
@@ -152,42 +152,47 @@ module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const { slug } = req.query;
+  const { slug } = req.query || {};
 
-  // Use Supabase if configured
-  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  // Attempt direct REST fetch to Supabase
+  if (supabaseUrl && supabaseKey) {
     try {
-      const { createClient } = require('@supabase/supabase-js');
-      const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-
-      let query = supabase.from('products').select('*').eq('is_deleted', false).order('sort_order', { ascending: true });
+      let endpoint = `${supabaseUrl.replace(/\/$/, '')}/rest/v1/products?is_deleted=eq.false&order=sort_order.asc`;
       if (slug) {
-        query = query.eq('slug', slug).single();
+        endpoint = `${supabaseUrl.replace(/\/$/, '')}/rest/v1/products?slug=eq.${encodeURIComponent(slug)}&is_deleted=eq.false`;
       }
 
-      const { data, error } = await query;
-      if (error && error.code !== 'PGRST116') {
-        throw error;
-      }
+      const response = await fetch(endpoint, {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`
+        }
+      });
 
-      if (data) {
-        return res.status(200).json({ success: true, data });
+      if (response.ok) {
+        const data = await response.json();
+        if (slug) {
+          if (Array.isArray(data) && data.length > 0) {
+            return res.status(200).json({ success: true, data: data[0] });
+          }
+        } else if (Array.isArray(data) && data.length > 0) {
+          return res.status(200).json({ success: true, data });
+        }
       }
     } catch (err) {
-      console.warn('Supabase fetch failed, fallback to local dataset:', err.message);
+      console.warn('Supabase fetch error, returning fallback:', err.message);
     }
   }
 
-  // Fallback to in-memory product list
+  // Fallback to local 8 products
   if (slug) {
     const p = FALLBACK_PRODUCTS.find(item => item.slug === slug);
-    if (!p) {
-      return res.status(404).json({ success: false, error: 'Product not found' });
-    }
+    if (!p) return res.status(404).json({ success: false, error: 'Product not found' });
     return res.status(200).json({ success: true, data: p });
   }
 

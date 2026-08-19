@@ -1,4 +1,4 @@
-// Vercel Serverless Function: /api/faqs
+// Vercel Serverless Function: /api/faqs (Zero-dependency Supabase REST API integration)
 
 const FALLBACK_FAQS = [
   {
@@ -58,13 +58,23 @@ module.exports = async (req, res) => {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (supabaseUrl && supabaseKey) {
     try {
-      const { createClient } = require('@supabase/supabase-js');
-      const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-      const { data, error } = await supabase.from('faqs').select('*').eq('is_active', true).order('sort_order', { ascending: true });
-      if (!error && data) {
-        return res.status(200).json({ success: true, data });
+      const endpoint = `${supabaseUrl.replace(/\/$/, '')}/rest/v1/faqs?is_active=eq.true&order=sort_order.asc`;
+      const response = await fetch(endpoint, {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+          return res.status(200).json({ success: true, data });
+        }
       }
     } catch (err) {
       console.warn('Supabase FAQ fetch warning:', err.message);

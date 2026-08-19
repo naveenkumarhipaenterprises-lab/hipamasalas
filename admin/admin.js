@@ -1,4 +1,4 @@
-// HIPA Masala Admin CMS Logic
+// HIPA Masala Admin CMS Logic (Supabase Auth & PostgreSQL Integration)
 
 document.addEventListener('DOMContentLoaded', () => {
   const authScreen = document.getElementById('authScreen');
@@ -7,16 +7,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginError = document.getElementById('loginError');
   const logoutBtn = document.getElementById('logoutBtn');
 
-  // In-memory data state (persists via API or Supabase fallback)
+  // Supabase client instance (if config present)
+  const cfg = window.SITE_CONFIG || {};
+  let supabase = null;
+  if (window.supabase && cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY) {
+    supabase = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+  }
+
+  // In-memory data state fallback
   let products = [
-    { id: "1", name: "Sambar Powder", slug: "sambar-powder", image_url: "/images/products/Sambar-masala.png", status: "available", is_featured: true },
-    { id: "2", name: "Rasam Powder", slug: "rasam-powder", image_url: "/images/products/Rasam-masala-h.png", status: "available", is_featured: true },
-    { id: "3", name: "Turmeric Powder", slug: "turmeric-powder", image_url: "/images/products/Turmeric-Powder-h.png", status: "available", is_featured: true },
-    { id: "4", name: "Red Chilli Powder", slug: "red-chilli-powder", image_url: "/images/products/Redchilli-powder.png", status: "available", is_featured: false },
-    { id: "5", name: "Coriander Powder", slug: "coriander-powder", image_url: "/images/products/Corainder-powder-h.png", status: "available", is_featured: false },
-    { id: "6", name: "Cumin Powder", slug: "cumin-powder", image_url: "/images/products/Cumin-powder-h.png", status: "available", is_featured: false },
-    { id: "7", name: "Pepper Powder", slug: "pepper-powder", image_url: "/images/products/pepper-powderr-h.png", status: "available", is_featured: false },
-    { id: "8", name: "Garam Masala", slug: "garam-masala", image_url: "/images/products/Garam-Masala-h.png", status: "available", is_featured: true }
+    { id: "1", name: "Sambar Powder", slug: "sambar-powder", image_url: "/images/products/Sambar-masala.png", status: "available", is_featured: true, sort_order: 1 },
+    { id: "2", name: "Rasam Powder", slug: "rasam-powder", image_url: "/images/products/Rasam-masala-h.png", status: "available", is_featured: true, sort_order: 2 },
+    { id: "3", name: "Turmeric Powder", slug: "turmeric-powder", image_url: "/images/products/Turmeric-Powder-h.png", status: "available", is_featured: true, sort_order: 3 },
+    { id: "4", name: "Red Chilli Powder", slug: "red-chilli-powder", image_url: "/images/products/Redchilli-powder.png", status: "available", is_featured: false, sort_order: 4 },
+    { id: "5", name: "Coriander Powder", slug: "coriander-powder", image_url: "/images/products/Corainder-powder-h.png", status: "available", is_featured: false, sort_order: 5 },
+    { id: "6", name: "Cumin Powder", slug: "cumin-powder", image_url: "/images/products/Cumin-powder-h.png", status: "available", is_featured: false, sort_order: 6 },
+    { id: "7", name: "Pepper Powder", slug: "pepper-powder", image_url: "/images/products/pepper-powderr-h.png", status: "available", is_featured: false, sort_order: 7 },
+    { id: "8", name: "Garam Masala", slug: "garam-masala", image_url: "/images/products/Garam-Masala-h.png", status: "available", is_featured: true, sort_order: 8 }
   ];
 
   let enquiries = [];
@@ -28,23 +35,31 @@ document.addEventListener('DOMContentLoaded', () => {
     showApp();
   }
 
-  loginForm.addEventListener('submit', (e) => {
+  loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('adminEmail').value;
     const pass = document.getElementById('adminPass').value;
 
-    // Default admin credentials (or server auth)
+    if (supabase) {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+      if (error) {
+        loginError.textContent = error.message;
+        loginError.style.display = 'block';
+        return;
+      }
+    }
+
     if (email && pass) {
       sessionStorage.setItem('hipa_admin_auth', 'true');
       loginError.style.display = 'none';
       showApp();
-    } else {
-      loginError.textContent = 'Invalid credentials';
-      loginError.style.display = 'block';
     }
   });
 
-  logoutBtn.addEventListener('click', () => {
+  logoutBtn.addEventListener('click', async () => {
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
     sessionStorage.removeItem('hipa_admin_auth');
     adminApp.style.display = 'none';
     authScreen.style.display = 'flex';
@@ -68,21 +83,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  function fetchInitialData() {
-    // Fetch products
-    fetch('/api/products')
-      .then(r => r.json())
-      .then(res => {
-        if (res.success && res.data) {
-          products = res.data;
-          renderProducts();
-          updateStats();
-        }
-      })
-      .catch(() => {
-        renderProducts();
-        updateStats();
-      });
+  async function fetchInitialData() {
+    if (supabase) {
+      const { data: pData } = await supabase.from('products').select('*').eq('is_deleted', false).order('sort_order');
+      if (pData && pData.length > 0) products = pData;
+
+      const { data: eData } = await supabase.from('enquiries').select('*').order('created_at', { ascending: false });
+      if (eData) enquiries = eData;
+
+      const { data: fData } = await supabase.from('faqs').select('*').order('sort_order');
+      if (fData) faqs = fData;
+    } else {
+      fetch('/api/products')
+        .then(r => r.json())
+        .then(res => { if (res.success && res.data) products = res.data; renderProducts(); updateStats(); });
+    }
+
+    renderProducts();
+    renderEnquiries();
+    renderFaqs();
+    updateStats();
   }
 
   function updateStats() {
@@ -108,24 +128,63 @@ document.addEventListener('DOMContentLoaded', () => {
         </td>
         <td>${p.is_featured ? '? Yes' : 'No'}</td>
         <td>
-          <button class="toggle-status-btn" data-id="${p.id}" style="padding: 4px 8px; font-size: 0.8rem; cursor: pointer;">
-            Toggle ${p.status === 'available' ? 'Unavailable' : 'Available'}
+          <button class="toggle-status-btn" data-id="${p.id}" style="padding: 4px 8px; font-size: 0.8rem; cursor: pointer; border-radius: 4px; border: 1px solid #ccc; background: #fff;">
+            Mark ${p.status === 'available' ? 'Unavailable' : 'Available'}
           </button>
         </td>
       </tr>
     `).join('');
 
-    // Attach status toggle handler
     tbody.querySelectorAll('.toggle-status-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const id = btn.getAttribute('data-id');
         const prod = products.find(p => p.id === id);
         if (prod) {
           prod.status = prod.status === 'available' ? 'unavailable' : 'available';
+          if (supabase) {
+            await supabase.from('products').update({ status: prod.status }).eq('id', id);
+          }
           renderProducts();
           updateStats();
         }
       });
     });
+  }
+
+  function renderEnquiries() {
+    const tbody = document.getElementById('enquiriesTableBody');
+    if (!tbody) return;
+
+    if (enquiries.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #6b7280;">No enquiries received yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = enquiries.map(e => `
+      <tr>
+        <td>${new Date(e.created_at).toLocaleDateString()}</td>
+        <td><strong>${e.name}</strong></td>
+        <td>${e.company_name || '—'}</td>
+        <td><span class="status-badge badge-new">${e.product_name_snapshot}</span></td>
+        <td><a href="tel:${e.phone}">${e.phone}</a></td>
+        <td><span class="status-badge badge-${e.status}">${e.status}</span></td>
+        <td><button style="padding: 4px 8px; font-size: 0.8rem;">View</button></td>
+      </tr>
+    `).join('');
+  }
+
+  function renderFaqs() {
+    const tbody = document.getElementById('faqsTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = faqs.map(f => `
+      <tr>
+        <td>${f.sort_order}</td>
+        <td><strong>${f.question}</strong></td>
+        <td>${f.category}</td>
+        <td><span class="status-badge ${f.is_active ? 'badge-available' : 'badge-unavailable'}">${f.is_active ? 'Active' : 'Disabled'}</span></td>
+        <td><button style="padding: 4px 8px; font-size: 0.8rem;">Edit</button></td>
+      </tr>
+    `).join('');
   }
 });

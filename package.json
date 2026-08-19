@@ -1,0 +1,11 @@
+{
+  "name": "hipa-masala-website",
+  "version": "1.0.0",
+  "description": "HIPA Masalas B2B Product Catalogue & Admin CMS",
+  "scripts": {
+    "build": "echo 'Build complete'"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.48.0"
+  }
+}

@@ -1,4 +1,4 @@
-// Vercel Serverless Function: /api/enquiries
+// Vercel Serverless Function: /api/enquiries (Zero-dependency Supabase REST API integration)
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -40,26 +40,37 @@ module.exports = async (req, res) => {
     created_at: new Date().toISOString()
   };
 
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
   let savedId = null;
 
-  // Insert to Supabase if configured
-  if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  if (supabaseUrl && supabaseKey) {
     try {
-      const { createClient } = require('@supabase/supabase-js');
-      const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-      const { data, error } = await supabase.from('enquiries').insert([record]).select('id').single();
-      if (!error && data) {
-        savedId = data.id;
+      const endpoint = `${supabaseUrl.replace(/\/$/, '')}/rest/v1/enquiries`;
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(record)
+      });
+      if (response.ok) {
+        const result = await response.json();
+        if (Array.isArray(result) && result.length > 0) {
+          savedId = result[0].id;
+        }
       }
     } catch (err) {
-      console.error('Failed saving enquiry to Supabase:', err.message);
+      console.error('Supabase enquiry insert error:', err.message);
     }
   }
 
   // Optional: Send email via Resend if RESEND_API_KEY is configured
   if (process.env.RESEND_API_KEY) {
     try {
-      const fetch = require('node-fetch');
       await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
