@@ -10,7 +10,12 @@
     "api/enquiries.js": { "memory": 128, "maxDuration": 10 }
   },
   "rewrites": [
-    { "source": "/blog/(.+)",                   "destination": "/blog-details.html" },
+    { "source": "/blog",                        "destination": "/blog.html" },
+    { "source": "/blog/",                       "destination": "/blog.html" },
+    { "source": "/blog/:slug",                  "destination": "/blog-details.html" },
+    { "source": "/blog/:slug/",                 "destination": "/blog-details.html" },
+    { "source": "/faq",                         "destination": "/faq.html" },
+    { "source": "/faq/",                        "destination": "/faq.html" },
     { "source": "/admin",                       "destination": "/admin/index.html" },
     { "source": "/admin/",                      "destination": "/admin/index.html" }
   ]
