@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const getSlugFromUrl = () => {
     const path = window.location.pathname;
-    const match = path.match(/\/blog\/([^\/]+)/i);
+    const match = path.match(/\/blog\/(.+)/i);
     if (match && match[1]) {
       return getCleanSlug(match[1]);
     }
