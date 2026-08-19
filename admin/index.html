@@ -8,7 +8,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="/admin/admin.css">
+<style>
+/* Defensive fallback inline styles */
+.auth-brand img { max-width: 60px !important; height: auto !important; }
+.modal-overlay { display: none; }
+.modal-overlay.open { display: flex !important; }
+</style>
 </head>
 <body>
 
@@ -16,7 +22,7 @@
 <div id="authScreen" class="auth-wrapper">
   <div class="auth-card">
     <div class="auth-brand">
-      <img src="/images/logo.png" alt="HIPA Masala Logo">
+      <img src="/images/logo.png" alt="HIPA Masala Logo" style="max-width: 60px; height: auto;">
       <h2>HIPA Admin</h2>
       <p>Content & Enquiry Management System</p>
     </div>
@@ -217,6 +223,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/config.js"></script>
-<script src="admin.js"></script>
+<script src="/admin/admin.js"></script>
 </body>
 </html>
