@@ -316,6 +316,13 @@ document.addEventListener('DOMContentLoaded', () => {
           prod.status = prod.status === 'available' ? 'unavailable' : 'available';
           saveProductStatuses();
 
+          // Dispatch sticky status to API serverless layer
+          fetch('/api/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'toggle_status', slug, status: prod.status })
+          }).catch(() => {});
+
           if (supabase) {
             try { await supabase.from('products').update({ status: prod.status }).eq('slug', slug); } catch (err) {}
           }

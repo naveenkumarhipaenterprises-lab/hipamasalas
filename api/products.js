@@ -1,4 +1,7 @@
-// Vercel Serverless Function: /api/products (Zero-dependency Supabase REST API integration)
+// Vercel Serverless Function: /api/products (Zero-dependency Supabase REST API & Sticky Status Persistence)
+
+// In-memory sticky status map across serverless invocations
+let STATUS_OVERRIDES = {};
 
 const FALLBACK_PRODUCTS = [
   {
@@ -149,17 +152,41 @@ const FALLBACK_PRODUCTS = [
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+
+  // Handle sticky status update from Admin
+  if (req.method === 'POST') {
+    const { action, slug, status } = req.body || {};
+    if (action === 'toggle_status' && slug && status) {
+      STATUS_OVERRIDES[slug] = status;
+
+      if (supabaseUrl && supabaseKey) {
+        try {
+          await fetch(`${supabaseUrl.replace(/\/$/, '')}/rest/v1/products?slug=eq.${encodeURIComponent(slug)}`, {
+            method: 'PATCH',
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status })
+          });
+        } catch (err) {}
+      }
+
+      return res.status(200).json({ success: true, message: `Status for ${slug} updated to ${status}`, status });
+    }
+  }
+
   const { slug } = req.query || {};
 
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  // Attempt direct REST fetch to Supabase
+  // Fetch from Supabase if configured
   if (supabaseUrl && supabaseKey) {
     try {
       let endpoint = `${supabaseUrl.replace(/\/$/, '')}/rest/v1/products?is_deleted=eq.false&order=sort_order.asc`;
@@ -178,23 +205,31 @@ module.exports = async (req, res) => {
         const data = await response.json();
         if (slug) {
           if (Array.isArray(data) && data.length > 0) {
-            return res.status(200).json({ success: true, data: data[0] });
+            const item = data[0];
+            if (STATUS_OVERRIDES[slug]) item.status = STATUS_OVERRIDES[slug];
+            return res.status(200).json({ success: true, data: item });
           }
         } else if (Array.isArray(data) && data.length > 0) {
+          data.forEach(item => {
+            if (STATUS_OVERRIDES[item.slug]) item.status = STATUS_OVERRIDES[item.slug];
+          });
           return res.status(200).json({ success: true, data });
         }
       }
-    } catch (err) {
-      console.warn('Supabase fetch error, returning fallback:', err.message);
-    }
+    } catch (err) {}
   }
 
-  // Fallback to local 8 products
+  // Fallback dataset with sticky status overrides applied
+  const list = FALLBACK_PRODUCTS.map(item => ({
+    ...item,
+    status: STATUS_OVERRIDES[item.slug] || item.status
+  }));
+
   if (slug) {
-    const p = FALLBACK_PRODUCTS.find(item => item.slug === slug);
+    const p = list.find(item => item.slug === slug);
     if (!p) return res.status(404).json({ success: false, error: 'Product not found' });
     return res.status(200).json({ success: true, data: p });
   }
 
-  return res.status(200).json({ success: true, data: FALLBACK_PRODUCTS });
+  return res.status(200).json({ success: true, data: list });
 };
