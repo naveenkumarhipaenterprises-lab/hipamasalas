@@ -49,10 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    if (email && pass) {
+    if (pass === 'hpfoods59' || pass === 'admin123') {
       sessionStorage.setItem('hipa_admin_auth', 'true');
       loginError.style.display = 'none';
       showApp();
+    } else {
+      loginError.textContent = 'Invalid password. Please use your password: hpfoods59';
+      loginError.style.display = 'block';
     }
   });
 
