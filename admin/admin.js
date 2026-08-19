@@ -1,4 +1,4 @@
-// HIPA Masala Admin CMS Logic (Supabase Auth & PostgreSQL Integration)
+// HIPA Masala Admin CMS Logic (Full Functionality, Modal CRUD, Availability & Supabase Sync)
 
 document.addEventListener('DOMContentLoaded', () => {
   const authScreen = document.getElementById('authScreen');
@@ -7,6 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginError = document.getElementById('loginError');
   const logoutBtn = document.getElementById('logoutBtn');
 
+  // Product Modal elements
+  const productModal = document.getElementById('productModal');
+  const openAddProductModal = document.getElementById('openAddProductModal');
+  const closeProductModal = document.getElementById('closeProductModal');
+  const productForm = document.getElementById('productForm');
+
   // Supabase client instance (if config present)
   const cfg = window.SITE_CONFIG || {};
   let supabase = null;
@@ -14,20 +20,33 @@ document.addEventListener('DOMContentLoaded', () => {
     supabase = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
   }
 
-  // In-memory data state fallback
+  // Base product catalog
   let products = [
-    { id: "1", name: "Sambar Powder", slug: "sambar-powder", image_url: "/images/products/Sambar-masala.png", status: "available", is_featured: true, sort_order: 1 },
-    { id: "2", name: "Rasam Powder", slug: "rasam-powder", image_url: "/images/products/Rasam-masala-h.png", status: "available", is_featured: true, sort_order: 2 },
-    { id: "3", name: "Turmeric Powder", slug: "turmeric-powder", image_url: "/images/products/Turmeric-Powder-h.png", status: "available", is_featured: true, sort_order: 3 },
-    { id: "4", name: "Red Chilli Powder", slug: "red-chilli-powder", image_url: "/images/products/Redchilli-powder.png", status: "available", is_featured: false, sort_order: 4 },
-    { id: "5", name: "Coriander Powder", slug: "coriander-powder", image_url: "/images/products/Corainder-powder-h.png", status: "available", is_featured: false, sort_order: 5 },
-    { id: "6", name: "Cumin Powder", slug: "cumin-powder", image_url: "/images/products/Cumin-powder-h.png", status: "available", is_featured: false, sort_order: 6 },
-    { id: "7", name: "Pepper Powder", slug: "pepper-powder", image_url: "/images/products/pepper-powderr-h.png", status: "available", is_featured: false, sort_order: 7 },
-    { id: "8", name: "Garam Masala", slug: "garam-masala", image_url: "/images/products/Garam-Masala-h.png", status: "available", is_featured: true, sort_order: 8 }
+    { id: "sambar-powder", name: "Sambar Powder", slug: "sambar-powder", image_url: "/images/products/Sambar-masala.png", status: "available", is_featured: true, sort_order: 1 },
+    { id: "rasam-powder", name: "Rasam Powder", slug: "rasam-powder", image_url: "/images/products/Rasam-masala-h.png", status: "available", is_featured: true, sort_order: 2 },
+    { id: "turmeric-powder", name: "Turmeric Powder", slug: "turmeric-powder", image_url: "/images/products/Turmeric-Powder-h.png", status: "available", is_featured: true, sort_order: 3 },
+    { id: "red-chilli-powder", name: "Red Chilli Powder", slug: "red-chilli-powder", image_url: "/images/products/Redchilli-powder.png", status: "available", is_featured: false, sort_order: 4 },
+    { id: "coriander-powder", name: "Coriander Powder", slug: "coriander-powder", image_url: "/images/products/Corainder-powder-h.png", status: "available", is_featured: false, sort_order: 5 },
+    { id: "cumin-powder", name: "Cumin Powder", slug: "cumin-powder", image_url: "/images/products/Cumin-powder-h.png", status: "available", is_featured: false, sort_order: 6 },
+    { id: "pepper-powder", name: "Pepper Powder", slug: "pepper-powder", image_url: "/images/products/pepper-powderr-h.png", status: "available", is_featured: false, sort_order: 7 },
+    { id: "garam-masala", name: "Garam Masala", slug: "garam-masala", image_url: "/images/products/Garam-Masala-h.png", status: "available", is_featured: true, sort_order: 8 }
   ];
 
   let enquiries = [];
   let faqs = [];
+
+  // Restore saved product status from localStorage if present
+  try {
+    const savedStatuses = JSON.parse(localStorage.getItem('hipa_product_statuses') || '{}');
+    products.forEach(p => {
+      if (savedStatuses[p.slug]) p.status = savedStatuses[p.slug];
+    });
+
+    const customProds = JSON.parse(localStorage.getItem('hipa_custom_products') || '[]');
+    if (Array.isArray(customProds) && customProds.length > 0) {
+      products = [...products, ...customProds];
+    }
+  } catch (e) {}
 
   // Check login session
   const isLoggedIn = sessionStorage.getItem('hipa_admin_auth') === 'true';
@@ -60,9 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   logoutBtn.addEventListener('click', async () => {
-    if (supabase) {
-      await supabase.auth.signOut();
-    }
+    if (supabase) await supabase.auth.signOut();
     sessionStorage.removeItem('hipa_admin_auth');
     adminApp.style.display = 'none';
     authScreen.style.display = 'flex';
@@ -86,20 +103,107 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Modal Open & Close
+  if (openAddProductModal) {
+    openAddProductModal.addEventListener('click', () => {
+      document.getElementById('productForm').reset();
+      document.getElementById('editProductId').value = '';
+      document.getElementById('productModalTitle').textContent = 'Add New Product';
+      productModal.classList.add('open');
+    });
+  }
+
+  if (closeProductModal) {
+    closeProductModal.addEventListener('click', () => {
+      productModal.classList.remove('open');
+    });
+  }
+
+  window.addEventListener('click', (e) => {
+    if (e.target === productModal) {
+      productModal.classList.remove('open');
+    }
+  });
+
+  // Product Form Submission
+  if (productForm) {
+    productForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const editId = document.getElementById('editProductId').value;
+      const name = document.getElementById('prodName').value.trim();
+      const slug = document.getElementById('prodSlug').value.trim().toLowerCase().replace(/\s+/g, '-');
+      const shortDesc = document.getElementById('prodShortDesc').value.trim();
+      const fullDesc = document.getElementById('prodFullDesc').value.trim();
+      const imageUrl = document.getElementById('prodImageUrl').value.trim();
+      const status = document.getElementById('prodStatus').value;
+      const availMsg = document.getElementById('prodAvailMsg').value.trim();
+      const features = document.getElementById('prodFeatures').value.split(',').map(s => s.trim()).filter(Boolean);
+      const packSizes = document.getElementById('prodPackSizes').value.split(',').map(s => s.trim()).filter(Boolean);
+
+      const newProd = {
+        id: editId || slug,
+        name,
+        slug,
+        short_description: shortDesc,
+        description: fullDesc,
+        image_url: imageUrl || '/images/products/Sambar-masala.png',
+        status,
+        availability_message: availMsg,
+        features,
+        pack_sizes: packSizes,
+        sort_order: products.length + 1
+      };
+
+      if (editId) {
+        const idx = products.findIndex(p => p.id === editId || p.slug === editId);
+        if (idx !== -1) products[idx] = { ...products[idx], ...newProd };
+      } else {
+        products.push(newProd);
+        // Save custom product to localStorage
+        try {
+          const customProds = JSON.parse(localStorage.getItem('hipa_custom_products') || '[]');
+          customProds.push(newProd);
+          localStorage.setItem('hipa_custom_products', JSON.stringify(customProds));
+        } catch (err) {}
+      }
+
+      // Save status map
+      saveProductStatuses();
+
+      // Save to Supabase if configured
+      if (supabase) {
+        try {
+          await supabase.from('products').upsert([newProd]);
+        } catch (err) {
+          console.warn('Supabase upsert error:', err.message);
+        }
+      }
+
+      productModal.classList.remove('open');
+      renderProducts();
+      updateStats();
+    });
+  }
+
+  function saveProductStatuses() {
+    const statusMap = {};
+    products.forEach(p => statusMap[p.slug] = p.status);
+    localStorage.setItem('hipa_product_statuses', JSON.stringify(statusMap));
+  }
+
   async function fetchInitialData() {
     if (supabase) {
-      const { data: pData } = await supabase.from('products').select('*').eq('is_deleted', false).order('sort_order');
-      if (pData && pData.length > 0) products = pData;
+      try {
+        const { data: pData } = await supabase.from('products').select('*').eq('is_deleted', false).order('sort_order');
+        if (pData && pData.length > 0) products = pData;
 
-      const { data: eData } = await supabase.from('enquiries').select('*').order('created_at', { ascending: false });
-      if (eData) enquiries = eData;
+        const { data: eData } = await supabase.from('enquiries').select('*').order('created_at', { ascending: false });
+        if (eData) enquiries = eData;
 
-      const { data: fData } = await supabase.from('faqs').select('*').order('sort_order');
-      if (fData) faqs = fData;
-    } else {
-      fetch('/api/products')
-        .then(r => r.json())
-        .then(res => { if (res.success && res.data) products = res.data; renderProducts(); updateStats(); });
+        const { data: fData } = await supabase.from('faqs').select('*').order('sort_order');
+        if (fData) faqs = fData;
+      } catch (err) {}
     }
 
     renderProducts();
@@ -131,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </td>
         <td>${p.is_featured ? '? Yes' : 'No'}</td>
         <td>
-          <button class="toggle-status-btn" data-id="${p.id}" style="padding: 4px 8px; font-size: 0.8rem; cursor: pointer; border-radius: 4px; border: 1px solid #ccc; background: #fff;">
+          <button class="toggle-status-btn" data-slug="${p.slug}" style="padding: 4px 8px; font-size: 0.8rem; cursor: pointer; border-radius: 4px; border: 1px solid #ccc; background: #fff;">
             Mark ${p.status === 'available' ? 'Unavailable' : 'Available'}
           </button>
         </td>
@@ -140,12 +244,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tbody.querySelectorAll('.toggle-status-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
-        const id = btn.getAttribute('data-id');
-        const prod = products.find(p => p.id === id);
+        const slug = btn.getAttribute('data-slug');
+        const prod = products.find(p => p.slug === slug);
         if (prod) {
           prod.status = prod.status === 'available' ? 'unavailable' : 'available';
+          saveProductStatuses();
+
           if (supabase) {
-            await supabase.from('products').update({ status: prod.status }).eq('id', id);
+            try {
+              await supabase.from('products').update({ status: prod.status }).eq('slug', slug);
+            } catch (err) {}
           }
           renderProducts();
           updateStats();
@@ -159,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!tbody) return;
 
     if (enquiries.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #6b7280;">No enquiries received yet.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #6b7280; padding: 20px;">No enquiries received yet.</td></tr>';
       return;
     }
 
