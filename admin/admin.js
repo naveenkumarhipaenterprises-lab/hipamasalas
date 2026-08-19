@@ -1,4 +1,4 @@
-// HIPA Masala Admin CMS Logic (Full Functionality, Modal CRUD, Availability & Supabase Sync)
+// HIPA Masala Admin CMS Logic (Full Functionality: Products, FAQs & Lead/Enquiry Management)
 
 document.addEventListener('DOMContentLoaded', () => {
   const authScreen = document.getElementById('authScreen');
@@ -12,6 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const openAddProductModal = document.getElementById('openAddProductModal');
   const closeProductModal = document.getElementById('closeProductModal');
   const productForm = document.getElementById('productForm');
+
+  // FAQ Modal elements
+  const faqModal = document.getElementById('faqModal');
+  const openAddFaqModal = document.getElementById('openAddFaqModal');
+  const closeFaqModal = document.getElementById('closeFaqModal');
+  const faqForm = document.getElementById('faqForm');
 
   // Supabase client instance (if config present)
   const cfg = window.SITE_CONFIG || {};
@@ -32,10 +38,17 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: "garam-masala", name: "Garam Masala", slug: "garam-masala", image_url: "/images/products/Garam-Masala-h.png", status: "available", is_featured: true, sort_order: 8 }
   ];
 
-  let enquiries = [];
-  let faqs = [];
+  let faqs = [
+    { id: "1", question: "Are HIPA Masala powders free from artificial colours and preservatives?", answer: "Yes. Every HIPA Masala blend is made from pure, handpicked spices with no artificial colours, fillers or preservatives — just traditional stone-ground preparation.", category: "quality", sort_order: 1, is_active: true },
+    { id: "2", question: "What pack sizes are available?", answer: "Most products are available in 100g, 200g, 500g and 1kg packs. Bulk and custom pack sizes are available for distributors and wholesalers on request.", category: "products", sort_order: 2, is_active: true },
+    { id: "3", question: "Do you supply to distributors, wholesalers and retailers?", answer: "Yes. We work with distributors, wholesalers, supermarkets and restaurants across India. Fill in the enquiry form or WhatsApp us for pricing and minimum order quantities.", category: "business", sort_order: 3, is_active: true },
+    { id: "4", question: "How long do the masala powders stay fresh?", answer: "Stored in a cool, dry place in an airtight container, our masala powders stay fresh and aromatic for up to 6-9 months from the date of packing.", category: "storage", sort_order: 4, is_active: true },
+    { id: "5", question: "Do you deliver across India?", answer: "Yes, we ship pan-India. For bulk and distributor orders, delivery timelines and logistics are confirmed after your enquiry is reviewed by our team.", category: "shipping", sort_order: 5, is_active: true }
+  ];
 
-  // Restore saved product status from localStorage if present
+  let enquiries = [];
+
+  // Restore saved product status, custom products, FAQs, and enquiries from localStorage
   try {
     const savedStatuses = JSON.parse(localStorage.getItem('hipa_product_statuses') || '{}');
     products.forEach(p => {
@@ -45,6 +58,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const customProds = JSON.parse(localStorage.getItem('hipa_custom_products') || '[]');
     if (Array.isArray(customProds) && customProds.length > 0) {
       products = [...products, ...customProds];
+    }
+
+    const savedFaqs = JSON.parse(localStorage.getItem('hipa_faqs') || '[]');
+    if (Array.isArray(savedFaqs) && savedFaqs.length > 0) {
+      faqs = savedFaqs;
+    }
+
+    const savedEnquiries = JSON.parse(localStorage.getItem('hipa_enquiries') || '[]');
+    if (Array.isArray(savedEnquiries) && savedEnquiries.length > 0) {
+      enquiries = savedEnquiries;
     }
   } catch (e) {}
 
@@ -103,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Modal Open & Close
+  // Product Modal Open & Close
   if (openAddProductModal) {
     openAddProductModal.addEventListener('click', () => {
       document.getElementById('productForm').reset();
@@ -119,10 +142,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // FAQ Modal Open & Close
+  if (openAddFaqModal) {
+    openAddFaqModal.addEventListener('click', () => {
+      document.getElementById('faqForm').reset();
+      document.getElementById('editFaqId').value = '';
+      document.getElementById('faqModalTitle').textContent = 'Add New FAQ';
+      if (faqModal) faqModal.classList.add('open');
+    });
+  }
+
+  if (closeFaqModal) {
+    closeFaqModal.addEventListener('click', () => {
+      if (faqModal) faqModal.classList.remove('open');
+    });
+  }
+
   window.addEventListener('click', (e) => {
-    if (e.target === productModal) {
-      productModal.classList.remove('open');
-    }
+    if (e.target === productModal) productModal.classList.remove('open');
+    if (e.target === faqModal) faqModal.classList.remove('open');
   });
 
   // Product Form Submission
@@ -138,8 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const imageUrl = document.getElementById('prodImageUrl').value.trim();
       const status = document.getElementById('prodStatus').value;
       const availMsg = document.getElementById('prodAvailMsg').value.trim();
-      const features = document.getElementById('prodFeatures').value.split(',').map(s => s.trim()).filter(Boolean);
-      const packSizes = document.getElementById('prodPackSizes').value.split(',').map(s => s.trim()).filter(Boolean);
 
       const newProd = {
         id: editId || slug,
@@ -150,8 +186,6 @@ document.addEventListener('DOMContentLoaded', () => {
         image_url: imageUrl || '/images/products/Sambar-masala.png',
         status,
         availability_message: availMsg,
-        features,
-        pack_sizes: packSizes,
         sort_order: products.length + 1
       };
 
@@ -160,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (idx !== -1) products[idx] = { ...products[idx], ...newProd };
       } else {
         products.push(newProd);
-        // Save custom product to localStorage
         try {
           const customProds = JSON.parse(localStorage.getItem('hipa_custom_products') || '[]');
           customProds.push(newProd);
@@ -168,21 +201,54 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {}
       }
 
-      // Save status map
       saveProductStatuses();
 
-      // Save to Supabase if configured
       if (supabase) {
-        try {
-          await supabase.from('products').upsert([newProd]);
-        } catch (err) {
-          console.warn('Supabase upsert error:', err.message);
-        }
+        try { await supabase.from('products').upsert([newProd]); } catch (err) {}
       }
 
       productModal.classList.remove('open');
       renderProducts();
       updateStats();
+    });
+  }
+
+  // FAQ Form Submission
+  if (faqForm) {
+    faqForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const editId = document.getElementById('editFaqId').value;
+      const question = document.getElementById('faqQuestion').value.trim();
+      const answer = document.getElementById('faqAnswer').value.trim();
+      const category = document.getElementById('faqCategory').value;
+      const sortOrder = parseInt(document.getElementById('faqSortOrder').value) || (faqs.length + 1);
+      const isActive = document.getElementById('faqIsActive').checked;
+
+      const newFaq = {
+        id: editId || String(Date.now()),
+        question,
+        answer,
+        category,
+        sort_order: sortOrder,
+        is_active: isActive
+      };
+
+      if (editId) {
+        const idx = faqs.findIndex(f => f.id === editId);
+        if (idx !== -1) faqs[idx] = newFaq;
+      } else {
+        faqs.push(newFaq);
+      }
+
+      localStorage.setItem('hipa_faqs', JSON.stringify(faqs));
+
+      if (supabase) {
+        try { await supabase.from('faqs').upsert([newFaq]); } catch (err) {}
+      }
+
+      if (faqModal) faqModal.classList.remove('open');
+      renderFaqs();
     });
   }
 
@@ -251,9 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
           saveProductStatuses();
 
           if (supabase) {
-            try {
-              await supabase.from('products').update({ status: prod.status }).eq('slug', slug);
-            } catch (err) {}
+            try { await supabase.from('products').update({ status: prod.status }).eq('slug', slug); } catch (err) {}
           }
           renderProducts();
           updateStats();
@@ -267,18 +331,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!tbody) return;
 
     if (enquiries.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #6b7280; padding: 20px;">No enquiries received yet.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #6b7280; padding: 20px;">No enquiries received yet. Submissions from website forms will appear here.</td></tr>';
       return;
     }
 
     tbody.innerHTML = enquiries.map(e => `
       <tr>
-        <td>${new Date(e.created_at).toLocaleDateString()}</td>
+        <td>${new Date(e.created_at || Date.now()).toLocaleDateString()}</td>
         <td><strong>${e.name}</strong></td>
         <td>${e.company_name || '—'}</td>
-        <td><span class="status-badge badge-new">${e.product_name_snapshot}</span></td>
+        <td><span class="status-badge badge-new">${e.product_name_snapshot || 'General Enquiry'}</span></td>
         <td><a href="tel:${e.phone}">${e.phone}</a></td>
-        <td><span class="status-badge badge-${e.status}">${e.status}</span></td>
+        <td><span class="status-badge badge-${e.status || 'new'}">${e.status || 'new'}</span></td>
         <td><button style="padding: 4px 8px; font-size: 0.8rem;">View</button></td>
       </tr>
     `).join('');
@@ -292,10 +356,29 @@ document.addEventListener('DOMContentLoaded', () => {
       <tr>
         <td>${f.sort_order}</td>
         <td><strong>${f.question}</strong></td>
-        <td>${f.category}</td>
+        <td><span style="text-transform: capitalize;">${f.category}</span></td>
         <td><span class="status-badge ${f.is_active ? 'badge-available' : 'badge-unavailable'}">${f.is_active ? 'Active' : 'Disabled'}</span></td>
-        <td><button style="padding: 4px 8px; font-size: 0.8rem;">Edit</button></td>
+        <td>
+          <button class="toggle-faq-btn" data-id="${f.id}" style="padding: 4px 8px; font-size: 0.8rem; cursor: pointer; border-radius: 4px; border: 1px solid #ccc; background: #fff;">
+            ${f.is_active ? 'Disable' : 'Enable'}
+          </button>
+        </td>
       </tr>
     `).join('');
+
+    tbody.querySelectorAll('.toggle-faq-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-id');
+        const faq = faqs.find(f => f.id === id);
+        if (faq) {
+          faq.is_active = !faq.is_active;
+          localStorage.setItem('hipa_faqs', JSON.stringify(faqs));
+          if (supabase) {
+            try { await supabase.from('faqs').update({ is_active: faq.is_active }).eq('id', id); } catch (e) {}
+          }
+          renderFaqs();
+        }
+      });
+    });
   }
 });

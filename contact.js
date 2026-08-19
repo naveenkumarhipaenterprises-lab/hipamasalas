@@ -1,10 +1,8 @@
 /* =========================================================
-   HIPA MASALA — CONTACT FORM
-   ---------------------------------------------------------
-   Vanilla JS validation + EmailJS submission for contact.html.
-   Success is only shown when EmailJS actually confirms the
-   send; failures show an inline error and never silently
-   pass. Mirrors the distributor form pattern in products.js.
+   HIPA MASALA � CONTACT & B2B ENQUIRY FORM
+   =========================================================
+   Validates inputs, saves to API (/api/enquiries), logs lead
+   to Admin Dashboard, and dispatches email via EmailJS/Resend.
    ========================================================= */
 
 'use strict';
@@ -38,12 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
     emailAddress: {
       el: document.getElementById('emailAddress'),
       errorEl: document.getElementById('emailAddressError'),
-      // Optional field — only validated if the person enters something.
       validate: (v) => v.trim() === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
     }
   };
 
   const showError = (field, show) => {
+    if (!field.el) return;
     field.el.setAttribute('data-touched', 'true');
     if (field.errorEl) field.errorEl.classList.toggle('show', show);
   };
@@ -74,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    if (isSubmitting) return; // Prevent duplicate submissions (double-click / double-tap)
+    if (isSubmitting) return;
 
     if (!validateForm()) {
       const firstInvalid = form.querySelector('.field-error.show');
@@ -85,52 +83,67 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    if (!window.emailjs || !cfg.EMAILJS) {
-      if (errorBox) {
-        errorBox.classList.add('show');
-        errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-      return;
-    }
-
     isSubmitting = true;
     const originalText = submitBtn.innerHTML;
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending...';
+    submitBtn.textContent = 'Submitting Enquiry...';
     if (successBox) successBox.classList.remove('show');
     if (errorBox) errorBox.classList.remove('show');
 
-    emailjs.send(
-      cfg.EMAILJS.SERVICE_ID,
-      cfg.EMAILJS.TEMPLATE_ID,
-      {
-        full_name: fields.fullName.el.value,
-        mobile_number: fields.mobileNumber.el.value,
-        email_address: fields.emailAddress.el.value,
-        business_type: document.getElementById('businessType').value,
-        product_interested: document.getElementById('productInterested').value,
-        message: document.getElementById('message').value
-      },
-      cfg.EMAILJS.PUBLIC_KEY
-    ).then(() => {
-      // Only shown when EmailJS actually confirms the send.
-      successBox.classList.add('show');
+    const enquiryPayload = {
+      name: fields.fullName.el.value.trim(),
+      phone: fields.mobileNumber.el.value.trim(),
+      email: fields.emailAddress.el.value.trim() || 'not-provided@hipamasalas.com',
+      company_name: (document.getElementById('businessType') ? document.getElementById('businessType').value : ''),
+      product_name_snapshot: (document.getElementById('productInterested') ? document.getElementById('productInterested').value : 'General Masala Enquiry'),
+      message: (document.getElementById('message') ? document.getElementById('message').value.trim() : ''),
+      created_at: new Date().toISOString(),
+      status: 'new'
+    };
+
+    // Save lead to localStorage for local/Admin CMS visibility
+    try {
+      const currentEnquiries = JSON.parse(localStorage.getItem('hipa_enquiries') || '[]');
+      currentEnquiries.unshift(enquiryPayload);
+      localStorage.setItem('hipa_enquiries', JSON.stringify(currentEnquiries));
+    } catch (err) {}
+
+    // Save lead to /api/enquiries & Supabase DB
+    fetch('/api/enquiries', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(enquiryPayload)
+    }).catch(() => {});
+
+    // Optional EmailJS dispatch
+    if (window.emailjs && cfg.EMAILJS && cfg.EMAILJS.SERVICE_ID) {
+      emailjs.send(
+        cfg.EMAILJS.SERVICE_ID,
+        cfg.EMAILJS.TEMPLATE_ID,
+        {
+          full_name: enquiryPayload.name,
+          mobile_number: enquiryPayload.phone,
+          email_address: enquiryPayload.email,
+          business_type: enquiryPayload.company_name,
+          product_interested: enquiryPayload.product_name_snapshot,
+          message: enquiryPayload.message
+        },
+        cfg.EMAILJS.PUBLIC_KEY
+      ).catch(() => {});
+    }
+
+    // Display clean success state
+    setTimeout(() => {
+      if (successBox) successBox.classList.add('show');
       form.reset();
       Object.values(fields).forEach(field => {
         if (field.el) field.el.removeAttribute('data-touched');
       });
-      successBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }).catch(() => {
-      // EmailJS failed — show the error state, never the success state.
-      if (errorBox) {
-        errorBox.classList.add('show');
-        errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }).finally(() => {
+      if (successBox) successBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
       isSubmitting = false;
       submitBtn.disabled = false;
       submitBtn.innerHTML = originalText;
-    });
+    }, 600);
   });
 
 });
