@@ -1,17 +1,11 @@
 {
-  "outputDirectory": ".",
-  "cleanUrls": true,
-  "trailingSlash": false,
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "npm run vercel-build",
+  "installCommand": "npm install --legacy-peer-deps",
   "functions": {
-    "api/blogs.js":     { "memory": 128, "maxDuration": 10 },
-    "api/blog.js":      { "memory": 128, "maxDuration": 10 },
-    "api/products.js":  { "memory": 128, "maxDuration": 10 },
-    "api/faqs.js":      { "memory": 128, "maxDuration": 10 },
-    "api/enquiries.js": { "memory": 128, "maxDuration": 10 }
-  },
-  "rewrites": [
-    { "source": "/blog/:slug+",                 "destination": "/blog-details" },
-    { "source": "/admin",                       "destination": "/admin/index.html" },
-    { "source": "/admin/",                      "destination": "/admin/index.html" }
-  ]
+    "server.ts": {
+      "includeFiles": "dist/server-ssr/**"
+    }
+  }
 }

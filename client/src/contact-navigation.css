@@ -1,0 +1,13 @@
+.main-nav > ul > li > a.contact-nav-link {
+  opacity: 1 !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+  .main-nav > ul > li > a.contact-nav-link {
+    font-size: 14.5px !important;
+  }
+}
