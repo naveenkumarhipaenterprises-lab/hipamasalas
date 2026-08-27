@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildRobotsTxt } from "./seoRoutes";
+import { buildLlmsTxt, buildRobotsTxt, buildSitemapXml } from "./seoRoutes";
 import { getIndexablePaths, getPageHead, getProduct, getProductFaqs, getStructuredData, products, siteIdentity } from "../shared/hipaContent";
 
 describe("standalone SEO parity", () => {
@@ -28,5 +28,12 @@ describe("standalone SEO parity", () => {
 
   it("permits public crawling while excluding the private admin section", () => {
     expect(buildRobotsTxt("https://www.hipamasalas.com")).toContain("User-agent: *\nAllow: /\nDisallow: /admin");
+  });
+
+  it("builds crawler-readable sitemap and AI context without a database", () => {
+    const sitemap = buildSitemapXml("https://www.hipamasalas.com");
+    expect(sitemap).toContain("/products/sambar-powder");
+    expect(sitemap).toContain("/b2b-enquiries");
+    expect(buildLlmsTxt("https://www.hipamasalas.com")).toContain("distributor, wholesaler, retailer");
   });
 });

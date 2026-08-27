@@ -243,8 +243,8 @@ export function getPageHead(pathname: string): PageHead {
 
   if (path === "/b2b-enquiries") {
     return {
-      title: "Product Enquiries | HIPA Masalas",
-      description: "Use the HIPA Masalas product enquiry page for current product information and business or consumer enquiries.",
+      title: "Masala Manufacturer, Distributor & Export Enquiries | HIPA Masalas",
+      description: "Contact HIPA Masalas, a Chennai spice and masala manufacturer, for distributor, dealer, wholesale, export, retail and consumer product enquiries.",
       canonicalPath: path,
     };
   }
@@ -315,8 +315,11 @@ export function getStructuredData(pathname: string, origin: string, articleOverr
     logo: absoluteUrl(origin, siteIdentity.logo),
     description: "HIPA Masalas is an Indian spice and masala brand based in Chennai, Tamil Nadu, India, offering a current range of spice powders and masala blends.",
     email: siteIdentity.email,
-    telephone: siteIdentity.phone,
-  };
+      telephone: siteIdentity.phone,
+      areaServed: ["Chennai", "Tamil Nadu", "India", "International export enquiries"],
+      knowsAbout: ["Indian spice powders", "masala blends", "distributor supply", "dealer enquiries", "wholesale enquiries", "export enquiries"],
+      contactPoint: { "@type": "ContactPoint", telephone: siteIdentity.phone, email: siteIdentity.email, contactType: "sales", areaServed: "IN" },
+    };
 
   // Do not publish `sameAs` until HIPA confirms ownership of each account URL.
   // Visible social links can remain available to users without being asserted as
