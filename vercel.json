@@ -6,7 +6,7 @@
   "installCommand": "npm install --legacy-peer-deps",
   "functions": {
     "api/**/*.ts": {
-      "includeFiles": "dist/server-ssr/**"
+      "includeFiles": ["dist/server-ssr/**", "dist/data/**"]
     }
   },
   "rewrites": [
