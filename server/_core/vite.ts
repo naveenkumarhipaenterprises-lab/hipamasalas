@@ -64,9 +64,7 @@ export function serveStatic(app: Express) {
   const isVercel = Boolean(process.env.VERCEL);
   const distPath = isVercel
     ? path.resolve(process.cwd(), "public")
-    : process.env.NODE_ENV === "development"
-      ? path.resolve(import.meta.dirname, "../..", "dist", "public")
-      : path.resolve(import.meta.dirname, "public");
+    : path.resolve(process.cwd(), "dist", "public");
   const templatePath = isVercel
     ? path.resolve(process.cwd(), "dist", "public", "index.html")
     : path.resolve(distPath, "index.html");
@@ -84,9 +82,7 @@ export function serveStatic(app: Express) {
     }
     try {
       const template = await fs.promises.readFile(templatePath, "utf-8");
-      const serverEntryPath = isVercel
-        ? path.resolve(process.cwd(), "dist", "server-ssr", "entry-server.js")
-        : path.resolve(import.meta.dirname, "server-ssr", "entry-server.js");
+      const serverEntryPath = path.resolve(process.cwd(), "dist", "server-ssr", "entry-server.js");
       const { render } = await import(serverEntryPath);
       const { html, dehydratedState, head } = await render(req.originalUrl);
       res.status(head.notFound ? 404 : 200).set({ "Content-Type": "text/html", "Cache-Control": "no-cache" }).end(composeHtml(template, html, head, dehydratedState));

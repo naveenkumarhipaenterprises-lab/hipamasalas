@@ -27,6 +27,7 @@ describe("Vercel deployment configuration", () => {
     const packageJson = JSON.parse(fs.readFileSync(path.join(projectRoot, "package.json"), "utf8"));
     const vercel = JSON.parse(fs.readFileSync(path.join(projectRoot, "vercel.json"), "utf8"));
     expect(packageJson.scripts["vercel-build"]).toContain("copy-public.mjs");
+    expect(packageJson.scripts.start).toContain("server/index.ts");
     const copyPublic = fs.readFileSync(path.join(projectRoot, "scripts", "copy-public.mjs"), "utf8");
     expect(copyPublic).toContain("SSR index excluded");
     const viteSource = fs.readFileSync(path.join(projectRoot, "server", "_core", "vite.ts"), "utf8");
