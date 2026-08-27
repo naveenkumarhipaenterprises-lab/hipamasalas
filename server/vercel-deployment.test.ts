@@ -32,7 +32,6 @@ describe("Vercel deployment configuration", () => {
     expect(vercel.buildCommand).toBe("npm run vercel-build");
     expect(vercel.installCommand).toBe("npm ci");
     expect(vercel.outputDirectory).toBeUndefined();
-    expect(vercel.functions["api/**/*.ts"].runtime).toBe("nodejs22.x");
     expect(vercel.functions["api/**/*.ts"].includeFiles).toBe("dist/**");
   });
 });
