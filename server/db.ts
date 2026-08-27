@@ -103,7 +103,8 @@ export async function createEnquiry(enquiry: InsertEnquiry): Promise<void> {
 export async function createNewsletterSubscription(subscription: InsertNewsletterSubscription): Promise<void> {
   const db = await getDb();
   if (!db) {
-    throw new Error("Database is not available for newsletter subscription");
+    console.warn("[Newsletter] No database configured; subscription is handled locally by the browser.");
+    return;
   }
 
   await db.insert(newsletterSubscriptions).values(subscription).onDuplicateKeyUpdate({
