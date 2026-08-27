@@ -11,6 +11,8 @@ describe("Vercel deployment configuration", () => {
     expect(serverEntry).toContain('export default app');
     expect(appSource).toContain('export function createApp()');
     expect(appSource).toContain('if (process.env.VERCEL)');
+    const apiEntry = fs.readFileSync(path.join(projectRoot, "api", "index.ts"), "utf8");
+    expect(apiEntry).toContain('import app from "../dist/index.js"');
   });
 
   it("builds public assets and includes the production SSR entry for Vercel", () => {
