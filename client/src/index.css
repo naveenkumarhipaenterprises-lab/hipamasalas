@@ -145,5 +145,5 @@
 }
 .footer-bottom { position: relative; padding-right: 110px; }
 @media (max-width: 640px) {
-  .footer-bottom { padding-right: 0; padding-bottom: 96px; }
+  .footer-bottom { padding-right: 90px; padding-bottom: 96px; }
 }
