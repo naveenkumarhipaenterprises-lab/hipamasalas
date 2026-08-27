@@ -67,6 +67,9 @@ export function serveStatic(app: Express) {
     : process.env.NODE_ENV === "development"
       ? path.resolve(import.meta.dirname, "../..", "dist", "public")
       : path.resolve(import.meta.dirname, "public");
+  const templatePath = isVercel
+    ? path.resolve(process.cwd(), "dist", "public", "index.html")
+    : path.resolve(distPath, "index.html");
   if (!fs.existsSync(distPath)) {
     console.error(
       `Could not find the build directory: ${distPath}, make sure to build the client first`
@@ -77,7 +80,7 @@ export function serveStatic(app: Express) {
 
   app.use("*", async (req, res) => {
     try {
-      const template = await fs.promises.readFile(path.resolve(distPath, "index.html"), "utf-8");
+      const template = await fs.promises.readFile(templatePath, "utf-8");
       const serverEntryPath = isVercel
         ? path.resolve(process.cwd(), "dist", "server-ssr", "entry-server.js")
         : path.resolve(import.meta.dirname, "server-ssr", "entry-server.js");
@@ -86,7 +89,7 @@ export function serveStatic(app: Express) {
       res.status(head.notFound ? 404 : 200).set({ "Content-Type": "text/html", "Cache-Control": "no-cache" }).end(composeHtml(template, html, head, dehydratedState));
     } catch (error) {
       console.error("[SSR] render failed, serving shell:", error);
-      const template = await fs.promises.readFile(path.resolve(distPath, "index.html"), "utf-8");
+      const template = await fs.promises.readFile(templatePath, "utf-8");
       res.status(200).set({ "Content-Type": "text/html", "Cache-Control": "no-cache" }).end(template.replace("<!--app-head-->", () => buildHead({ title: siteName, description: "HIPA Masalas product and enquiry information." })));
     }
   });

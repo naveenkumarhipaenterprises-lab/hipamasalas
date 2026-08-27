@@ -27,6 +27,8 @@ describe("Vercel deployment configuration", () => {
     expect(packageJson.scripts["vercel-build"]).toContain("copy-public.mjs");
     const copyPublic = fs.readFileSync(path.join(projectRoot, "scripts", "copy-public.mjs"), "utf8");
     expect(copyPublic).toContain("SSR index excluded");
+    const viteSource = fs.readFileSync(path.join(projectRoot, "server", "_core", "vite.ts"), "utf8");
+    expect(viteSource).toContain('path.resolve(process.cwd(), "dist", "public", "index.html")');
     expect(vercel.buildCommand).toBe("npm run vercel-build");
     expect(vercel.outputDirectory).toBe("public");
     expect(vercel.functions["api/**/*.ts"].includeFiles).toBe("dist/**");
