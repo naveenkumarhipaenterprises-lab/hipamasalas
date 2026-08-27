@@ -1,13 +1,16 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { BlogPost, ProductAvailability } from "../drizzle/schema";
+import bundledSeedBlogs from "../data/blog-posts.json";
 
 type StoredBlogPost = Omit<BlogPost, "createdAt" | "updatedAt" | "publishedAt"> & { createdAt: string; updatedAt: string; publishedAt: string | null };
 type LocalState = { blogs: StoredBlogPost[]; availability: ProductAvailability[] };
 
-const dataDir = path.resolve(import.meta.dirname, "..", "data");
+const isVercel = Boolean(process.env.VERCEL);
+const dataDir = isVercel ? path.resolve(process.cwd(), "data") : path.resolve(import.meta.dirname, "..", "data");
 const seedPath = path.join(dataDir, "blog-posts.json");
 const statePath = path.join(dataDir, "local-state.json");
+const bundledBlogs = bundledSeedBlogs as StoredBlogPost[];
 
 function fromStored(post: StoredBlogPost): BlogPost {
   return { ...post, createdAt: new Date(post.createdAt), updatedAt: new Date(post.updatedAt), publishedAt: post.publishedAt ? new Date(post.publishedAt) : null };
@@ -19,11 +22,13 @@ function toStored(post: BlogPost): StoredBlogPost {
 
 function readState(): LocalState {
   const file = fs.existsSync(statePath) ? statePath : seedPath;
+  if (!fs.existsSync(file)) return { blogs: bundledBlogs, availability: [] };
   const blogs = JSON.parse(fs.readFileSync(file, "utf8")) as StoredBlogPost[];
   return { blogs, availability: [] };
 }
 
 function writeState(state: LocalState) {
+  if (isVercel) throw new Error("Persistent blog and availability writes require a configured database");
   fs.mkdirSync(dataDir, { recursive: true });
   fs.writeFileSync(statePath, `${JSON.stringify(state, null, 2)}\n`);
 }

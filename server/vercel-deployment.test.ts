@@ -30,7 +30,9 @@ describe("Vercel deployment configuration", () => {
     const viteSource = fs.readFileSync(path.join(projectRoot, "server", "_core", "vite.ts"), "utf8");
     expect(viteSource).toContain('path.resolve(process.cwd(), "dist", "public", "index.html")');
     expect(vercel.buildCommand).toBe("npm run vercel-build");
-    expect(vercel.outputDirectory).toBe("public");
+    expect(vercel.installCommand).toBe("npm ci");
+    expect(vercel.outputDirectory).toBeUndefined();
+    expect(vercel.functions["api/**/*.ts"].runtime).toBe("nodejs22.x");
     expect(vercel.functions["api/**/*.ts"].includeFiles).toBe("dist/**");
   });
 });

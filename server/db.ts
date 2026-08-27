@@ -157,13 +157,16 @@ export async function getAdminBlogPostBySlug(slug: string): Promise<BlogPost | u
 
 export async function createBlogPost(post: BlogPostWrite): Promise<BlogPost> {
   const db = await getDb();
-  if (!db) return createLocalBlog({
+  if (!db) {
+    if (process.env.VERCEL) throw new Error("Persistent blog publishing requires a configured database");
+    return createLocalBlog({
     ...post,
     status: post.status ?? "draft",
     createdByUserId: post.createdByUserId ?? 0,
     coverImageUrl: post.coverImageUrl ?? null,
     coverImageAlt: post.coverImageAlt ?? null,
-  });
+    });
+  }
   const result = await db.insert(blogPosts).values(post);
   const created = await getAdminBlogPostById(Number(result[0].insertId));
   if (!created) throw new Error("Blog post could not be created");
@@ -172,14 +175,20 @@ export async function createBlogPost(post: BlogPostWrite): Promise<BlogPost> {
 
 export async function updateBlogPost(id: number, post: Partial<BlogPostWrite>): Promise<BlogPost | undefined> {
   const db = await getDb();
-  if (!db) return updateLocalBlog(id, post);
+  if (!db) {
+    if (process.env.VERCEL) throw new Error("Persistent blog editing requires a configured database");
+    return updateLocalBlog(id, post);
+  }
   await db.update(blogPosts).set(post).where(eq(blogPosts.id, id));
   return getAdminBlogPostById(id);
 }
 
 export async function deleteBlogPost(id: number): Promise<void> {
   const db = await getDb();
-  if (!db) return deleteLocalBlog(id);
+  if (!db) {
+    if (process.env.VERCEL) throw new Error("Persistent blog deletion requires a configured database");
+    return deleteLocalBlog(id);
+  }
   await db.delete(blogPosts).where(eq(blogPosts.id, id));
 }
 
@@ -196,7 +205,10 @@ export async function listProductAvailability(): Promise<ProductAvailability[]> 
 
 export async function setProductAvailability(productSlug: string, status: ProductAvailability["status"], updatedByUserId: number): Promise<ProductAvailability> {
   const db = await getDb();
-  if (!db) return setLocalAvailability(productSlug, status, updatedByUserId);
+  if (!db) {
+    if (process.env.VERCEL) throw new Error("Persistent product availability updates require a configured database");
+    return setLocalAvailability(productSlug, status, updatedByUserId);
+  }
   await db.insert(productAvailability).values({ productSlug, status, updatedByUserId }).onDuplicateKeyUpdate({
     set: { status, updatedByUserId },
   });
