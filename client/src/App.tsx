@@ -2,7 +2,7 @@ import { HeadManager } from "@/components/HeadManager";
 import { SiteShell } from "@/components/SiteShell";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { ArticlePage, B2BEnquiriesPage, BlogPage, ContactPage, FaqPage, HomePage, NotFoundPage, PrivacyPage, ProductDetailPage, ProductsPage } from "@/pages/HipaPages";
+import { AboutPage, ArticlePage, B2BEnquiriesPage, BlogPage, ContactPage, FaqPage, HomePage, NotFoundPage, PrivacyPage, ProductDetailPage, ProductsPage, TermsOfServicePage } from "@/pages/HipaPages";
 import { AdminBlogPage } from "@/pages/AdminBlogPage";
 import { AdminProductAvailabilityPage } from "@/pages/AdminProductAvailabilityPage";
 import { Route, Switch, useLocation } from "wouter";
@@ -15,11 +15,13 @@ function Router() {
     <Switch>
       <Route path="/" component={HomePage} />
       <Route path="/products" component={ProductsPage} />
+      <Route path="/about" component={AboutPage} />
       <Route path="/products/:slug" component={ProductDetailPage} />
       <Route path="/faq" component={FaqPage} />
       <Route path="/contact" component={ContactPage} />
       <Route path="/b2b-enquiries" component={B2BEnquiriesPage} />
       <Route path="/privacy" component={PrivacyPage} />
+      <Route path="/terms-of-service" component={TermsOfServicePage} />
       <Route path="/blog" component={BlogPage} />
       <Route path="/blog/:slug" component={ArticlePage} />
       <Route path="/admin" component={AdminBlogPage} />

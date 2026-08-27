@@ -180,6 +180,7 @@ export function getIndexablePaths() {
     ...products.map((product) => `/products/${product.slug}`),
     "/faq",
     "/contact",
+    "/about",
     "/b2b-enquiries",
     "/blog",
     ...articles.filter((article) => article.complete).map((article) => `/blog/${article.slug}`),
@@ -241,6 +242,14 @@ export function getPageHead(pathname: string): PageHead {
     };
   }
 
+  if (path === "/about") {
+    return {
+      title: "About HIPA Masalas | Chennai Spice Brand",
+      description: "Learn about HIPA Masalas, an Indian spice and masala brand based in Chennai, Tamil Nadu, India.",
+      canonicalPath: path,
+    };
+  }
+
   if (path === "/b2b-enquiries") {
     return {
       title: "Masala Manufacturer, Distributor & Export Enquiries | HIPA Masalas",
@@ -275,6 +284,10 @@ export function getPageHead(pathname: string): PageHead {
 
   if (path === "/privacy") {
     return { title: "Privacy Policy | HIPA Masalas", description: "Learn how HIPA Masalas uses enquiry and newsletter details submitted through this website.", canonicalPath: path, noindex: true };
+  }
+
+  if (path === "/terms-of-service") {
+    return { title: "Terms of Service | HIPA Masalas", description: "Review the general terms for using the HIPA Masalas website and its product-information and enquiry features.", canonicalPath: path, noindex: true };
   }
 
   if (path === "/admin" || path.startsWith("/admin/")) {
@@ -382,8 +395,8 @@ export function getStructuredData(pathname: string, origin: string, articleOverr
     );
   }
 
-  if (path === "/contact" || path === "/b2b-enquiries" || path === "/blog") {
-    schemas.push(breadcrumbSchema(origin, path, ["Home", path === "/contact" ? "Contact" : path === "/blog" ? "Journal" : "Business Enquiries"]));
+  if (path === "/contact" || path === "/about" || path === "/b2b-enquiries" || path === "/blog") {
+    schemas.push(breadcrumbSchema(origin, path, ["Home", path === "/contact" ? "Contact" : path === "/about" ? "About" : path === "/blog" ? "Journal" : "Business Enquiries"]));
   }
 
   const articleMatch = path.match(/^\/blog\/([^/]+)$/);

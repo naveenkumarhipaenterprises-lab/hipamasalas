@@ -4,7 +4,7 @@ import { Link, useLocation } from "wouter";
 import { products, siteIdentity } from "@shared/hipaContent";
 import { trackEvent } from "@/lib/analytics";
 
-const navigation = [["Home", "/"], ["Products", "/products"], ["Blog", "/blog"], ["FAQ", "/faq"], ["Contact", "/contact"]] as const;
+const navigation = [["Home", "/"], ["Products", "/products"], ["About", "/about"], ["Blog", "/blog"], ["FAQ", "/faq"], ["Contact", "/contact"]] as const;
 const footerProductOrder = ["sambar-powder", "rasam-powder", "turmeric-powder", "red-chilli-powder", "coriander-powder", "cumin-powder", "pepper-powder", "garam-masala"] as const;
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
@@ -28,6 +28,19 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      const hash = window.location.hash.slice(1);
+      const target = hash ? document.getElementById(decodeURIComponent(hash)) : null;
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      }
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [location]);
+
   return <div>
     <div className="top-bar"><div className="container top-bar-inner"><div className="top-bar-left"><a className="top-bar-link" href={siteIdentity.phoneHref} onClick={() => trackEvent("phone_click", { location: "topbar" })}><Phone size={14} /><span>{siteIdentity.phone}</span></a><a className="top-bar-link" href={`mailto:${siteIdentity.email}`}><span>{siteIdentity.email}</span></a></div><div className="top-bar-right"><a href={siteIdentity.facebook} target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook size={14} /></a><a href={siteIdentity.instagram} target="_blank" rel="noreferrer" aria-label="Instagram"><Instagram size={14} /></a></div></div></div>
     <header className={`site-header ${headerScrolled ? "scrolled" : ""}`}><div className="container header-inner">
@@ -37,7 +50,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
     </div></header>
     <button className={`nav-overlay ${menuOpen ? "show" : ""}`} aria-label="Close menu" onClick={closeMenu} />
     <main>{children}</main>
-    <footer className="site-footer"><div className="container footer-grid"><div className="footer-brand"><Link href="/" className="brand"><img className="brand-logo-img" src={siteIdentity.logo} alt="HIPA Masalas official logo" /><span className="brand-text"><span className="brand-name">HIPA</span><span className="brand-sub">Masalas · Taste of Tradition</span></span></Link><p>Current product information and practical spice guides from HIPA Masalas in Chennai.</p><div className="social-row"><a href={siteIdentity.facebook} target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook size={16} /></a><a href={siteIdentity.instagram} target="_blank" rel="noreferrer" aria-label="Instagram"><Instagram size={16} /></a><a href={siteIdentity.whatsappHref} target="_blank" rel="noreferrer" aria-label="WhatsApp"><MessageCircle size={16} /></a></div></div><div className="footer-col"><h5>Explore</h5><ul><li><Link href="/">Home</Link></li><li><Link href="/products">Products</Link></li><li><Link href="/blog">Blog</Link></li><li><Link href="/contact">Contact</Link></li></ul></div><div className="footer-col"><h5>Products</h5><ul>{footerProductOrder.map((slug) => products.find((product) => product.slug === slug)).filter((product): product is (typeof products)[number] => Boolean(product)).map((product) => <li key={product.slug}><Link href={`/products/${product.slug}`}>{product.name}</Link></li>)}</ul></div><div className="footer-col"><h5>Contact</h5><ul className="footer-contact"><li><a href={`mailto:${siteIdentity.email}`}>{siteIdentity.email}</a></li><li><a href={siteIdentity.phoneHref} onClick={() => trackEvent("phone_click", { location: "footer" })}>{siteIdentity.phone}</a></li><li>{siteIdentity.locationLabel}</li></ul></div></div><div className="container footer-bottom"><span>© {new Date().getFullYear()} HIPA Masalas. All rights reserved.</span><span><Link className="footer-admin-link" href="/privacy">Privacy</Link></span></div></footer>
+    <footer className="site-footer"><div className="container footer-grid"><div className="footer-brand"><Link href="/" className="brand"><img className="brand-logo-img" src={siteIdentity.logo} alt="HIPA Masalas official logo" /><span className="brand-text"><span className="brand-name">HIPA</span><span className="brand-sub">Masalas · Taste of Tradition</span></span></Link><p>Current product information and practical spice guides from HIPA Masalas in Chennai.</p><div className="social-row"><a href={siteIdentity.facebook} target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook size={16} /></a><a href={siteIdentity.instagram} target="_blank" rel="noreferrer" aria-label="Instagram"><Instagram size={16} /></a><a href={siteIdentity.whatsappHref} target="_blank" rel="noreferrer" aria-label="WhatsApp"><MessageCircle size={16} /></a></div></div><div className="footer-col"><h5>Explore</h5><ul><li><Link href="/">Home</Link></li><li><Link href="/products">Products</Link></li><li><Link href="/about">About</Link></li><li><Link href="/blog">Blog</Link></li><li><Link href="/contact">Contact</Link></li></ul></div><div className="footer-col"><h5>Products</h5><ul>{footerProductOrder.map((slug) => products.find((product) => product.slug === slug)).filter((product): product is (typeof products)[number] => Boolean(product)).map((product) => <li key={product.slug}><Link href={`/products/${product.slug}`}>{product.name}</Link></li>)}</ul></div><div className="footer-col"><h5>Contact</h5><ul className="footer-contact"><li><a href={`mailto:${siteIdentity.email}`}>{siteIdentity.email}</a></li><li><a href={siteIdentity.phoneHref} onClick={() => trackEvent("phone_click", { location: "footer" })}>{siteIdentity.phone}</a></li><li>{siteIdentity.locationLabel}</li></ul></div></div><div className="container footer-bottom"><span>© {new Date().getFullYear()} HIPA Masalas. All rights reserved.</span><span><Link className="footer-admin-link" href="/about">About</Link><span aria-hidden="true"> · </span><Link className="footer-admin-link" href="/privacy">Privacy</Link><span aria-hidden="true"> · </span><Link className="footer-admin-link" href="/terms-of-service">Terms of Service</Link></span></div></footer>
     <div className="floating-actions" aria-label="Quick contact"><a className="fab fab-call" href={siteIdentity.phoneHref} aria-label="Call HIPA Masalas" onClick={() => trackEvent("phone_click", { location: "floating" })}><Phone size={21} /></a><a className="fab fab-whatsapp" href={siteIdentity.whatsappHref} aria-label="Chat with HIPA Masalas on WhatsApp" target="_blank" rel="noreferrer" onClick={() => trackEvent("whatsapp_click", { location: "floating" })}><span className="fab-pulse" /><MessageCircle size={22} /></a></div>
     <button className={`back-to-top ${backToTopVisible ? "show" : ""}`} type="button" aria-label="Back to top" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}><ArrowUp size={18} /></button>
   </div>;

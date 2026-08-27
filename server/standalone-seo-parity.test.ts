@@ -19,12 +19,15 @@ describe("standalone SEO parity", () => {
     }
   });
 
-  it("emits Product and FAQPage schema for a product and keeps privacy out of the index", () => {
+  it("emits Product and FAQPage schema for a product and keeps legal pages out of the index", () => {
     const product = getProduct("sambar-powder");
     expect(product).not.toBeNull();
     const schemas = getStructuredData("/products/sambar-powder", "https://www.hipamasalas.com");
     expect(schemas.map((schema) => schema["@type"])).toEqual(expect.arrayContaining(["Product", "FAQPage"]));
     expect(getPageHead("/privacy")).toMatchObject({ canonicalPath: "/privacy", noindex: true });
+    expect(getPageHead("/about")).toMatchObject({ title: "About HIPA Masalas | Chennai Spice Brand", canonicalPath: "/about" });
+    expect(getPageHead("/terms-of-service")).toMatchObject({ canonicalPath: "/terms-of-service", noindex: true });
+    expect(getStructuredData("/about", "https://www.hipamasalas.com").map((schema) => schema["@type"])).toContain("BreadcrumbList");
   });
 
   it("permits public crawling while excluding the private admin section", () => {
@@ -39,6 +42,8 @@ describe("standalone SEO parity", () => {
   it("builds crawler-readable sitemap and AI context without a database", () => {
     const sitemap = buildSitemapXml("https://www.hipamasalas.com");
     expect(sitemap).toContain("/products/sambar-powder");
+    expect(sitemap).toContain("/about");
+    expect(sitemap).not.toContain("/terms-of-service");
     expect(sitemap).toContain("/b2b-enquiries");
     expect(buildLlmsTxt("https://www.hipamasalas.com")).toContain("distributor, wholesaler, retailer");
   });

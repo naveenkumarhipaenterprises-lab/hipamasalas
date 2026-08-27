@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "NODE_ENV=development tsx server/index.ts",
     "build": "vite build && vite build --config vite.config.ssr.ts && esbuild server/vercel-entry.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
-    "start": "NODE_ENV=production node dist/vercel-entry.js",
+    "start": "NODE_ENV=production tsx server/index.ts",
     "vercel-build": "npm run build && node scripts/copy-public.mjs",
     "check": "tsc --noEmit",
     "test": "vitest run",
