@@ -4,8 +4,11 @@
   "buildCommand": "npm run vercel-build",
   "installCommand": "npm install --legacy-peer-deps",
   "functions": {
-    "server.ts": {
+    "api/**/*.ts": {
       "includeFiles": "dist/server-ssr/**"
     }
-  }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/index" }
+  ]
 }
