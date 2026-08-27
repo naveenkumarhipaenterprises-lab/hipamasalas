@@ -1,24 +1,12 @@
 import "dotenv/config";
-import express from "express";
 import { createServer } from "node:http";
-import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { appRouter } from "./routers";
-import { createContext } from "./_core/context";
-import { registerSeoRoutes } from "./seoRoutes";
+import { createApp } from "./app";
 import { serveStatic } from "./_core/vite";
 import { setupVite } from "./_core/vite-dev";
 
-export function createApp() {
-  const app = express();
-  app.use(express.json({ limit: "50mb" }));
-  app.use(express.urlencoded({ limit: "50mb", extended: true }));
-  app.use("/api/trpc", createExpressMiddleware({ router: appRouter, createContext }));
-  registerSeoRoutes(app);
-  return app;
-}
+export { createApp } from "./app";
 
 const app = createApp();
-export default app;
 
 async function startServer() {
   const server = createServer(app);
