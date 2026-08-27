@@ -177,3 +177,34 @@
   .hero-carousel-img { height: 280px; }
   .btn-brochure-download { width: 100%; }
 }
+
+/* Full-width Our Story banner using the existing approved story image. */
+.story {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: var(--green-900, #173c17);
+  background-image: url('/assets/story-spice-mortar_d4ded661.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.story::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, rgba(11, 34, 13, .92) 0%, rgba(11, 34, 13, .8) 38%, rgba(11, 34, 13, .46) 72%, rgba(11, 34, 13, .62) 100%);
+}
+.story-inner { position: relative; z-index: 1; }
+.story-art {
+  border: 1px solid rgba(239, 225, 182, .35);
+  background: rgba(8, 28, 10, .2);
+  box-shadow: 0 18px 42px rgba(5, 18, 7, .28);
+  backdrop-filter: none;
+}
+.story-art img { filter: saturate(1.08) contrast(1.06); }
+@media (max-width: 900px) {
+  .story { background-position: 58% center; }
+  .story::before { background: linear-gradient(180deg, rgba(11, 34, 13, .88) 0%, rgba(11, 34, 13, .68) 54%, rgba(11, 34, 13, .86) 100%); }
+}
