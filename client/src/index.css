@@ -147,3 +147,33 @@
 @media (max-width: 640px) {
   .footer-bottom { padding-right: 90px; padding-bottom: 96px; }
 }
+
+/* Brochure CTA and high-impact package scale requested for the hero. */
+.hero-btns { flex-wrap: wrap; }
+.btn-brochure-download {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #d5ae43;
+  background: #f3ead4;
+  color: #173c17;
+  box-shadow: 0 8px 18px rgba(20, 35, 14, .12);
+}
+.btn-brochure-download:hover {
+  background: #e3c374;
+  color: #173c17;
+  transform: translateY(-2px);
+}
+.hero-carousel-img { height: clamp(360px, 38vw, 480px); }
+.hero-carousel-track-wrapper { padding: 18px 0 12px; }
+@media (max-width: 1100px) {
+  .hero-carousel-img { height: clamp(320px, 34vw, 410px); }
+}
+@media (max-width: 900px) {
+  .hero-carousel-img { height: 320px; }
+}
+@media (max-width: 560px) {
+  .hero-carousel-img { height: 280px; }
+  .btn-brochure-download { width: 100%; }
+}
