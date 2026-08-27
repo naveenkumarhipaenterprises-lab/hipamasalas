@@ -16,8 +16,9 @@ describe("Vercel deployment configuration", () => {
   it("builds public assets and includes the production SSR entry for Vercel", () => {
     const packageJson = JSON.parse(fs.readFileSync(path.join(projectRoot, "package.json"), "utf8"));
     const vercel = JSON.parse(fs.readFileSync(path.join(projectRoot, "vercel.json"), "utf8"));
-    expect(packageJson.scripts["vercel-build"]).toContain("dist/public");
+    expect(packageJson.scripts["vercel-build"]).toContain("copy-public.mjs");
     expect(vercel.buildCommand).toBe("npm run vercel-build");
+    expect(vercel.outputDirectory).toBe("public");
     expect(vercel.functions["server.ts"].includeFiles).toBe("dist/server-ssr/**");
   });
 });

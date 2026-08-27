@@ -1,0 +1,12 @@
+node_modules/
+dist/
+public/*
+!public/.gitkeep
+.env
+.env.*
+!.env.example
+.vercel/
+.DS_Store
+*.log
+coverage/
+client/public/uploads/

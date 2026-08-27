@@ -1,6 +1,6 @@
 # Vercel deployment requirements
 
-Deploy the project root containing `server.ts`, not a static `dist` upload. Leave Vercel's Output Directory empty. Vercel runs `npm run vercel-build`, serves client files from the generated root `public/` directory, and detects `server.ts` as the Express application entry point.
+Deploy the project root containing `server.ts`, not a static `dist` upload. The repository sets Vercel's Output Directory to `public`, so do not override it with `dist` in the Vercel dashboard. Vercel runs `npm run vercel-build`, serves client files from the generated root `public/` directory, and detects `server.ts` as the Express application entry point.
 
 Set these production environment variables in Vercel before deployment:
 
