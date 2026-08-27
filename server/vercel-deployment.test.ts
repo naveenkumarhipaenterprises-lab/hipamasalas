@@ -31,7 +31,7 @@ describe("Vercel deployment configuration", () => {
     expect(viteSource).toContain('path.resolve(process.cwd(), "dist", "public", "index.html")');
     expect(vercel.buildCommand).toBe("npm run vercel-build");
     expect(vercel.installCommand).toBe("npm ci");
-    expect(vercel.outputDirectory).toBeUndefined();
+    expect(vercel.outputDirectory).toBe("public");
     expect(vercel.functions["api/**/*.ts"].includeFiles).toBe("dist/**");
   });
 });
