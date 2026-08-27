@@ -5,7 +5,8 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "./routers";
 import { createContext } from "./_core/context";
 import { registerSeoRoutes } from "./seoRoutes";
-import { serveStatic, setupVite } from "./_core/vite";
+import { serveStatic } from "./_core/vite";
+import { setupVite } from "./_core/vite-dev";
 
 export function createApp() {
   const app = express();
