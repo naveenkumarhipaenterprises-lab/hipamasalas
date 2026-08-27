@@ -27,6 +27,6 @@ describe("Vercel deployment configuration", () => {
     expect(packageJson.scripts["vercel-build"]).toContain("copy-public.mjs");
     expect(vercel.buildCommand).toBe("npm run vercel-build");
     expect(vercel.outputDirectory).toBe("public");
-    expect(vercel.functions["api/**/*.ts"].includeFiles).toEqual(["dist/server-ssr/**", "dist/data/**"]);
+    expect(vercel.functions["api/**/*.ts"].includeFiles).toBe("dist/**");
   });
 });
