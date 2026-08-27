@@ -20,11 +20,19 @@ function toStored(post: BlogPost): StoredBlogPost {
   return { ...post, createdAt: post.createdAt.toISOString(), updatedAt: post.updatedAt.toISOString(), publishedAt: post.publishedAt?.toISOString() ?? null };
 }
 
+export function parseLocalState(raw: string): LocalState {
+  const parsed = JSON.parse(raw) as StoredBlogPost[] | Partial<LocalState>;
+  if (Array.isArray(parsed)) return { blogs: parsed, availability: [] };
+  return {
+    blogs: Array.isArray(parsed.blogs) ? parsed.blogs : bundledBlogs,
+    availability: Array.isArray(parsed.availability) ? parsed.availability : [],
+  };
+}
+
 function readState(): LocalState {
   const file = fs.existsSync(statePath) ? statePath : seedPath;
   if (!fs.existsSync(file)) return { blogs: bundledBlogs, availability: [] };
-  const blogs = JSON.parse(fs.readFileSync(file, "utf8")) as StoredBlogPost[];
-  return { blogs, availability: [] };
+  return parseLocalState(fs.readFileSync(file, "utf8"));
 }
 
 function writeState(state: LocalState) {

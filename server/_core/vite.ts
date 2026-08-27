@@ -76,9 +76,12 @@ export function serveStatic(app: Express) {
     );
   }
 
-  if (!isVercel) app.use(express.static(distPath, { index: false, redirect: false }));
+  app.use(express.static(distPath, { index: false, redirect: false }));
 
   app.use("*", async (req, res) => {
+    if (req.path.startsWith("/assets/")) {
+      return res.status(404).type("text/plain").send("Not found");
+    }
     try {
       const template = await fs.promises.readFile(templatePath, "utf-8");
       const serverEntryPath = isVercel

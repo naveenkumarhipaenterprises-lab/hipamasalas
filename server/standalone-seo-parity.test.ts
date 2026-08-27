@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildLlmsTxt, buildRobotsTxt, buildSitemapXml } from "./seoRoutes";
+import fs from "node:fs";
 import { getIndexablePaths, getPageHead, getProduct, getProductFaqs, getStructuredData, products, siteIdentity } from "../shared/hipaContent";
 
 describe("standalone SEO parity", () => {
@@ -28,6 +29,11 @@ describe("standalone SEO parity", () => {
 
   it("permits public crawling while excluding the private admin section", () => {
     expect(buildRobotsTxt("https://www.hipamasalas.com")).toContain("User-agent: *\nAllow: /\nDisallow: /admin");
+  });
+
+  it("keeps the singular B2B enquiry URL as a compatibility redirect", () => {
+    const source = fs.readFileSync(new URL("./seoRoutes.ts", import.meta.url), "utf8");
+    expect(source).toContain('"/b2b-enquiry": "/b2b-enquiries"');
   });
 
   it("builds crawler-readable sitemap and AI context without a database", () => {

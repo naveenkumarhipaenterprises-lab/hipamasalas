@@ -19,6 +19,7 @@ const legacyRoutes: Record<string, string> = {
   "/pepper-powder.html": "/products/pepper-powder",
   "/garam-masala.html": "/products/garam-masala",
   "/blog-details.html": "/blog",
+  "/b2b-enquiry": "/b2b-enquiries",
 };
 
 function xmlEscape(value: string) {

@@ -17,6 +17,8 @@ describe("Vercel deployment configuration", () => {
     expect(viteSource).toContain('from "vite"');
     const productionViteSource = fs.readFileSync(path.join(projectRoot, "server", "_core", "vite.ts"), "utf8");
     expect(productionViteSource).not.toContain('from "vite"');
+    expect(productionViteSource).toContain('app.use(express.static(distPath, { index: false, redirect: false }));');
+    expect(productionViteSource).toContain('if (req.path.startsWith("/assets/"))');
     const apiEntry = fs.readFileSync(path.join(projectRoot, "api", "index.ts"), "utf8");
     expect(apiEntry).toContain('import app from "../dist/vercel-entry.js"');
   });
