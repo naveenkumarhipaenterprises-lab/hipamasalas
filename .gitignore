@@ -10,3 +10,4 @@ public/*
 *.log
 coverage/
 client/public/uploads/
+.next
