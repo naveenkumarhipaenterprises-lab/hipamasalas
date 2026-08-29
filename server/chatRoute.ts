@@ -18,8 +18,8 @@ async function callGeminiAPI(
   userMessage: string,
   history: Array<{ role: string; content: string }> = []
 ): Promise<{ reply: string | null; error: string | null }> {
-  const primaryModel = process.env.GEMINI_MODEL || "gemini-2.0-flash";
-  const candidateModels = Array.from(new Set([primaryModel, "gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"]));
+  const primaryModel = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
+  const candidateModels = Array.from(new Set([primaryModel, "gemini-2.5-flash-lite", "gemini-2.5-flash"]));
 
   console.log(`[Gemini Debug] Has GEMINI_API_KEY: ${Boolean(apiKey)}`);
 
@@ -55,7 +55,7 @@ async function callGeminiAPI(
       contents: trimmedContents,
       generationConfig: {
         temperature: 0.7,
-        maxOutputTokens: 800,
+        maxOutputTokens: 500,
       },
     };
 
@@ -189,7 +189,7 @@ export function registerChatRoute(app: Express) {
       name: "HIPA Masalas AI Chatbot API",
       status: "ok",
       hasGeminiKey: Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== "your_free_gemini_api_key_here"),
-      model: process.env.GEMINI_MODEL || "gemini-1.5-flash",
+      model: process.env.GEMINI_MODEL || "gemini-2.5-flash-lite",
     });
   });
 }
