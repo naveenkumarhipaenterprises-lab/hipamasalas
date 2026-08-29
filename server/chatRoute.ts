@@ -18,8 +18,8 @@ async function callGeminiAPI(
   userMessage: string,
   history: Array<{ role: string; content: string }> = []
 ): Promise<{ reply: string | null; error: string | null }> {
-  const primaryModel = process.env.GEMINI_MODEL || "gemini-1.5-flash";
-  const candidateModels = Array.from(new Set([primaryModel, "gemini-1.5-flash", "gemini-2.0-flash", "gemini-2.5-flash"]));
+  const primaryModel = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+  const candidateModels = Array.from(new Set([primaryModel, "gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"]));
 
   console.log(`[Gemini Debug] Has GEMINI_API_KEY: ${Boolean(apiKey)}`);
 
