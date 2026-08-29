@@ -13,6 +13,80 @@ Languages: Clear English, Tamil, and Tanglish (Tamil-English mixing, e.g. "Samba
 Rule: Never invent unconfirmed prices, ingredients, discounts, or health claims. If unsure, offer to connect them with the HIPA team.
 Answer Length: Short and direct (1-4 sentences).`;
 
+async function callGeminiAPI(
+  apiKey: string,
+  userMessage: string,
+  history: Array<{ role: string; content: string }> = []
+): Promise<{ reply: string | null; error: string | null }> {
+  const primaryModel = process.env.GEMINI_MODEL || "gemini-1.5-flash";
+  const candidateModels = Array.from(new Set([primaryModel, "gemini-1.5-flash", "gemini-2.0-flash", "gemini-2.5-flash"]));
+
+  console.log(`[Gemini Debug] Has GEMINI_API_KEY: ${Boolean(apiKey)}`);
+
+  for (const modelName of candidateModels) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+    console.log(`[Gemini Debug] Attempting Gemini Model: ${modelName}`);
+
+    const contents: Array<{ role: "user" | "model"; parts: Array<{ text: string }> }> = [];
+
+    if (Array.isArray(history)) {
+      for (const msg of history) {
+        if (msg && typeof msg.content === "string" && msg.content.trim()) {
+          const role = msg.role === "assistant" || msg.role === "model" ? "model" : "user";
+          contents.push({
+            role,
+            parts: [{ text: msg.content.trim() }],
+          });
+        }
+      }
+    }
+
+    contents.push({
+      role: "user",
+      parts: [{ text: userMessage.trim() }],
+    });
+
+    const trimmedContents = contents.slice(-14);
+
+    const payload = {
+      systemInstruction: {
+        parts: [{ text: HIPA_SYSTEM_PROMPT }],
+      },
+      contents: trimmedContents,
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 800,
+      },
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      console.log(`[Gemini Debug] (${modelName}) Response Status: ${response.status} ${response.statusText}`);
+
+      if (response.ok) {
+        const data: any = await response.json();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || null;
+        if (reply) return { reply, error: null };
+      } else {
+        const errorText = await response.text();
+        console.error(`[Gemini API Error] (${modelName}) Status ${response.status}: ${errorText}`);
+        if (errorText.includes("API_KEY_INVALID")) {
+          return { reply: null, error: `Invalid GEMINI_API_KEY: ${errorText}` };
+        }
+      }
+    } catch (err: any) {
+      console.error(`[Gemini Exception] (${modelName})`, err);
+    }
+  }
+
+  return { reply: null, error: "Failed to get response from Gemini API" };
+}
+
 export function registerChatRoute(app: Express) {
   app.post("/api/chat", async (req: Request, res: Response) => {
     try {
@@ -21,63 +95,31 @@ export function registerChatRoute(app: Express) {
         return res.status(400).json({ error: "Message is required." });
       }
 
-      const messages = [
-        { role: "system", content: HIPA_SYSTEM_PROMPT },
-      ];
+      let reply: string | null = null;
+      const apiKey = process.env.GEMINI_API_KEY;
 
-      if (Array.isArray(history)) {
-        for (const m of history) {
-          if (m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string") {
-            messages.push({ role: m.role, content: m.content });
-          }
+      // 1. PRIMARY: GOOGLE GEMINI API
+      if (apiKey && apiKey !== "your_free_gemini_api_key_here") {
+        const result = await callGeminiAPI(apiKey, message, history);
+        if (result.reply) {
+          reply = result.reply;
         }
-      }
-      messages.push({ role: "user", content: message.trim() });
-
-      // Keep context length compact
-      const MAX_MESSAGES = 16;
-      if (messages.length > MAX_MESSAGES) {
-        const sys = messages[0];
-        const tail = messages.slice(-(MAX_MESSAGES - 1));
-        messages.length = 0;
-        messages.push(sys, ...tail);
+      } else {
+        console.warn("[Gemini Warning] GEMINI_API_KEY is missing or contains placeholder string!");
       }
 
-      let reply = "";
-
-      // 1. GOOGLE GEMINI FREE API (Primary)
-      if (process.env.GEMINI_API_KEY) {
-        try {
-          const geminiRes = await fetch(
-            "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-            {
-              method: "POST",
-              headers: {
-                "Authorization": `Bearer ${process.env.GEMINI_API_KEY}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                model: "gemini-1.5-flash",
-                messages,
-                temperature: 0.7,
-              }),
-            }
-          );
-
-          if (geminiRes.ok) {
-            const data: any = await geminiRes.json();
-            reply = data.choices?.[0]?.message?.content?.trim() || "";
-          } else {
-            console.error("[Gemini API Error]", await geminiRes.text());
-          }
-        } catch (err) {
-          console.error("[Gemini Fetch Error]", err);
-        }
-      }
-
-      // 2. GROQ FREE API FALLBACK
+      // 2. FALLBACK: GROQ API
       if (!reply && process.env.GROQ_API_KEY) {
         try {
+          console.log("[Groq Fallback] Attempting Groq API...");
+          const messages = [{ role: "system", content: HIPA_SYSTEM_PROMPT }];
+          if (Array.isArray(history)) {
+            for (const m of history) {
+              if (m && typeof m.content === "string") messages.push({ role: m.role, content: m.content });
+            }
+          }
+          messages.push({ role: "user", content: message.trim() });
+
           const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -85,7 +127,7 @@ export function registerChatRoute(app: Express) {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              model: "llama-3.3-70b-versatile",
+              model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
               messages,
               temperature: 0.7,
               max_tokens: 500,
@@ -94,27 +136,33 @@ export function registerChatRoute(app: Express) {
 
           if (groqRes.ok) {
             const data: any = await groqRes.json();
-            reply = data.choices?.[0]?.message?.content?.trim() || "";
+            reply = data.choices?.[0]?.message?.content?.trim() || null;
           }
-        } catch (err) {
-          console.error("[Groq Fetch Error]", err);
+        } catch (groqErr) {
+          console.error("[Groq Error]", groqErr);
         }
       }
 
-      // 3. ZERO-KEY FALLBACK (POLLINATIONS FREE AI - Works out of the box)
+      // 3. ZERO-KEY FALLBACK (Pollinations AI)
       if (!reply) {
         try {
+          console.log("[Pollinations Fallback] Attempting zero-key fallback...");
+          const messages = [{ role: "system", content: HIPA_SYSTEM_PROMPT }];
+          if (Array.isArray(history)) {
+            for (const m of history) {
+              if (m && typeof m.content === "string") messages.push({ role: m.role, content: m.content });
+            }
+          }
+          messages.push({ role: "user", content: message.trim() });
+
           const pollinationsRes = await fetch("https://text.pollinations.ai/", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              messages,
-              model: "openai",
-            }),
+            body: JSON.stringify({ messages, model: "openai" }),
           });
 
           if (pollinationsRes.ok) {
-            reply = (await pollinationsRes.text()).trim();
+            reply = (await pollinationsRes.text()).trim() || null;
           }
         } catch (pErr) {
           console.error("[Pollinations Error]", pErr);
@@ -140,7 +188,8 @@ export function registerChatRoute(app: Express) {
     res.json({
       name: "HIPA Masalas AI Chatbot API",
       status: "ok",
-      provider: process.env.GEMINI_API_KEY ? "Google Gemini Free API" : "Zero-Key Fallback",
+      hasGeminiKey: Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== "your_free_gemini_api_key_here"),
+      model: process.env.GEMINI_MODEL || "gemini-1.5-flash",
     });
   });
 }
