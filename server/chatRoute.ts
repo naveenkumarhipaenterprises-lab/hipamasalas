@@ -13,6 +13,38 @@ Languages: Clear English, Tamil, and Tanglish (Tamil-English mixing, e.g. "Samba
 Rule: Never invent unconfirmed prices, ingredients, discounts, or health claims. If unsure, offer to connect them with the HIPA team.
 Answer Length: Short and direct (1-4 sentences).`;
 
+function getHipaKnowledgeFallback(input: string): string {
+  const msg = input.toLowerCase();
+
+  // Product discovery
+  if (msg.includes("product") || msg.includes("list") || msg.includes("range") || (msg.includes("masala") && msg.includes("what"))) {
+    return "HIPA Masalas offers 8 authentic spice products inspired by traditional South Indian recipes:\n\n1. 🍲 Sambar Powder\n2. 🥣 Rasam Powder\n3. 🌟 Turmeric Powder\n4. 🌶️ Red Chilli Powder\n5. 🌿 Coriander Powder\n6. 🟤 Cumin Powder\n7. ⚫ Pepper Powder\n8. 🔥 Garam Masala\n\nWhich product would you like to know more about?";
+  }
+
+  // Sambar / Recipe (English/Tanglish/Tamil)
+  if (msg.includes("sambar") || msg.includes("சாம்பார்")) {
+    return "Sambar-ku HIPA Sambar Powder use pannalaam! 🍲\n\n**Quick Step-by-Step Sambar Recipe:**\n1. Boil toor dal with a pinch of HIPA Turmeric Powder until soft.\n2. Boil cooked dal with tamarind extract, salt, and vegetables (drumstick/shallots/brinjal).\n3. Add 1-2 tbsp HIPA Sambar Powder and simmer for 5 mins.\n4. Prepare tadka (mustard seeds, curry leaves, asafoetida in ghee/oil) and pour over sambar.\n\nEnjoy hot with rice or idli! 🍚";
+  }
+
+  // Rasam / Recipe
+  if (msg.includes("rasam") || msg.includes("ரசம்")) {
+    return "For comforting, soothing rasam, use HIPA Rasam Powder! 🥣\n\n**Simple Rasam Recipe:**\n1. Boil tamarind water with tomatoes, crushed garlic, and HIPA Rasam Powder.\n2. Add cooked dal water (optional) and salt; bring to a single froth.\n3. Temper with mustard seeds, cumin, and curry leaves in ghee.\n\nServe hot as a soup or with rice!";
+  }
+
+  // B2B / Bulk orders
+  if (msg.includes("bulk") || msg.includes("hotel") || msg.includes("restaurant") || msg.includes("catering") || msg.includes("distributor") || msg.includes("wholesale")) {
+    return "HIPA Masalas handles bulk and business enquiries for hotels, restaurants, caterers, distributors, and exporters! 🏨\n\nTo help us assist your business requirement, please share:\n1. Your Name & Business Name\n2. City / Location\n3. Required Products & Approximate Monthly Quantity\n\nOur B2B team will get back to you directly!";
+  }
+
+  // Contact info
+  if (msg.includes("contact") || msg.includes("phone") || msg.includes("email") || msg.includes("number") || msg.includes("address") || msg.includes("location")) {
+    return "You can reach the HIPA Masalas team directly at:\n\n📧 **Email:** info@hipamasalas.com\n📞 **Phone:** +91 70580 53055\n📍 **Location:** Chennai, Tamil Nadu, India\n🌐 **Website:** https://www.hipamasalas.com/\n\nFeel free to call or WhatsApp us for instant enquiries!";
+  }
+
+  // Default HIPA team member greeting/guidance
+  return "Hi! 👋 Welcome to **HIPA Masalas — Taste of Tradition**.\n\nI can help you explore our 8 masala products, guide you with recipes, or process bulk and B2B orders for your business. What are you looking for today?";
+}
+
 async function callGeminiAPI(
   apiKey: string,
   userMessage: string,
@@ -96,7 +128,8 @@ export function registerChatRoute(app: Express) {
       }
 
       let reply: string | null = null;
-      const apiKey = process.env.GEMINI_API_KEY;
+      // Multi-env variable lookup in case user configured an alias in Vercel
+      const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY || process.env.GOOGLE_GEMINI_API_KEY;
 
       // 1. PRIMARY: GOOGLE GEMINI API
       if (apiKey && apiKey !== "your_free_gemini_api_key_here") {
@@ -105,7 +138,7 @@ export function registerChatRoute(app: Express) {
           reply = result.reply;
         }
       } else {
-        console.warn("[Gemini Warning] GEMINI_API_KEY is missing or contains placeholder string!");
+        console.warn("[Gemini Warning] GEMINI_API_KEY is missing or placeholder!");
       }
 
       // 2. FALLBACK: GROQ API
@@ -143,52 +176,27 @@ export function registerChatRoute(app: Express) {
         }
       }
 
-      // 3. ZERO-KEY FALLBACK (Pollinations AI)
+      // 3. GUARANTEED KNOWLEDGE FALLBACK (Never return an error message to the customer!)
       if (!reply) {
-        try {
-          console.log("[Pollinations Fallback] Attempting zero-key fallback...");
-          const messages = [{ role: "system", content: HIPA_SYSTEM_PROMPT }];
-          if (Array.isArray(history)) {
-            for (const m of history) {
-              if (m && typeof m.content === "string") messages.push({ role: m.role, content: m.content });
-            }
-          }
-          messages.push({ role: "user", content: message.trim() });
-
-          const pollinationsRes = await fetch("https://text.pollinations.ai/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ messages, model: "openai" }),
-          });
-
-          if (pollinationsRes.ok) {
-            reply = (await pollinationsRes.text()).trim() || null;
-          }
-        } catch (pErr) {
-          console.error("[Pollinations Error]", pErr);
-        }
-      }
-
-      if (!reply) {
-        reply =
-          "Hi! I'm currently having trouble connecting to the AI assistant. Feel free to contact our team directly at info@hipamasalas.com or +91 70580 53055!";
+        reply = getHipaKnowledgeFallback(message);
       }
 
       return res.json({ reply, role: "assistant" });
     } catch (err) {
       console.error("[/api/chat Error]", err);
       return res.json({
-        reply: "I'm having a little trouble right now. Please try again or reach the HIPA team at info@hipamasalas.com / +91 70580 53055.",
+        reply: getHipaKnowledgeFallback(req.body?.message || ""),
         role: "assistant",
       });
     }
   });
 
   app.get("/api/chat", (_req: Request, res: Response) => {
+    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY || process.env.GOOGLE_GEMINI_API_KEY;
     res.json({
       name: "HIPA Masalas AI Chatbot API",
       status: "ok",
-      hasGeminiKey: Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== "your_free_gemini_api_key_here"),
+      hasGeminiKey: Boolean(apiKey && apiKey !== "your_free_gemini_api_key_here"),
       model: process.env.GEMINI_MODEL || "gemini-2.5-flash-lite",
     });
   });
