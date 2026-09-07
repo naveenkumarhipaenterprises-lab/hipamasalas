@@ -46,6 +46,11 @@ function getHipaKnowledgeFallback(input: string, history: Array<{ role: string; 
   const lastAssistantMsg = history.filter(h => h.role === "assistant" || h.role === "model").pop()?.content.toLowerCase() || "";
   const hadHotelContext = history.some(h => (h.content || "").toLowerCase().includes("hotel") || (h.content || "").toLowerCase().includes("shop") || (h.content || "").toLowerCase().includes("restaurant"));
 
+  // Appreciation / Gratitude
+  if (msg.includes("thank") || msg.includes("tnx") || msg.includes("nandri") || msg.includes("thx") || msg === "ok thankyou" || msg === "okay thankyou" || msg === "ok thanks") {
+    return "Most welcome! 😊 Happy cooking with HIPA Masalas! Vera edhavadhu help venum-na sollunga!";
+  }
+
   // Contextual Short Answers
   if (msg === "illa" || msg === "no") {
     if (lastAssistantMsg.includes("saptingala") || lastAssistantMsg.includes("saptiya")) {
@@ -144,7 +149,7 @@ function getHipaKnowledgeFallback(input: string, history: Array<{ role: string; 
     return "Elon Musk pathi general-a solla mudiyum 😄 but naan principalmente HIPA Masalas & cooking guidance-ku iruken. Enna masala help venum?";
   }
 
-  return "Hey 👋 Welcome to HIPA Masalas! Enna cooking or product help venum?";
+  return "Got it! 👍 HIPA Masalas products, recipes, or bulk orders pathi edhavadhu kekka poringala?";
 }
 
 async function callGeminiAPI(
