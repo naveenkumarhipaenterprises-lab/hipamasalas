@@ -110,16 +110,29 @@ function getArticleBlocks(body: string) {
 
 function renderArticleInlineLinks(content: string, resources: ArticleResource[]) {
   const allowedHrefs = new Set(resources.map((resource) => resource.href));
-  const linkPattern = /\[\[([^\]|]+)\|([^\]]+)\]\]/g;
+  const linkPattern = /(?:\[\[([^\]|]+)\|([^\]]+)\]\]|\[([^\]]+)\]\(([^)]+)\))/g;
   const nodes: React.ReactNode[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
   while ((match = linkPattern.exec(content)) !== null) {
     if (match.index > lastIndex) nodes.push(content.slice(lastIndex, match.index));
-    const label = match[1]?.trim() || "";
-    const href = match[2]?.trim() || "";
-    nodes.push(allowedHrefs.has(href) && label ? <Link href={href} key={`${href}-${match.index}`}>{label}</Link> : match[0]);
+    const label = match[1]?.trim() || match[3]?.trim() || "";
+    let rawHref = match[2]?.trim() || match[4]?.trim() || "";
+    let href = rawHref.replace(/^https?:\/\/(www\.)?hipamasalas\.com/, "");
+    if (!href.startsWith("/") && !href.startsWith("http")) href = `/${href}`;
+
+    nodes.push(
+      label ? (
+        href.startsWith("/") ? (
+          <Link href={href} key={`${href}-${match.index}`}>{label}</Link>
+        ) : (
+          <a href={href} target="_blank" rel="noreferrer" key={`${href}-${match.index}`}>{label}</a>
+        )
+      ) : (
+        match[0]
+      )
+    );
     lastIndex = linkPattern.lastIndex;
   }
 
