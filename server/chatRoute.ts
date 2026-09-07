@@ -23,8 +23,11 @@ CRITICAL HUMAN TALKING RULES:
    - Only bring up HIPA masalas when food, cooking, recipes, or buying is actually mentioned. Don't force sales pitches into casual banter!
 
 4. BUSINESS & B2B LOGIC:
-   - If user mentions "hotel", "restaurant", "50kg", "100kg", "bulk", or "wholesale", talk like a sharp, helpful business manager.
-   - Ask for product name, monthly quantity, and city location in a single friendly sentence.
+   - If user mentions "hotel", "restaurant", "50kg", "100kg", "bulk", "wholesale", "catering", or bulk requirement:
+     * Immediately acknowledge bulk supply capability ("Super! HIPA Masalas-la hotel & commercial bulk orders supply panrom 🏨📦.").
+     * Ask for product name, monthly quantity (kg), and city location in a single friendly sentence.
+     * Share contact details (+91 70580 53055 / info@hipamasalas.com) so they can reach the sales team directly.
+     * NEVER ask generic home cooking questions like "what are you cooking today?" or "enna cooking help venum?".
    - If they already mentioned running a hotel, DO NOT ask "Are you a business?".
 
 5. LANGUAGE MATCHING:
@@ -44,11 +47,16 @@ RESPONSE STYLE:
 function getHipaKnowledgeFallback(input: string, history: Array<{ role: string; content: string }> = []): string {
   const msg = input.toLowerCase().trim();
   const lastAssistantMsg = history.filter(h => h.role === "assistant" || h.role === "model").pop()?.content.toLowerCase() || "";
-  const hadHotelContext = history.some(h => (h.content || "").toLowerCase().includes("hotel") || (h.content || "").toLowerCase().includes("shop") || (h.content || "").toLowerCase().includes("restaurant"));
+  const hadHotelContext = history.some(h => (h.content || "").toLowerCase().includes("hotel") || (h.content || "").toLowerCase().includes("shop") || (h.content || "").toLowerCase().includes("restaurant") || (h.content || "").toLowerCase().includes("bulk"));
 
   // Appreciation / Gratitude
   if (msg.includes("thank") || msg.includes("tnx") || msg.includes("nandri") || msg.includes("thx") || msg === "ok thankyou" || msg === "okay thankyou" || msg === "ok thanks") {
     return "Most welcome! 😊 Happy cooking with HIPA Masalas! Vera edhavadhu help venum-na sollunga!";
+  }
+
+  // Bulk & Hotel Business Inquiries (Priority)
+  if (msg.includes("bulk") || msg.includes("hotel") || msg.includes("restaurant") || msg.includes("wholesale") || msg.includes("catering") || msg.includes("commercial") || msg.includes("supply")) {
+    return "Super! HIPA Masalas-la hotel & commercial bulk orders supply panrom 🏨📦. Enna product (e.g. Sambar, Rasam, Garam Masala), approx monthly quantity & city location sollunga! Direct-a HIPA sales team (+91 70580 53055 / info@hipamasalas.com) kitta contact pannalam!";
   }
 
   // Contextual Short Answers
