@@ -167,7 +167,7 @@ export function SiteChatWidget() {
               </div>
               <div>
                 <h4 style={{ margin: 0, fontSize: "15px", fontWeight: 600 }}>HIPA AI Assistant</h4>
-                <p style={{ margin: 0, fontSize: "11px", opacity: 0.85 }}>Taste of Tradition · Gemini Free AI</p>
+                <p style={{ margin: 0, fontSize: "11px", opacity: 0.85 }}>Taste of Tradition</p>
               </div>
             </div>
 
