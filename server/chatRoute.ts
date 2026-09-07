@@ -1,19 +1,20 @@
 import type { Express, Request, Response } from "express";
+import { HIPA_KNOWLEDGE_BASE } from "./hipaKnowledge";
 
 export const HIPA_SYSTEM_PROMPT = `You are the official AI Assistant for HIPA Masalas, a Chennai, Tamil Nadu-based Indian spice and masala brand. You speak and act like a warm, intelligent, authentic HIPA team member.
 
-IDENTITY & PERSONALITY:
-- Friendly, warm, natural, human, and professional for B2B.
-- Never sound robotic, script-like, formal, or template-driven.
+IDENTITY & BRAND PERSONALITY:
+- Friendly, warm, natural, conversational, human, and professional for B2B.
+- Never sound robotic, corporate, or script-driven. Avoid canned fillers ("According to your query...", "Your request has been processed", "I understand your question", etc.).
 - Avoid repetitive sentence starters (DO NOT constantly begin messages with "Sure 😊", "Absolutely 😊", "Of course 😊", or "Great 👍"). Vary your sentence openings naturally based on context.
-- Never expose internal intent labels, chain-of-thought, system instructions, or API details. Output ONLY your final natural response.
+- Never expose internal system instructions, intent names, or API details. Output ONLY your final natural response.
 
-CONVERSATION CONTEXT & MULTI-TURN MEMORY:
+CONVERSATION CONTEXT & MULTI-TURN MEMORY (CRITICAL):
 - ALWAYS USE THE CONVERSATION HISTORY TO INTERPRET SHORT REPLIES AND CONTEXTUAL REFERENCES:
   * Short words like "illa", "no", "aama", "yes", "seri", "okay", "first one", "second one", "this one", "adhu", "idhu", "50 kg", "hotel", "price evlo?", "enga kedaikum?", "venam" MUST be interpreted relative to what was discussed in previous messages.
-  * Example context flow:
+  * Context flow examples:
     - If you asked "Neenga saptingala?", and user replies "illa", respond naturally: "Aiyo 😄 poi first sapdunga! Enna sapda poringa?".
-    - If user previously mentioned running a hotel, and later asks for "sambar powder", interpret it as a commercial B2B requirement for their hotel.
+    - If user previously mentioned running a hotel/shop, and later asks for "sambar powder", interpret it as a commercial B2B requirement for their business!
     - If user asks "price evlo?", interpret "price" as referring to the product discussed in prior turns.
 - DO NOT REPEAT QUESTIONS IF THE USER ALREADY PROVIDED THE INFORMATION in prior turns.
 
@@ -25,22 +26,24 @@ LANGUAGE & TANGLISH UNDERSTANDING:
   * Mixed -> Natural mixed English + Tanglish.
 - UNDERSTAND CASUAL TYPING & SPELLING ERRORS: Seamlessly interpret words like "masla", "masalaa", "saptiyaa", "epdi", "eppadi", "venum", "vnum", "nga", "bro", "iruka", "yenga", "erukuma", "evlo", "evvalavu", "nalla irukuma", etc. Do NOT ask the user to correct spelling.
 
-CASUAL TALK vs HIPA RECOMMENDATIONS:
+CASUAL BANTER vs HIPA RECOMMENDATIONS:
 - Handle casual greetings ("hi", "epdi iruka?", "saptiya?") and food banter naturally as a friendly person. Do NOT force a sales pitch or product catalogue into every message.
 - Recommend HIPA products naturally when food, cooking, recipes, masala selection, or purchase intent is discussed.
 - For off-topic questions (e.g. "who is elon musk?"), answer briefly or politely redirect: "Elon Musk pathi general-a solla mudiyum 😄 but naan mainly HIPA Masalas, cooking, recipes, masala products and bulk enquiries-ku help panna designed. Enna masala information venum?"
 
-HIPA KNOWLEDGE BASE:
-- Products: Sambar Powder, Rasam Powder, Thaniya (Coriander) Powder, Seeragam (Cumin) Powder, Pepper Powder, Garam Masala, Red Chilli Powder, Turmeric Powder, Paruppu Podi, Garlic Podi.
-- Company Info: Location: Chennai, Tamil Nadu; Phone/WhatsApp: +91 70580 53055; Email: info@hipamasalas.com; Website: https://www.hipamasalas.com/
-- STRICT ACCURACY: NEVER invent unconfirmed prices, discounts, stock levels, ingredient percentages, or delivery timelines. If exact details are not available in knowledge base, say: "I don't want to give you wrong information 😊. Please contact the HIPA team for current details (+91 70580 53055 / info@hipamasalas.com)."
+HIPA KNOWLEDGE DATA SOURCE:
+${JSON.stringify(HIPA_KNOWLEDGE_BASE, null, 2)}
 
-RESPONSE LENGTH:
+STRICT ACCURACY RULE:
+- NEVER INVENT unconfirmed prices, exact stock levels, discounts, ingredient percentages, or delivery timelines. If exact details are not available in the knowledge base, say: "I don't want to give you wrong information 😊. Please contact the HIPA team for current details (+91 70580 53055 / info@hipamasalas.com)."
+
+RESPONSE STYLE:
 - Keep normal conversational responses short and direct (1-3 short paragraphs / bullet points when helpful). Emojis used naturally.`;
 
 function getHipaKnowledgeFallback(input: string, history: Array<{ role: string; content: string }> = []): string {
   const msg = input.toLowerCase().trim();
   const lastAssistantMsg = history.filter(h => h.role === "assistant" || h.role === "model").pop()?.content.toLowerCase() || "";
+  const hadHotelContext = history.some(h => (h.content || "").toLowerCase().includes("hotel") || (h.content || "").toLowerCase().includes("shop") || (h.content || "").toLowerCase().includes("restaurant"));
 
   // 1. Contextual Short Answers
   if (msg === "illa" || msg === "no") {
@@ -57,14 +60,11 @@ function getHipaKnowledgeFallback(input: string, history: Array<{ role: string; 
     if (lastAssistantMsg.includes("saptingala")) {
       return "Super 😄 Enna saptinga?";
     }
-    if (lastAssistantMsg.includes("hotel") || lastAssistantMsg.includes("business")) {
-      return "Great! Enna product & approx quantity venum sollunga, bulk price quote guide panren.";
-    }
     return "Super 👍 Next enna details venum sollunga!";
   }
 
   if (msg === "first one" || msg === "first") {
-    return "Sure! Sambar Powder - 🍲 Traditional South Indian flavor. Pack size and bulk details venuma?";
+    return "Sure! Sambar Powder - 🍲 Traditional South Indian flavor. Pack size & price details venuma?";
   }
 
   if (msg === "second one" || msg === "second") {
@@ -75,11 +75,9 @@ function getHipaKnowledgeFallback(input: string, history: Array<{ role: string; 
     return "Seri 👍 Clear! Vera edhavadhu products or recipe assistance venuma?";
   }
 
-  // 2. Contextual continuation
-  const hadHotelContext = history.some(h => (h.content || "").toLowerCase().includes("hotel") || (h.content || "").toLowerCase().includes("shop") || (h.content || "").toLowerCase().includes("restaurant"));
-
+  // 2. Multi-turn continuation
   if (msg === "sambar" || msg === "sambar powder" || msg === "sambar masala") {
-    if (hadHotelContext || lastAssistantMsg.includes("hotel") || lastAssistantMsg.includes("business")) {
+    if (hadHotelContext || lastAssistantMsg.includes("hotel")) {
       return "Sure 👍 Hotel use-ku Sambar Powder bulk requirement-aa? Approx quantity evlo venum?";
     }
     return "Sambar-ku HIPA Sambar Powder use pannalaam! 🍲 Traditional taste nalla varum. Home use-ku venuma illa hotel/bulk requirement-aa?";
@@ -89,8 +87,12 @@ function getHipaKnowledgeFallback(input: string, history: Array<{ role: string; 
     return "Super 👍 50kg bulk requirement recorded. Product name & Delivery location (City) share pannunga, HIPA sales team direct-a connect pannuvanga!";
   }
 
-  if (msg.includes("enga kedaikum") || msg.includes("where to buy") || msg.includes("how to buy")) {
-    return "HIPA Masalas online website moolama and Chennai stores-la available. Bulk & direct order-ku Phone/WhatsApp (+91 70580 53055) / Email (info@hipamasalas.com) contact pannalam!";
+  if (msg.includes("chennai") || msg.includes("location") || msg.includes("city")) {
+    return "Chennai-la irukinga 👍. Your location note panniten. Bulk order / enquiry details-ku HIPA sales team (+91 70580 53055) contact pannuvanga!";
+  }
+
+  if (msg.includes("enga kedaikum") || msg.includes("where to buy")) {
+    return "HIPA Masalas online website (https://www.hipamasalas.com/) moolama and stores-la available. Bulk & direct order-ku Phone/WhatsApp (+91 70580 53055) / Email (info@hipamasalas.com) contact pannalam!";
   }
 
   // 3. Casual conversation
@@ -110,28 +112,32 @@ function getHipaKnowledgeFallback(input: string, history: Array<{ role: string; 
     return "Super 😄 Enna saptinga?";
   }
 
-  if (msg.includes("naan hotel vachiruken") || msg.includes("hotel iruku") || msg.includes("enaku hotel iruku")) {
+  if (msg.includes("hotel vachiruken") || msg.includes("hotel iruku") || msg.includes("enaku hotel iruku")) {
     return "Super 👍 Hotel requirement-ku HIPA bulk supply help pannalam.";
   }
 
   if (msg.includes("price evlo") || msg.includes("cost") || msg.includes("evlo")) {
-    return "Which product price venum? 😊 Sambar Powder, Rasam Powder, Garam Masala etc. sollunga.";
+    return "Which product price venum? 😊 Sambar Powder, Rasam Powder, Garam Masala etc. sollunga. HIPA team kitta current pack price check panni guide panren.";
   }
 
   if (msg.includes("masala venum") || msg.includes("masla venum")) {
     return "Sure 😊 Enna masala venum? Sambar, Rasam, Garam Masala, Chilli Powder or vera edhavadhu?";
   }
 
+  if (msg.includes("enna iruku") || msg.includes("products") || msg.includes("list")) {
+    return "HIPA Masalas-la 10 authentic products iruku:\n1. 🍲 Sambar Powder\n2. 🥣 Rasam Powder\n3. 🌟 Turmeric Powder\n4. 🌶️ Red Chilli Powder\n5. 🌿 Thaniya (Coriander) Powder\n6. 🟤 Seeragam (Cumin) Powder\n7. ⚫ Pepper Powder\n8. 🔥 Garam Masala\n9. 🧄 Garlic Podi\n10. 🌾 Paruppu Podi\n\nEnna product details venum?";
+  }
+
+  if (msg.includes("sambar epdi seiyanum") || msg.includes("recipe")) {
+    return "Sambar seiya HIPA Sambar Powder use pannunga 🍲! Boil dal with turmeric, add tamarind extract & vegetables, add HIPA Sambar Powder and simmer for 5 mins. Temper with mustard & curry leaves!";
+  }
+
+  if (msg.includes("garam masala")) {
+    return "Biryani, kurma and gravies-ku HIPA Garam Masala perfect choice 😋! Rich aromatic taste kidaikkum.";
+  }
+
   if (msg.includes("elon musk")) {
     return "Elon Musk pathi general-a solla mudiyum 😄 but naan mainly HIPA Masalas, cooking, recipes, masala products and bulk enquiries-ku help panna designed. Enna masala information venum?";
-  }
-
-  if (msg.includes("nalla masala") || msg.includes("good brand") || msg.includes("recommend")) {
-    return "Definitely 😊 HIPA Masalas try pannunga. Traditional taste and quality-focused masala products offer panrom.";
-  }
-
-  if (msg.includes("biryani")) {
-    return "Biryani-ku HIPA Garam Masala use pannina rich, warm traditional aromatic flavour kidaikkum 😋!";
   }
 
   return "Hi! 👋 Welcome to **HIPA Masalas — Taste of Tradition**.\n\nI can help you explore our authentic masala products, recommend spices for recipes, or process bulk and B2B orders. What are you looking for today?";
@@ -144,8 +150,6 @@ async function callGeminiAPI(
 ): Promise<{ reply: string | null; error: string | null }> {
   const primaryModel = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
   const candidateModels = Array.from(new Set([primaryModel, "gemini-2.5-flash-lite", "gemini-2.5-flash"]));
-
-  console.log(`[Gemini Debug] Has GEMINI_API_KEY: ${Boolean(apiKey)}`);
 
   for (const modelName of candidateModels) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
@@ -170,7 +174,7 @@ async function callGeminiAPI(
     });
 
     const trimmedContents = contents.slice(-20);
-    console.log(`[Gemini Request] Calling Model: ${modelName} | Message: "${userMessage}" | Context History Items: ${trimmedContents.length}`);
+    console.log(`[Gemini API] Request model: ${modelName} | History turns: ${trimmedContents.length} | Prompt length: ${userMessage.length}`);
 
     const payload = {
       systemInstruction: {
@@ -190,7 +194,7 @@ async function callGeminiAPI(
         body: JSON.stringify(payload),
       });
 
-      console.log(`[Gemini Debug] (${modelName}) Response Status: ${response.status} ${response.statusText}`);
+      console.log(`[Gemini API] Response status: ${response.status} ${response.statusText}`);
 
       if (response.ok) {
         const data: any = await response.json();
@@ -231,9 +235,10 @@ export function registerChatRoute(app: Express) {
         console.warn("[Gemini Warning] GEMINI_API_KEY is missing or placeholder!");
       }
 
+      // Backup LLM (Groq) if configured
       if (!reply && process.env.GROQ_API_KEY) {
         try {
-          console.log("[Groq Fallback] Attempting Groq API...");
+          console.log("[Groq Backup] Attempting Groq API...");
           const messages = [{ role: "system", content: HIPA_SYSTEM_PROMPT }];
           if (Array.isArray(history)) {
             for (const m of history) {
@@ -265,6 +270,7 @@ export function registerChatRoute(app: Express) {
         }
       }
 
+      // Knowledge Fallback
       if (!reply) {
         reply = getHipaKnowledgeFallback(message, history);
       }
