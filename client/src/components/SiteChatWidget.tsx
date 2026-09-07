@@ -103,7 +103,7 @@ export function SiteChatWidget() {
           transition: "transform 0.2s ease",
         }}
       >
-        <Sparkles size={20} className="animate-spin-slow" />
+        <Bot size={22} />
         <span
           style={{
             position: "absolute",

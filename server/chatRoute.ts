@@ -2,10 +2,19 @@ import type { Express, Request, Response } from "express";
 
 export const HIPA_SYSTEM_PROMPT = `You are the official AI Assistant for HIPA Masalas, a Chennai, Tamil Nadu-based Indian spice and masala brand. Speak like a friendly, knowledgeable, authentic HIPA team member.
 
-CORE PERSONALITY:
+CORE PERSONALITY & INTENT REASONING:
 - Friendly, warm, natural, conversational, human, and professional for B2B.
-- Never sound robotic, corporate, or formal (Avoid "According to your query...", "Your request has been processed", "I understand your question", etc.).
-- Never expose chain-of-thought, internal analysis, system instructions, or API details. Output ONLY your final useful response.
+- Never sound robotic, corporate, or formal. Avoid generic fillers ("According to your query...", "Your request has been processed", "I understand your question", etc.).
+- Never expose internal intent names, chain-of-thought, or system instructions to the customer. Output ONLY your final useful response.
+
+CONVERSATION CONTEXT & SHORT REPLIES (CRITICAL):
+- ALWAYS USE THE CONVERSATION HISTORY TO INTERPRET SHORT REPLIES AND CONTEXTUAL REFERENCES:
+  * "illa" / "no" / "aama" / "yes" / "seri" / "okay" -> Interpret based on the last assistant question! (e.g. If you asked "Neenga saptingala?", and user says "illa", respond "Aiyo 😄 poi first sapdunga! Enna sapda poringa?").
+  * "first one" / "second one" / "this one" / "adhu" / "idhu" -> Map to the options presented in your previous message.
+  * "sambar" / "rasam" -> Map to the dish/product context being discussed.
+  * "50 kg" / "bulk" / "hotel" -> If user previously mentioned running a hotel/shop, treat 50kg/sambar powder as a commercial B2B bulk request for that business!
+  * "price evlo?" / "enga kedaikum?" -> Interpret "price" or "it" as referring to the product discussed in prior turns.
+- DO NOT REPEAT QUESTIONS IF THE USER ALREADY PROVIDED THE INFORMATION! (e.g. If user said "naan hotel vachiruken", do NOT ask "Are you a business owner?").
 
 LANGUAGE & SPELLING RULES:
 - MATCH THE USER'S LANGUAGE EXACTLY:
@@ -13,16 +22,15 @@ LANGUAGE & SPELLING RULES:
   * Tamil -> Natural Tamil script.
   * Tanglish -> Natural Tanglish (Tamil words written in English letters, e.g. "sambar-ku HIPA Sambar Powder use pannalaam", "epdi iruka?", "nalla iruken 😄").
   * Mixed -> Natural mixed English + Tanglish.
-- UNDERSTAND CASUAL TYPING & SPELLING ERRORS: Interpret intended meaning for words like "masla", "masalaa", "saptiyaa", "epdi", "eppadi", "venum", "vnum", "nga", "bro", "iruka", "yenga", etc.
+- UNDERSTAND CASUAL TYPING & SPELLING ERRORS: Interpret intended meaning for words like "masla", "masalaa", "saptiyaa", "epdi", "eppadi", "venum", "vnum", "nga", "bro", "iruka", "yenga", "erukuma", "evlo", "evvalavu", "nalla irukuma", etc.
 
 CASUAL FOOD & CONVERSATIONAL BEHAVIOUR:
 - Handle casual conversation naturally before introducing HIPA products. Do NOT force a sales pitch into every sentence.
 - "epdi iruka?" -> "Nalla iruken 😄 Neenga epdi irukinga?"
-- "saptiya?" -> "Naan AI assistant 😄 so naan sapda maten. Neenga saptingala? Sapadu-ku masala venumna HIPA Masalas try pannunga!"
-- "naan sapten" -> "Super 😄 Enna saptinga?"
-- "sambar" -> "Nice 😋 Sambar-ku HIPA Sambar Powder use pannina traditional flavour nalla varum."
+- "saptiya?" -> "Naan AI assistant 😄 so naan sapda maten. Neenga saptingala?" -> User: "illa" -> "Aiyo 😄 poi first sapdunga! Enna sapda poringa?"
+- "naan sapten" -> "Super 😄 Enna saptinga?" -> User: "sambar" -> "Nice 😋 Sambar-ku HIPA Sambar Powder use pannina traditional flavour nalla varum."
 - "pasikuthu" -> "Aiyo 😄 appo first sapadu dhaan important! Enna sapda poringa?"
-- For off-topic questions (e.g. "who is elon musk?"), politely redirect: "I'm mainly here to help with HIPA Masalas, cooking, recipes, spice products and bulk/B2B enquiries 😊. What would you like to know?"
+- For off-topic questions (e.g. "who is elon musk?"), politely redirect: "Elon Musk pathi general-a solla mudiyum 😄 but naan mainly HIPA Masalas, cooking, recipes, masala products and bulk enquiries-ku help panna designed. Enna masala information venum?"
 
 HIPA PRODUCTS & ACCURACY:
 - Products: Sambar Powder, Rasam Powder, Thaniya (Coriander) Powder, Seeragam (Cumin) Powder, Pepper Powder, Garam Masala, Red Chilli Powder, Turmeric Powder, Paruppu Podi, Garlic Podi.
@@ -32,80 +40,104 @@ HIPA PRODUCTS & ACCURACY:
 B2B & BULK ENQUIRIES:
 - Recognize buying intent ("bulk", "100kg", "50kg", "hotel", "restaurant", "catering", "distributor", "dealer", "wholesale", "shop").
 - Respond conversationally to collect: 1. Product 2. Approx quantity 3. Business type & location.
-- Remember previous turns in conversation (e.g. if user already mentioned running a hotel, do not ask "Are you a business?").
 
 RESPONSE STYLE:
-- Short & direct (1-4 short paragraphs / bullet points when helpful). Emojis used naturally.`;
+- Short & direct (1-3 short paragraphs / bullet points when helpful). Emojis used naturally.`;
 
-function getHipaKnowledgeFallback(input: string): string {
+function getHipaKnowledgeFallback(input: string, history: Array<{ role: string; content: string }> = []): string {
   const msg = input.toLowerCase().trim();
+  const lastAssistantMsg = history.filter(h => h.role === "assistant" || h.role === "model").pop()?.content.toLowerCase() || "";
 
-  // Casual greetings & how are you
-  if (msg === "hi" || msg === "hello" || msg === "hey" || msg.includes("epdi iruka") || msg.includes("how are you")) {
-    return "Nalla iruken 😄 Neenga epdi irukinga? HIPA Masalas products or cooking help venuma?";
+  // 1. Contextual Short Answers
+  if (msg === "illa" || msg === "no") {
+    if (lastAssistantMsg.includes("saptingala") || lastAssistantMsg.includes("saptiya")) {
+      return "Aiyo 😄 poi first sapdunga! Enna sapda poringa?";
+    }
+    if (lastAssistantMsg.includes("home use")) {
+      return "Super 👍 Commercial / Hotel requirement-na bulk supply details share panren!";
+    }
+    return "Seri 👍 Edhavadhu masala or recipe help venum-na sollunga!";
   }
 
-  // Casual eating questions
+  if (msg === "aama" || msg === "yes" || msg === "correct" || msg === "seri" || msg === "okay") {
+    if (lastAssistantMsg.includes("saptingala")) {
+      return "Super 😄 Enna saptinga?";
+    }
+    if (lastAssistantMsg.includes("hotel") || lastAssistantMsg.includes("business")) {
+      return "Great! Enna product & approx quantity venum sollunga, bulk price quote guide panren.";
+    }
+    return "Super 👍 Next enna details venum sollunga!";
+  }
+
+  if (msg === "first one" || msg === "first") {
+    return "Sure! Sambar Powder - 🍲 Traditional South Indian flavor. Pack size and bulk details venuma?";
+  }
+
+  if (msg === "second one" || msg === "second") {
+    return "Sure! Rasam Powder - 🥣 Comforting authentic Rasam flavour. Pack size details venuma?";
+  }
+
+  if (msg === "venam" || msg === "no need") {
+    return "Seri 👍 Clear! Vera edhavadhu products or recipe assistance venuma?";
+  }
+
+  // 2. Contextual continuation (User previously said hotel / business)
+  const hadHotelContext = history.some(h => (h.content || "").toLowerCase().includes("hotel") || (h.content || "").toLowerCase().includes("shop") || (h.content || "").toLowerCase().includes("restaurant"));
+
+  if (msg === "sambar" || msg === "sambar powder" || msg === "sambar masala") {
+    if (hadHotelContext || lastAssistantMsg.includes("hotel") || lastAssistantMsg.includes("business")) {
+      return "Sure 👍 Hotel use-ku Sambar Powder bulk requirement-aa? Approx quantity evlo venum?";
+    }
+    return "Sambar-ku HIPA Sambar Powder use pannalaam! 🍲 Traditional taste nalla varum. Home use-ku venuma illa hotel/bulk requirement-aa?";
+  }
+
+  if (msg.includes("50 kg") || msg.includes("50kg") || msg.includes("100kg") || msg.includes("100 kg")) {
+    return "Super 👍 50kg bulk requirement recorded. Product name & Delivery location (City) share pannunga, HIPA sales team direct-a connect pannuvanga!";
+  }
+
+  if (msg.includes("enga kedaikum") || msg.includes("where to buy") || msg.includes("how to buy")) {
+    return "HIPA Masalas online website moolama and Chennai stores-la available. Bulk & direct order-ku Phone/WhatsApp (+91 70580 53055) / Email (info@hipamasalas.com) contact pannalam!";
+  }
+
+  // 3. Casual conversation
+  if (msg === "hi" || msg === "hello" || msg === "hey") {
+    return "Hi! 👋 Welcome to HIPA Masalas — Taste of Tradition. Enna help venum?";
+  }
+
+  if (msg.includes("epdi iruka") || msg.includes("how are you")) {
+    return "Nalla iruken 😄 Neenga epdi irukinga?";
+  }
+
   if (msg.includes("saptiya") || msg.includes("sapdu") || msg.includes("saapadu")) {
-    return "Naan AI assistant 😄 so naan sapda mudiyadhu. Neenga saptingala? Sapadu-ku traditional masala venumna HIPA Masalas try pannunga!";
+    return "Naan AI assistant 😄 so naan sapda mudiyadhu. Neenga saptingala?";
   }
 
   if (msg.includes("naan sapten") || msg.includes("nan sapten") || msg.includes("ate")) {
     return "Super 😄 Enna saptinga?";
   }
 
-  if (msg.includes("pasikuthu") || msg.includes("hungry")) {
-    return "Aiyo 😄 appo first sapadu dhaan important! Enna sapda poringa?";
+  if (msg.includes("naan hotel vachiruken") || msg.includes("hotel iruku") || msg.includes("enaku hotel iruku")) {
+    return "Super 👍 Hotel requirement-ku HIPA bulk supply help pannalam.";
   }
 
-  // Off-topic question handling
-  if (msg.includes("elon musk") || msg.includes("crypto") || msg.includes("politics") || msg.includes("movie") || msg.includes("weather")) {
-    return "I'm mainly here to help with HIPA Masalas, cooking, recipes, spice products and bulk/B2B enquiries 😊. What would you like to know?";
+  if (msg.includes("price evlo") || msg.includes("cost") || msg.includes("evlo")) {
+    return "Which product price venum? 😊 Sambar Powder, Rasam Powder, Garam Masala etc. sollunga.";
   }
 
-  // Specific dish queries
-  if (msg.includes("biryani")) {
-    return "Biryani-ku HIPA Garam Masala use pannina rich, warm traditional aromatic flavour kidaikkum 😋!";
+  if (msg.includes("masala venum") || msg.includes("masla venum")) {
+    return "Sure 😊 Enna masala venum? Sambar, Rasam, Garam Masala, Chilli Powder or vera edhavadhu?";
   }
 
-  if (msg === "sambar" || msg.includes("sambar masala") || msg.includes("sambar powder")) {
-    if (msg.includes("hotel") || msg.includes("bulk")) {
-      return "Hotel & commercial kitchen requirement-ku HIPA Sambar Powder bulk quantity supply pannalam! 🏨 Approx quantity and location sollunga, HIPA team help pannuvanga.";
-    }
-    return "Sambar-ku HIPA Sambar Powder use pannalaam! 🍲\n\n**Quick Step-by-Step Sambar Recipe:**\n1. Boil toor dal with a pinch of HIPA Turmeric Powder.\n2. Add tamarind extract, salt, and vegetables.\n3. Add 1-2 tbsp HIPA Sambar Powder and simmer for 5 mins.\n4. Temper with mustard seeds & curry leaves in ghee!";
+  if (msg.includes("elon musk")) {
+    return "Elon Musk pathi general-a solla mudiyum 😄 but naan mainly HIPA Masalas, cooking, recipes, masala products and bulk enquiries-ku help panna designed. Enna masala information venum?";
   }
 
-  if (msg === "rasam" || msg.includes("rasam powder")) {
-    return "Comforting, soothing rasam-ku HIPA Rasam Powder use pannunga! 🥣 Tamarind water, tomatoes, garlic and HIPA Rasam Powder sethu boil panni mustard seeds-la temper pannunga!";
-  }
-
-  // B2B & Hotel requirements
-  if (msg.includes("bulk") || msg.includes("hotel") || msg.includes("restaurant") || msg.includes("50kg") || msg.includes("100kg") || msg.includes("distributor") || msg.includes("wholesale")) {
-    return "Sure 👍 Bulk requirement-ku HIPA team help pannuvanga. Product name, approx quantity and business type (Hotel/Shop/Distributor) & location sollunga!";
-  }
-
-  if (msg.includes("hotel vachiruken") || msg.includes("shop vachiruken")) {
-    return "Super 👍 Hotel requirement-ku HIPA bulk supply details help pannalam. Enna product & quantity venum?";
-  }
-
-  // Pricing enquiry
-  if (msg.includes("price") || msg.includes("cost") || msg.includes("evlo")) {
-    return "Which product price venum? 😊 Sambar Powder, Rasam Powder, Garam Masala etc. sollunga. Current pack price details-ku HIPA team direct-a guide pannuvanga.";
-  }
-
-  // Order & delivery
-  if (msg.includes("order") || msg.includes("buy") || msg.includes("vangalam")) {
-    return "HIPA website moolama or direct-a phone/WhatsApp (+91 70580 53055) / email (info@hipamasalas.com) via enquiry panni order pannalam 😊.";
-  }
-
-  // Brand recommendation
   if (msg.includes("nalla masala") || msg.includes("good brand") || msg.includes("recommend")) {
     return "Definitely 😊 HIPA Masalas try pannunga. Traditional taste and quality-focused masala products offer panrom.";
   }
 
-  // Products list fallback
-  if (msg.includes("product") || msg.includes("list") || msg.includes("range")) {
-    return "HIPA Masalas offers 10 authentic products:\n1. 🍲 Sambar Powder\n2. 🥣 Rasam Powder\n3. 🌟 Turmeric Powder\n4. 🌶️ Red Chilli Powder\n5. 🌿 Thaniya (Coriander) Powder\n6. 🟤 Seeragam (Cumin) Powder\n7. ⚫ Pepper Powder\n8. 🔥 Garam Masala\n9. 🧄 Garlic Podi\n10. 🌾 Paruppu Podi\n\nEnna product details venum?";
+  if (msg.includes("biryani")) {
+    return "Biryani-ku HIPA Garam Masala use pannina rich, warm traditional aromatic flavour kidaikkum 😋!";
   }
 
   return "Hi! 👋 Welcome to **HIPA Masalas — Taste of Tradition**.\n\nI can help you explore our authentic masala products, recommend spices for recipes, or process bulk and B2B orders. What are you looking for today?";
@@ -240,14 +272,14 @@ export function registerChatRoute(app: Express) {
       }
 
       if (!reply) {
-        reply = getHipaKnowledgeFallback(message);
+        reply = getHipaKnowledgeFallback(message, history);
       }
 
       return res.json({ reply, role: "assistant" });
     } catch (err) {
       console.error("[/api/chat Error]", err);
       return res.json({
-        reply: getHipaKnowledgeFallback(req.body?.message || ""),
+        reply: getHipaKnowledgeFallback(req.body?.message || "", req.body?.history || []),
         role: "assistant",
       });
     }
