@@ -31,7 +31,7 @@ HOW TO ANSWER VISITORS (HUMAN TALKING RULES):
    - English -> Reply in warm Indian English.
 
 3. CASUAL BANTER vs SALES:
-   - "hi" / "hello" / "epdi iruka?" -> Respond warmly and casually without forcing a sales pitch.
+   - "hi" / "hello" / "epdi iruka?" -> Respond warmly and casually ("Nalla iruken 😄 Neenga epdi irukinga?") without forcing a sales pitch.
    - "thank you" / "nandri" -> Respond warmly ("Most welcome! 😊 Happy cooking with HIPA Masalas! Vera edhavadhu help venum-na sollunga!").
 
 4. BUSINESS & B2B BULK ORDERS (HOTELS, RESTAURANTS, CATERERS, DISTRIBUTORS):
@@ -55,7 +55,6 @@ function buildGeminiContents(
     (m) => m && typeof m.content === "string" && m.content.trim()
   );
 
-  // Skip initial welcome greeting if present at start of history
   let startIndex = 0;
   if (validHistory.length > 0) {
     const firstRole = validHistory[0].role;
@@ -95,10 +94,15 @@ async function callGeminiAPI(
   userMessage: string,
   history: Array<{ role: string; content: string }> = []
 ): Promise<{ reply: string | null; error: string | null }> {
-  const primaryModel = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
   const candidateModels = Array.from(
-    new Set([primaryModel, "gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-2.0-flash-lite", "gemini-1.5-flash"])
-  );
+    new Set([
+      process.env.GEMINI_MODEL,
+      "gemini-1.5-flash",
+      "gemini-2.0-flash",
+      "gemini-2.0-flash-lite",
+      "gemini-1.5-flash-8b",
+    ]).filter(Boolean)
+  ) as string[];
 
   const contents = buildGeminiContents(userMessage, history);
   const trimmedContents = contents.slice(-20);
@@ -118,48 +122,67 @@ async function callGeminiAPI(
     };
 
     try {
-      console.log(`[Gemini Request] Model: ${modelName} | Turns: ${trimmedContents.length} | User Prompt: "${userMessage}"`);
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      console.log(`[Gemini Response] Model: ${modelName} | Status: ${response.status}`);
-
       if (response.ok) {
         const data: any = await response.json();
         const reply = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || null;
         if (reply) {
-          console.log(`[Gemini Success] (${modelName}) Length: ${reply.length}`);
           return { reply, error: null };
         }
       } else {
         const errorText = await response.text();
-        console.error(`[Gemini API Error] (${modelName}) Status ${response.status}: ${errorText}`);
+        console.error(`[Gemini Error] ${modelName} status ${response.status}: ${errorText}`);
       }
     } catch (err: any) {
-      console.error(`[Gemini Exception] (${modelName})`, err);
+      console.error(`[Gemini Exception] ${modelName}:`, err);
     }
   }
 
   return { reply: null, error: "Failed to get response from Gemini API" };
 }
 
-function getEmergencyFallback(input: string): string {
+function getIntelligentFallback(input: string, history: Array<{ role: string; content: string }> = []): string {
   const msg = input.toLowerCase().trim();
+  const lastAssistantMsg = history.filter((h) => h.role === "assistant" || h.role === "model").pop()?.content.toLowerCase() || "";
 
-  if (msg.includes("thank") || msg.includes("nandri") || msg.includes("thx")) {
-    return "Most welcome! 😊 Happy cooking with HIPA Masalas!";
-  }
-  if (msg.includes("bulk") || msg.includes("hotel") || msg.includes("wholesale") || msg.includes("catering") || msg.includes("commercial")) {
-    return "Super! HIPA Masalas-la hotel & commercial bulk orders supply panrom 🏨📦. Direct sales team contact: +91 70580 53055 / info@hipamasalas.com!";
-  }
-  if (msg.includes("product") || msg.includes("list") || msg.includes("masala")) {
-    return "HIPA Masalas offers Sambar Powder, Rasam Powder, Garam Masala, Turmeric, Red Chilli, Thaniya, Seeragam, Pepper, Garlic Podi & Paruppu Podi! Contact details: +91 70580 53055 / info@hipamasalas.com";
+  // Greetings & Casual Conversation
+  if (msg.includes("epdi iruka") || msg.includes("epdi irukinga") || msg.includes("how are you")) {
+    return "Nalla iruken 😄 Neenga epdi irukinga? HIPA Masalas website-ku welcome!";
   }
 
-  return "Got it! 👍 HIPA Masalas products, recipes, or order details-ku +91 70580 53055 / info@hipamasalas.com contact pannalam or try your query again!";
+  if (msg === "hi" || msg === "hello" || msg === "hey" || msg === "vanakkam") {
+    return "Hey 👋 Welcome to HIPA Masalas! Enna cooking or product help venum?";
+  }
+
+  if (msg.includes("saptiya") || msg.includes("saapadu")) {
+    return "Naan AI assistant 😄 sapda mudiyadhu! Neenga saptingala?";
+  }
+
+  if (msg.includes("thank") || msg.includes("nandri") || msg.includes("thx") || msg === "ok thankyou" || msg === "okay thankyou") {
+    return "Most welcome! 😊 Happy cooking with HIPA Masalas! Vera edhavadhu help venum-na sollunga!";
+  }
+
+  // Bulk & Commercial Requirements
+  if (msg.includes("bulk") || msg.includes("hotel") || msg.includes("wholesale") || msg.includes("catering") || msg.includes("commercial") || msg.includes("supply")) {
+    return "Super! HIPA Masalas-la hotel & commercial bulk orders supply panrom 🏨📦. Enna product & monthly quantity venum sollunga! Direct sales contact: +91 70580 53055 / info@hipamasalas.com";
+  }
+
+  // Product List
+  if (msg.includes("product") || msg.includes("list") || msg.includes("masala") || msg.includes("what do you have")) {
+    return "HIPA Masalas offers authentic Sambar Powder, Rasam Powder, Garam Masala, Turmeric, Red Chilli, Thaniya, Seeragam, Pepper, Garlic Podi & Paruppu Podi! Order & product details-ku HIPA team contact: +91 70580 53055 / info@hipamasalas.com";
+  }
+
+  // Recipe Guidance
+  if (msg.includes("recipe") || msg.includes("sambar epdi") || msg.includes("rasam epdi")) {
+    return "Simple-a sollren 😄 HIPA Masalas authentic traditional spices use panni easy-a cook pannalam! Sambar & Rasam powders 50g to 1kg packs-la kidaikudhu.";
+  }
+
+  return "Got it! 👍 HIPA Masalas products, recipes, or bulk order details pathi edhavadhu kekka poringala? HIPA team direct contact: +91 70580 53055 / info@hipamasalas.com!";
 }
 
 export function registerHipaChatRoute(app: Express) {
@@ -171,38 +194,49 @@ export function registerHipaChatRoute(app: Express) {
       }
 
       let reply: string | null = null;
-      const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY || process.env.GOOGLE_GEMINI_API_KEY;
+      const apiKey =
+        process.env.GEMINI_API_KEY ||
+        process.env.GOOGLE_API_KEY ||
+        process.env.GEMINI_KEY ||
+        process.env.GOOGLE_GEMINI_API_KEY ||
+        process.env.VITE_GEMINI_API_KEY ||
+        process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
       if (apiKey && apiKey !== "your_free_gemini_api_key_here") {
         const result = await callGeminiAPI(apiKey, message, history);
         if (result.reply) {
           reply = result.reply;
         }
-      } else {
-        console.warn("[Gemini Warning] API Key is missing or default placeholder!");
       }
 
       if (!reply) {
-        reply = getEmergencyFallback(message);
+        reply = getIntelligentFallback(message, history);
       }
 
       return res.json({ reply, role: "assistant" });
     } catch (err) {
       console.error("[/api/chat Error]", err);
       return res.json({
-        reply: getEmergencyFallback(req.body?.message || ""),
+        reply: getIntelligentFallback(req.body?.message || "", req.body?.history || []),
         role: "assistant",
       });
     }
   });
 
   app.get("/api/chat", (_req: Request, res: Response) => {
-    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY || process.env.GOOGLE_GEMINI_API_KEY;
+    const apiKey =
+      process.env.GEMINI_API_KEY ||
+      process.env.GOOGLE_API_KEY ||
+      process.env.GEMINI_KEY ||
+      process.env.GOOGLE_GEMINI_API_KEY ||
+      process.env.VITE_GEMINI_API_KEY ||
+      process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+
     res.json({
       name: "HIPA Masalas AI Assistant API",
       status: "ok",
       hasGeminiKey: Boolean(apiKey && apiKey !== "your_free_gemini_api_key_here"),
-      model: process.env.GEMINI_MODEL || "gemini-2.5-flash-lite",
+      model: process.env.GEMINI_MODEL || "gemini-1.5-flash",
     });
   });
 }
