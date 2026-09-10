@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import { getLocalBlogBySlug, listLocalBlogs, parseLocalState } from "./localStore";
 
 describe("bundled local blog store", () => {
-  it("exposes all seven published HIPA articles without a database", () => {
+  it("exposes all published HIPA articles without a database", () => {
     const posts = listLocalBlogs();
 
-    expect(posts).toHaveLength(7);
+    expect(posts).toHaveLength(8);
     expect(posts.every((post) => post.status === "published")).toBe(true);
     expect(posts.every((post) => post.coverImageUrl?.startsWith("/assets/"))).toBe(true);
   });

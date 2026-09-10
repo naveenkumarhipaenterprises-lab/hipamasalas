@@ -49,6 +49,11 @@ const articleResourcesBySlug: Record<string, ArticleResource[]> = {
     { href: "/faq", label: "Read product questions and answers", detail: "Review the current HIPA product-information FAQ." },
     { href: "/contact#enquire", label: "Contact HIPA for product details", detail: "Ask for further pack or product information." },
   ],
+  "masala-supplier-for-supermarkets-in-chennai": [
+    { href: "/products", label: "Browse HIPA Masala products", detail: "Explore the current HIPA retail and bulk product range." },
+    { href: "/contact#enquire", label: "Contact HIPA for wholesale & retail inquiries", detail: "Connect with our team for supermarket sample kits and distributor terms." },
+    { href: "/faq", label: "Read HIPA FAQs", detail: "Review answers regarding shelf-life, batch consistency, and certification." },
+  ],
 };
 
 const articleInlineLinksBySlug: Record<string, ArticleResource[]> = {
@@ -100,23 +105,71 @@ const productGuidesBySlug: Record<string, ArticleResource> = {
   "garam-masala": { href: "/blog/garam-masala-vs-other-indian-masalas", label: "Read the Garam Masala guide", detail: "Understand general culinary differences between garam masala and other Indian masalas." },
 };
 
-function getArticleBlocks(body: string) {
-  return body.split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean).map((block) => block.startsWith("### ")
-    ? { type: "subheading" as const, content: block.slice(4).trim() }
-    : block.startsWith("## ")
-      ? { type: "heading" as const, content: block.slice(3).trim() }
-      : { type: "paragraph" as const, content: block });
+type ArticleBlock =
+  | { type: "heading"; content: string }
+  | { type: "subheading"; content: string }
+  | { type: "blockquote"; content: string }
+  | { type: "list"; items: string[] }
+  | { type: "ordered-list"; items: string[] }
+  | { type: "table"; headers: string[]; rows: string[][] }
+  | { type: "paragraph"; content: string };
+
+function getArticleBlocks(body: string): ArticleBlock[] {
+  return body
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter(Boolean)
+    .map((block) => {
+      if (block.startsWith("### ")) {
+        return { type: "subheading" as const, content: block.slice(4).trim() };
+      }
+      if (block.startsWith("## ")) {
+        return { type: "heading" as const, content: block.slice(3).trim() };
+      }
+      if (block.startsWith(">")) {
+        return { type: "blockquote" as const, content: block.replace(/^>\s*/gm, "").trim() };
+      }
+      if (block.startsWith("|") && block.includes("\n|")) {
+        const lines = block.split("\n").map((l) => l.trim()).filter((l) => l.startsWith("|"));
+        if (lines.length >= 2) {
+          const headers = lines[0].split("|").slice(1, -1).map((c) => c.trim());
+          const rows = lines.slice(2).map((l) => l.split("|").slice(1, -1).map((c) => c.trim()));
+          return { type: "table" as const, headers, rows };
+        }
+      }
+      const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
+      if (lines.length > 0 && lines.every((l) => l.startsWith("- ") || l.startsWith("* "))) {
+        return { type: "list" as const, items: lines.map((l) => l.replace(/^[-*]\s+/, "")) };
+      }
+      if (lines.length > 0 && lines.every((l) => /^\d+\.\s+/.test(l))) {
+        return { type: "ordered-list" as const, items: lines.map((l) => l.replace(/^\d+\.\s+/, "")) };
+      }
+      return { type: "paragraph" as const, content: block };
+    });
 }
 
 function renderArticleInlineLinks(content: string, resources: ArticleResource[]) {
-  const allowedHrefs = new Set(resources.map((resource) => resource.href));
   const linkPattern = /(?:\[\[([^\]|]+)\|([^\]]+)\]\]|\[([^\]]+)\]\(([^)]+)\))/g;
   const nodes: React.ReactNode[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
+  const renderTextWithBold = (text: string, keyPrefix: string): React.ReactNode => {
+    if (!text.includes("**")) return text;
+    const parts = text.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((part, i) =>
+      part.startsWith("**") && part.endsWith("**") ? (
+        <strong key={`${keyPrefix}-b-${i}`}>{part.slice(2, -2)}</strong>
+      ) : (
+        part
+      )
+    );
+  };
+
   while ((match = linkPattern.exec(content)) !== null) {
-    if (match.index > lastIndex) nodes.push(content.slice(lastIndex, match.index));
+    if (match.index > lastIndex) {
+      nodes.push(renderTextWithBold(content.slice(lastIndex, match.index), `txt-${lastIndex}`));
+    }
     const label = match[1]?.trim() || match[3]?.trim() || "";
     let rawHref = match[2]?.trim() || match[4]?.trim() || "";
     let href = rawHref.replace(/^https?:\/\/(www\.)?hipamasalas\.com/, "");
@@ -125,9 +178,13 @@ function renderArticleInlineLinks(content: string, resources: ArticleResource[])
     nodes.push(
       label ? (
         href.startsWith("/") ? (
-          <Link href={href} key={`${href}-${match.index}`}>{label}</Link>
+          <Link href={href} key={`${href}-${match.index}`}>
+            {renderTextWithBold(label, `lnk-${match.index}`)}
+          </Link>
         ) : (
-          <a href={href} target="_blank" rel="noreferrer" key={`${href}-${match.index}`}>{label}</a>
+          <a href={href} target="_blank" rel="noreferrer" key={`${href}-${match.index}`}>
+            {renderTextWithBold(label, `lnk-${match.index}`)}
+          </a>
         )
       ) : (
         match[0]
@@ -136,8 +193,10 @@ function renderArticleInlineLinks(content: string, resources: ArticleResource[])
     lastIndex = linkPattern.lastIndex;
   }
 
-  if (lastIndex < content.length) nodes.push(content.slice(lastIndex));
-  return nodes.length ? nodes : content;
+  if (lastIndex < content.length) {
+    nodes.push(renderTextWithBold(content.slice(lastIndex), `txt-${lastIndex}`));
+  }
+  return nodes.length ? nodes : renderTextWithBold(content, "root");
 }
 
 function Breadcrumbs({ current }: { current: string }) {
@@ -351,11 +410,62 @@ export function ArticlePage() {
         <p className="section-desc">By {article.authorName} · {publishedDate}</p>
         {article.coverImageUrl && <img src={article.coverImageUrl} alt={article.coverImageAlt || ""} loading="eager" fetchPriority="high" decoding="async" style={{ borderRadius: 18, marginBottom: 28 }} />}
         <div className="article-body">
-          {blocks.map((block, index) => block.type === "heading"
-            ? <h2 key={`${block.content}-${index}`}>{block.content}</h2>
-            : block.type === "subheading"
-              ? <h3 key={`${block.content}-${index}`}>{block.content}</h3>
-              : <p key={`${block.content}-${index}`} className="section-desc">{renderArticleInlineLinks(block.content, inlineResources)}</p>)}
+          {blocks.map((block, index) => {
+            switch (block.type) {
+              case "heading":
+                return <h2 key={`h2-${index}`}>{renderArticleInlineLinks(block.content, inlineResources)}</h2>;
+              case "subheading":
+                return <h3 key={`h3-${index}`}>{renderArticleInlineLinks(block.content, inlineResources)}</h3>;
+              case "blockquote":
+                return (
+                  <blockquote key={`bq-${index}`} className="article-blockquote">
+                    <p>{renderArticleInlineLinks(block.content, inlineResources)}</p>
+                  </blockquote>
+                );
+              case "list":
+                return (
+                  <ul key={`ul-${index}`} className="article-list">
+                    {block.items.map((item, i) => (
+                      <li key={`li-${i}`}>{renderArticleInlineLinks(item, inlineResources)}</li>
+                    ))}
+                  </ul>
+                );
+              case "ordered-list":
+                return (
+                  <ol key={`ol-${index}`} className="article-ordered-list">
+                    {block.items.map((item, i) => (
+                      <li key={`oli-${i}`}>{renderArticleInlineLinks(item, inlineResources)}</li>
+                    ))}
+                  </ol>
+                );
+              case "table":
+                return (
+                  <div key={`tbl-${index}`} className="article-table-wrap">
+                    <table className="article-table">
+                      <thead>
+                        <tr>
+                          {block.headers.map((h, i) => (
+                            <th key={`th-${i}`}>{renderArticleInlineLinks(h, inlineResources)}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {block.rows.map((row, ri) => (
+                          <tr key={`tr-${ri}`}>
+                            {row.map((cell, ci) => (
+                              <td key={`td-${ci}`}>{renderArticleInlineLinks(cell, inlineResources)}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              case "paragraph":
+              default:
+                return <p key={`p-${index}`} className="section-desc">{renderArticleInlineLinks(block.content, inlineResources)}</p>;
+            }
+          })}
         </div>
         {relatedResources.length > 0 && <aside className="article-related-links" aria-labelledby="related-hipa-pages">
           <p className="eyebrow">Continue exploring</p>

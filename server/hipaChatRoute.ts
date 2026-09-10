@@ -101,8 +101,8 @@ async function callGeminiAPI(
       "gemini-2.0-flash",
       "gemini-2.0-flash-lite",
       "gemini-1.5-flash-8b",
-    ]).filter(Boolean)
-  ) as string[];
+    ])
+  ).filter(Boolean) as string[];
 
   const contents = buildGeminiContents(userMessage, history);
   const trimmedContents = contents.slice(-20);
