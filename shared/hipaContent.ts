@@ -47,7 +47,14 @@ export const siteIdentity = {
   phone: "+91 70580 53055",
   phoneHref: "tel:+917058053055",
   email: "info@hipamasalas.com",
-  locationLabel: "Chennai, Tamil Nadu, India",
+  locationLabel: "Plot No. 10, (Highway Colony), 5th Main Road, Zamin Pallavaram, Highway Nagar, Perumal Nagar, Old Pallavaram, Chennai – 600117, Tamil Nadu, India",
+  address: {
+    streetAddress: "Plot No. 10, (Highway Colony), 5th Main Road, Zamin Pallavaram, Highway Nagar, Perumal Nagar, Old Pallavaram",
+    addressLocality: "Chennai",
+    postalCode: "600117",
+    addressRegion: "Tamil Nadu",
+    addressCountry: "India",
+  },
   logo: "/assets/logo_a24808ac.png",
   heroImage: "/assets/hero-spices_8241cadf.webp",
   facebook: "https://www.facebook.com/profile.php?id=61592093192345",
@@ -320,6 +327,15 @@ function breadcrumbSchema(origin: string, path: string, labels: string[]) {
 export function getStructuredData(pathname: string, origin: string, articleOverride?: Article) {
   const path = pathname.replace(/\/+$/, "") || "/";
   const schemas: Record<string, unknown>[] = [];
+  const postalAddress = {
+    "@type": "PostalAddress",
+    streetAddress: siteIdentity.address.streetAddress,
+    addressLocality: siteIdentity.address.addressLocality,
+    postalCode: siteIdentity.address.postalCode,
+    addressRegion: siteIdentity.address.addressRegion,
+    addressCountry: "IN",
+  };
+
   const organization = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -328,18 +344,31 @@ export function getStructuredData(pathname: string, origin: string, articleOverr
     logo: absoluteUrl(origin, siteIdentity.logo),
     description: "HIPA Masalas is an Indian spice and masala brand based in Chennai, Tamil Nadu, India, offering a current range of spice powders and masala blends.",
     email: siteIdentity.email,
-      telephone: siteIdentity.phone,
-      areaServed: ["Chennai", "Tamil Nadu", "India", "International export enquiries"],
-      knowsAbout: ["Indian spice powders", "masala blends", "distributor supply", "dealer enquiries", "wholesale enquiries", "export enquiries"],
-      contactPoint: { "@type": "ContactPoint", telephone: siteIdentity.phone, email: siteIdentity.email, contactType: "sales", areaServed: "IN" },
-    };
+    telephone: siteIdentity.phone,
+    address: postalAddress,
+    areaServed: ["Chennai", "Tamil Nadu", "India", "International export enquiries"],
+    knowsAbout: ["Indian spice powders", "masala blends", "distributor supply", "dealer enquiries", "wholesale enquiries", "export enquiries"],
+    contactPoint: { "@type": "ContactPoint", telephone: siteIdentity.phone, email: siteIdentity.email, contactType: "sales", areaServed: "IN" },
+  };
+
+  const localBusiness = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    name: siteIdentity.name,
+    image: absoluteUrl(origin, siteIdentity.logo),
+    url: absoluteUrl(origin, "/"),
+    telephone: siteIdentity.phone,
+    email: siteIdentity.email,
+    address: postalAddress,
+    priceRange: "₹₹",
+  };
 
   // Do not publish `sameAs` until HIPA confirms ownership of each account URL.
   // Visible social links can remain available to users without being asserted as
   // entity relationships in structured data.
 
   if (path === "/") {
-    schemas.push(organization, {
+    schemas.push(organization, localBusiness, {
       "@context": "https://schema.org",
       "@type": "WebSite",
       name: siteIdentity.name,
@@ -397,6 +426,9 @@ export function getStructuredData(pathname: string, origin: string, articleOverr
 
   if (path === "/contact" || path === "/about" || path === "/b2b-enquiries" || path === "/blog") {
     schemas.push(breadcrumbSchema(origin, path, ["Home", path === "/contact" ? "Contact" : path === "/about" ? "About" : path === "/blog" ? "Journal" : "Business Enquiries"]));
+    if (path === "/contact") {
+      schemas.push(localBusiness);
+    }
   }
 
   const articleMatch = path.match(/^\/blog\/([^/]+)$/);
@@ -421,7 +453,5 @@ export function getStructuredData(pathname: string, origin: string, articleOverr
     }
   }
 
-  // LocalBusiness is intentionally omitted until HIPA confirms its legal/trading
-  // name, complete postal address, and current opening hours for public use.
   return schemas;
 }

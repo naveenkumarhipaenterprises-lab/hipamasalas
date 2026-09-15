@@ -1,5 +1,5 @@
 import type { Express } from "express";
-import { getIndexablePaths } from "../shared/hipaContent";
+import { getIndexablePaths, siteIdentity } from "../shared/hipaContent";
 import { listPublishedBlogPaths } from "./db";
 
 const canonicalOrigin = (process.env.CANONICAL_ORIGIN || "https://www.hipamasalas.com").replace(/\/$/, "");
@@ -38,7 +38,7 @@ export function buildRobotsTxt(origin = canonicalOrigin) {
 }
 
 export function buildLlmsTxt(origin = canonicalOrigin) {
-  return `# HIPA Masalas\n\n> HIPA Masalas is a Chennai, Tamil Nadu, India spice and masala brand.\n\n## Business\n- Website: ${origin}/\n- Location: Chennai, Tamil Nadu, India\n- Phone: +91 70580 53055\n- Email: info@hipamasalas.com\n- WhatsApp: ${origin}/contact\n\n## Products\nHIPA Masalas currently lists Sambar Powder, Rasam Powder, Turmeric Powder, Red Chilli Powder, Coriander Powder, Cumin Powder, Pepper Powder and Garam Masala. Product pages: ${origin}/products\n\n## Enquiries\nFor consumer product questions, distributor, wholesaler, retailer, supermarket, restaurant or exporter enquiries, use ${origin}/b2b-enquiries or ${origin}/contact. Commercial availability, pricing, delivery, manufacturing and export terms must be confirmed directly by HIPA Masalas.\n\n## Public pages\n- Products: ${origin}/products\n- FAQ: ${origin}/faq\n- Contact: ${origin}/contact\n- Business enquiries: ${origin}/b2b-enquiries\n- Blog: ${origin}/blog\n`;
+  return `# HIPA Masalas\n\n> HIPA Masalas is a Chennai, Tamil Nadu, India spice and masala brand.\n\n## Business\n- Website: ${origin}/\n- Location: ${siteIdentity.locationLabel}\n- Phone: +91 70580 53055\n- Email: info@hipamasalas.com\n- WhatsApp: ${origin}/contact\n\n## Products\nHIPA Masalas currently lists Sambar Powder, Rasam Powder, Turmeric Powder, Red Chilli Powder, Coriander Powder, Cumin Powder, Pepper Powder and Garam Masala. Product pages: ${origin}/products\n\n## Enquiries\nFor consumer product questions, distributor, wholesaler, retailer, supermarket, restaurant or exporter enquiries, use ${origin}/b2b-enquiries or ${origin}/contact. Commercial availability, pricing, delivery, manufacturing and export terms must be confirmed directly by HIPA Masalas.\n\n## Public pages\n- Products: ${origin}/products\n- FAQ: ${origin}/faq\n- Contact: ${origin}/contact\n- Business enquiries: ${origin}/b2b-enquiries\n- Blog: ${origin}/blog\n`;
 }
 
 export function registerSeoRoutes(app: Express) {

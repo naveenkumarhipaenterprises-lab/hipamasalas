@@ -4,7 +4,8 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { notifyOwner } from "./_core/notification";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, publicProcedure, router } from "./_core/trpc";
-import { createBlogPost, createEnquiry, createNewsletterSubscription, deleteBlogPost, getAdminBlogPostById, getAdminBlogPostBySlug, getPublishedBlogPostBySlug, listAdminBlogPosts, listProductAvailability, listPublishedBlogPosts, setProductAvailability, updateBlogPost } from "./db";
+import { createBlogPost, deleteBlogPost, getAdminBlogPostById, getAdminBlogPostBySlug, getPublishedBlogPostBySlug, listAdminBlogPosts, listProductAvailability, listPublishedBlogPosts, setProductAvailability, updateBlogPost } from "./db";
+import { submitEnquiryToGoogleSheets, submitNewsletterToGoogleSheets } from "./googleSheets";
 import { products } from "../shared/hipaContent";
 import { ADMIN_SESSION_COOKIE, ADMIN_SESSION_MAX_AGE_MS, createAdminSessionToken, verifyAdminCredentials } from "./adminPasswordAuth";
 import { storagePut } from "./storage";
@@ -95,7 +96,7 @@ export const appRouter = router({
   }),
   enquiries: router({
     create: publicProcedure.input(enquiryInput).mutation(async ({ input }) => {
-      await createEnquiry({
+      const result = await submitEnquiryToGoogleSheets({
         fullName: input.fullName,
         mobileNumber: input.mobileNumber,
         emailAddress: input.emailAddress || null,
@@ -104,7 +105,6 @@ export const appRouter = router({
         expectedMonthlyVolume: input.expectedMonthlyVolume || null,
         productInterest: input.productInterest,
         message: input.message || null,
-        consent: input.consent,
         source: "website",
       });
 
@@ -121,17 +121,16 @@ export const appRouter = router({
         ].join("\n"),
       });
 
-      return { success: true, notified } as const;
+      return { success: true, notified, mode: result.mode } as const;
     }),
   }),
   newsletter: router({
     subscribe: publicProcedure.input(newsletterInput).mutation(async ({ input }) => {
-      await createNewsletterSubscription({
+      const result = await submitNewsletterToGoogleSheets({
         emailAddress: input.emailAddress,
-        consent: true,
         source: "website",
       });
-      return { success: true } as const;
+      return { success: true, mode: result.mode } as const;
     }),
   }),
   productAvailability: router({

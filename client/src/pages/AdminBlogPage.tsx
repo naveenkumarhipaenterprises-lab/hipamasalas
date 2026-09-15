@@ -1,4 +1,4 @@
-import { ImageUp, LogOut, Pencil, Plus, Save, Send, Trash2, X } from "lucide-react";
+import { Copy, ImageUp, LogOut, Pencil, Plus, Save, Send, Trash2, X } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { Link } from "wouter";
 import { AdminPasswordLogin } from "@/components/AdminPasswordAccess";
@@ -284,7 +284,29 @@ export function AdminBlogPage() {
             <div className="admin-editor-actions">
               <button className="admin-primary-button" type="submit" disabled={saving || uploadCoverImage.isPending}>
                 {form.status === "published" ? <Send size={17} /> : <Save size={17} />}
-                {saving ? "Saving…" : form.status === "published" ? "Publish changes" : "Save draft"}
+                {saving ? "Saving…" : form.status === "published" ? "Publish article" : "Save draft"}
+              </button>
+              <button
+                className="admin-secondary-button"
+                type="button"
+                onClick={() => {
+                  const blogEntry = {
+                    id: form.id || Date.now(),
+                    slug: form.slug.trim(),
+                    title: form.title.trim(),
+                    description: form.description.trim(),
+                    body: form.body.trim(),
+                    authorName: form.authorName.trim() || "HIPA Masala",
+                    coverImageUrl: form.coverImageUrl.trim() || null,
+                    coverImageAlt: form.coverImageAlt.trim() || null,
+                    status: form.status,
+                    publishedAt: form.status === "published" ? new Date().toISOString() : null,
+                  };
+                  navigator.clipboard.writeText(JSON.stringify(blogEntry, null, 2));
+                  setNotice("Article JSON copied to clipboard! You can paste it directly into data/blog-posts.json in GitHub.");
+                }}
+              >
+                <Copy size={16} /> Copy JSON for GitHub
               </button>
               {form.id ? (
                 <button className="admin-danger-button" type="button" disabled={deletePost.isPending} onClick={() => { if (window.confirm("Remove this blog post? This cannot be undone.")) deletePost.mutate({ id: form.id! }); }}>

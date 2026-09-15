@@ -4,10 +4,10 @@ import fs from "node:fs";
 import { getIndexablePaths, getPageHead, getProduct, getProductFaqs, getStructuredData, products, siteIdentity } from "../shared/hipaContent";
 
 describe("standalone SEO parity", () => {
-  it("keeps the validated city-level HIPA entity without unsupported public-local details", () => {
+  it("keeps the validated official HIPA entity with complete address and LocalBusiness schema", () => {
     expect(siteIdentity.name).toBe("HIPA Masalas");
-    expect(siteIdentity.locationLabel).toBe("Chennai, Tamil Nadu, India");
-    expect("businessHours" in siteIdentity).toBe(false);
+    expect(siteIdentity.locationLabel).toBe("Plot No. 10, (Highway Colony), 5th Main Road, Zamin Pallavaram, Highway Nagar, Perumal Nagar, Old Pallavaram, Chennai – 600117, Tamil Nadu, India");
+    expect(siteIdentity.address.postalCode).toBe("600117");
   });
 
   it("exposes all eight product routes and a three-question visible FAQ model for each product", () => {
@@ -28,6 +28,7 @@ describe("standalone SEO parity", () => {
     expect(getPageHead("/about")).toMatchObject({ title: "About HIPA Masalas | Chennai Spice Brand", canonicalPath: "/about" });
     expect(getPageHead("/terms-of-service")).toMatchObject({ canonicalPath: "/terms-of-service", noindex: true });
     expect(getStructuredData("/about", "https://www.hipamasalas.com").map((schema) => schema["@type"])).toContain("BreadcrumbList");
+    expect(getStructuredData("/", "https://www.hipamasalas.com").map((schema) => schema["@type"])).toContain("LocalBusiness");
   });
 
   it("permits public crawling while excluding the private admin section", () => {

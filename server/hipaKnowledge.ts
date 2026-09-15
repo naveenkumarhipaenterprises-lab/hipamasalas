@@ -5,12 +5,13 @@ export const HIPA_KNOWLEDGE_BASE = {
   brand: {
     name: "HIPA Masalas",
     tagline: "Taste of Tradition",
-    location: "Chennai, Tamil Nadu, India",
+    location: "Plot No. 10, (Highway Colony), 5th Main Road, Zamin Pallavaram, Highway Nagar, Perumal Nagar, Old Pallavaram, Chennai – 600117, Tamil Nadu, India",
+    address: "Plot No. 10, (Highway Colony), 5th Main Road, Zamin Pallavaram, Highway Nagar, Perumal Nagar, Old Pallavaram, Chennai – 600117, Tamil Nadu, India",
     phone: "+91 70580 53055",
     whatsapp: "+91 70580 53055",
     email: "info@hipamasalas.com",
     website: "https://www.hipamasalas.com/",
-    description: "Authentic South Indian spice powders and masalas prepared with premium traditional recipes in Chennai, Tamil Nadu."
+    description: "Authentic South Indian spice powders and masalas prepared with premium traditional recipes at Old Pallavaram, Chennai, Tamil Nadu."
   },
   products: [
     {

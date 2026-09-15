@@ -1,8 +1,15 @@
-# Vercel deployment requirements
+# Vercel Deployment Guide (Zero-Database Architecture)
 
-Deploy the project root containing `server.ts`, not a static `dist` upload. The repository sets Vercel's Output Directory to `public`, so do not override it with `dist` in the Vercel dashboard. Vercel runs `npm run vercel-build`, serves client files from the generated root `public/` directory, and detects `server.ts` as the Express application entry point.
+The HIPA Masalas website uses a fast, reliable, zero-database architecture:
+- **Hosting**: Vercel Serverless & Static CDN
+- **Blog Content**: Git-backed (`data/blog-posts.json`)
+- **Customer & B2B Enquiries**: Direct integration with Google Sheets
+- **Newsletter Subscriptions**: Direct integration with Google Sheets
+- **Chatbot**: Google Gemini 2.5 Flash Lite
 
-Set these production environment variables in Vercel before deployment:
+## Production Environment Variables in Vercel
+
+Set these environment variables in **Vercel → Project Settings → Environment Variables**:
 
 ```text
 NODE_ENV=production
@@ -10,11 +17,21 @@ CANONICAL_ORIGIN=https://www.hipamasalas.com
 JWT_SECRET=<long-random-secret>
 ADMIN_LOGIN_USERNAME=<private-admin-username>
 ADMIN_LOGIN_PASSWORD=<private-admin-password>
-DATABASE_URL=mysql://<user>:<password>@<host>:3306/<database>?ssl={"rejectUnauthorized":true}
+GOOGLE_SHEETS_ENQUIRIES_URL=https://script.google.com/macros/s/<YOUR_SCRIPT_ID>/exec
+GOOGLE_SHEETS_NEWSLETTER_URL=https://script.google.com/macros/s/<YOUR_SCRIPT_ID>/exec
+GEMINI_API_KEY=<your-google-gemini-api-key>
+GEMINI_MODEL=gemini-2.5-flash-lite
 ```
 
-Before the first production deploy, configure a MySQL-compatible database through the Vercel Marketplace or another managed provider, set `DATABASE_URL` locally as well, and run `npm run db:push` once. This creates the enquiry, newsletter, blog and availability tables. Do not run `db:push` automatically inside Vercel's build command.
+## How to Publish Blogs Daily
 
-The `DATABASE_URL` is mandatory for persisted enquiry submissions, newsletter subscriptions, availability updates and admin-created or edited blogs. Vercel function files are not persistent storage. The bundled seven published blogs remain available as a read-only fallback if no database is configured, but forms cannot record submissions and admin edits cannot persist without the database.
+1. Open `data/blog-posts.json` in your local project or on GitHub.
+2. Add your new article JSON entry (or use `/admin` on the website to format and copy the JSON).
+3. Commit and push to GitHub.
+4. Vercel automatically deploys the new blog in ~30 seconds.
 
-After deployment, verify that `/robots.txt` is plain text, `/sitemap.xml` is XML, public product and article pages include server-rendered metadata and JSON-LD, and unknown routes return HTTP 404.
+## How to Set Up Google Sheets for Enquiries
+
+1. Open `scripts/google-sheets-script.js` in this repository.
+2. Follow the 5-step instructions at the top of the file to deploy the Google Apps Script Web App.
+3. Paste the generated Web App URL into your `.env` (locally) and in Vercel Settings as `GOOGLE_SHEETS_ENQUIRIES_URL`.

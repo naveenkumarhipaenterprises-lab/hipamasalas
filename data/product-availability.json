@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "productSlug": "sambar-powder",
+    "status": "available",
+    "updatedByUserId": 1
+  },
+  {
+    "id": 2,
+    "productSlug": "rasam-powder",
+    "status": "available",
+    "updatedByUserId": 1
+  },
+  {
+    "id": 3,
+    "productSlug": "turmeric-powder",
+    "status": "available",
+    "updatedByUserId": 1
+  },
+  {
+    "id": 4,
+    "productSlug": "red-chilli-powder",
+    "status": "available",
+    "updatedByUserId": 1
+  },
+  {
+    "id": 5,
+    "productSlug": "coriander-powder",
+    "status": "available",
+    "updatedByUserId": 1
+  },
+  {
+    "id": 6,
+    "productSlug": "cumin-powder",
+    "status": "available",
+    "updatedByUserId": 1
+  },
+  {
+    "id": 7,
+    "productSlug": "pepper-powder",
+    "status": "available",
+    "updatedByUserId": 1
+  },
+  {
+    "id": 8,
+    "productSlug": "garam-masala",
+    "status": "available",
+    "updatedByUserId": 1
+  }
+]
