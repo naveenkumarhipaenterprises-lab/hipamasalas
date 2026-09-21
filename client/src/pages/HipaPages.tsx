@@ -1,4 +1,4 @@
-import { ArrowRight, Check, ChevronDown, ChevronLeft, ChevronRight, Download, Heart, Leaf, Mail, MapPin, Package, Phone, ShieldCheck, Sparkles, Truck } from "lucide-react";
+import { ArrowRight, Building2, Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Download, FileText, Heart, HelpCircle, Info, Leaf, Mail, MapPin, Package, Phone, ShieldCheck, Sparkles, Store, Truck, Utensils, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useRoute } from "wouter";
 import { EnquiryForm } from "@/components/EnquiryForm";
@@ -15,7 +15,7 @@ type ArticleResource = {
 
 const articleResourcesBySlug: Record<string, ArticleResource[]> = {
   "how-to-choose-sambar-powder": [
-    { href: "/products/sambar-powder", label: "Explore Sambar Powder", detail: "View the current HIPA Sambar Powder product information." },
+    { href: "/products/sambar-powder", label: "Explore Sambar Powder", detail: "View the complete HIPA Sambar Powder specifications and culinary uses." },
     { href: "/products", label: "Browse all HIPA products", detail: "Compare the available HIPA Masala range for everyday cooking." },
     { href: "/contact#enquire", label: "Contact HIPA for product details", detail: "Ask for further pack or product information." },
   ],
@@ -25,7 +25,7 @@ const articleResourcesBySlug: Record<string, ArticleResource[]> = {
     { href: "/contact#enquire", label: "Contact HIPA for product details", detail: "Ask for further pack or product information." },
   ],
   "garam-masala-vs-other-indian-masalas": [
-    { href: "/products/garam-masala", label: "Explore Garam Masala", detail: "View the current HIPA Garam Masala product information." },
+    { href: "/products/garam-masala", label: "Explore Garam Masala", detail: "View the complete HIPA Garam Masala specifications and culinary uses." },
     { href: "/products/sambar-powder", label: "Explore Sambar Powder", detail: "Compare a product intended for sambar-style dishes." },
     { href: "/products/rasam-powder", label: "Explore Rasam Powder", detail: "Compare a product intended for rasam-style dishes." },
   ],
@@ -35,8 +35,8 @@ const articleResourcesBySlug: Record<string, ArticleResource[]> = {
     { href: "/contact#enquire", label: "Contact HIPA for product details", detail: "Ask for further pack or product information." },
   ],
   "south-indian-lunch-box-recipes": [
-    { href: "/products/sambar-powder", label: "Explore Sambar Powder", detail: "View the current HIPA Sambar Powder product information." },
-    { href: "/products/rasam-powder", label: "Explore Rasam Powder", detail: "View the current HIPA Rasam Powder product information." },
+    { href: "/products/sambar-powder", label: "Explore Sambar Powder", detail: "View the complete HIPA Sambar Powder specifications." },
+    { href: "/products/rasam-powder", label: "Explore Rasam Powder", detail: "View the complete HIPA Rasam Powder specifications." },
     { href: "/products", label: "Browse all HIPA products", detail: "Explore the available HIPA Masala range." },
   ],
   "true-cost-of-your-spice-supplier": [
@@ -51,7 +51,7 @@ const articleResourcesBySlug: Record<string, ArticleResource[]> = {
   ],
   "masala-supplier-for-supermarkets-in-chennai": [
     { href: "/products", label: "Browse HIPA Masala products", detail: "Explore the current HIPA retail and bulk product range." },
-    { href: "/contact#enquire", label: "Contact HIPA for wholesale & retail inquiries", detail: "Connect with our team for supermarket sample kits and distributor terms." },
+    { href: "/b2b-enquiries", label: "Contact HIPA for wholesale & retail inquiries", detail: "Connect with our team for supermarket sample kits and distributor terms." },
     { href: "/faq", label: "Read HIPA FAQs", detail: "Review answers regarding shelf-life, batch consistency, and certification." },
   ],
 };
@@ -92,17 +92,6 @@ const articleInlineLinksBySlug: Record<string, ArticleResource[]> = {
     { href: "/blog/how-spice-quality-affects-food-taste", label: "how spice quality affects food taste and consistency", detail: "See how everyday quality factors affect cooking." },
     { href: "/blog/true-cost-of-your-spice-supplier", label: "questions to compare spice-supplier information", detail: "Read broader supplier-comparison guidance." },
   ],
-};
-
-const productGuidesBySlug: Record<string, ArticleResource> = {
-  "sambar-powder": { href: "/blog/how-to-choose-sambar-powder", label: "Read the Sambar Powder buying guide", detail: "Practical checks for choosing a sambar powder for everyday cooking." },
-  "rasam-powder": { href: "/blog/south-indian-lunch-box-recipes", label: "Read South Indian lunch box ideas", detail: "Explore everyday South Indian meal ideas that include simple sambar and rasam pairings." },
-  "turmeric-powder": { href: "/blog/how-to-read-a-spice-powder-label", label: "Read the spice-label guide", detail: "Use practical label checks when comparing spice powder products." },
-  "red-chilli-powder": { href: "/blog/how-to-read-a-spice-powder-label", label: "Read the spice-label guide", detail: "Use practical label checks when comparing spice powder products." },
-  "coriander-powder": { href: "/blog/what-makes-a-good-spice-powder", label: "Read the spice-powder buying guide", detail: "Learn general checks for choosing spice powders." },
-  "cumin-powder": { href: "/blog/what-makes-a-good-spice-powder", label: "Read the spice-powder buying guide", detail: "Learn general checks for choosing spice powders." },
-  "pepper-powder": { href: "/blog/what-makes-a-good-spice-powder", label: "Read the spice-powder buying guide", detail: "Learn general checks for choosing spice powders." },
-  "garam-masala": { href: "/blog/garam-masala-vs-other-indian-masalas", label: "Read the Garam Masala guide", detail: "Understand general culinary differences between garam masala and other Indian masalas." },
 };
 
 type ArticleBlock =
@@ -199,16 +188,30 @@ function renderArticleInlineLinks(content: string, resources: ArticleResource[])
   return nodes.length ? nodes : renderTextWithBold(content, "root");
 }
 
-function Breadcrumbs({ current }: { current: string }) {
-  return <nav className="replica-breadcrumb" aria-label="Breadcrumb"><div className="container"><Link href="/">Home</Link><span>/</span><strong>{current}</strong></div></nav>;
+function Breadcrumbs({ current, parent }: { current: string; parent?: { label: string; href: string } }) {
+  return (
+    <nav className="replica-breadcrumb" aria-label="Breadcrumb">
+      <div className="container">
+        <Link href="/">Home</Link>
+        <span>/</span>
+        {parent && (
+          <>
+            <Link href={parent.href}>{parent.label}</Link>
+            <span>/</span>
+          </>
+        )}
+        <strong>{current}</strong>
+      </div>
+    </nav>
+  );
 }
 
 function ProductAvailabilityLabel({ slug }: { slug: string }) {
   const availability = trpc.productAvailability.publicList.useQuery(undefined, { staleTime: 30_000, refetchOnWindowFocus: false });
-  if (availability.isError) return <p className="product-availability checking">Contact HIPA for availability</p>;
-  if (availability.isLoading && !availability.data) return <p className="product-availability checking">Checking availability</p>;
+  if (availability.isError) return <p className="product-availability checking">Available for Enquiry</p>;
+  if (availability.isLoading && !availability.data) return <p className="product-availability checking">In Production</p>;
   const status = availability.data?.find((record) => record.productSlug === slug)?.status || "available";
-  return <p className={`product-availability ${status}`}>{status === "available" ? "Available" : "Currently unavailable"}</p>;
+  return <p className={`product-availability ${status}`}>{status === "available" ? "Active Product" : "Available on Request"}</p>;
 }
 
 function ProductCard({ product, compact = false }: { product: (typeof products)[number]; compact?: boolean }) {
@@ -219,15 +222,83 @@ function ProductCard({ product, compact = false }: { product: (typeof products)[
     "coriander-powder": "/assets/coriander-collection_65f09b3e.webp",
     "pepper-powder": "/assets/pepper-collection_62ecec6f.webp",
   };
-  return <article className={`product-card ${compact ? "product-card-compact" : ""}`}><Link href={`/products/${product.slug}`} className="product-media"><img src={sourceCollectionAssets[product.slug] || product.image} alt={product.imageAlt} loading="lazy" decoding="async" /></Link><h3 className="product-name">{product.name}</h3>{!compact && <><ProductAvailabilityLabel slug={product.slug} /><Link href={`/products/${product.slug}`} className="btn btn-outline btn-sm">View Details <span className="arrow">→</span></Link></>}</article>;
+  return (
+    <article className={`product-card ${compact ? "product-card-compact" : ""}`}>
+      <Link href={`/products/${product.slug}`} className="product-media">
+        <img src={sourceCollectionAssets[product.slug] || product.image} alt={product.imageAlt} loading="lazy" decoding="async" />
+      </Link>
+      <h3 className="product-name">{product.name}</h3>
+      {!compact && (
+        <>
+          <p className="product-card-short-desc">{product.shortDescription}</p>
+          <ProductAvailabilityLabel slug={product.slug} />
+          <Link href={`/products/${product.slug}`} className="btn btn-outline btn-sm">
+            View Details <span className="arrow">→</span>
+          </Link>
+        </>
+      )}
+    </article>
+  );
 }
 
 function CatalogueProductCard({ product }: { product: (typeof products)[number] }) {
-  return <article className="catalogue-product-card"><Link href={`/products/${product.slug}`} className="catalogue-product-media"><img src={product.image} alt={product.imageAlt} loading="lazy" decoding="async" /></Link><div className="catalogue-product-copy"><h2>{product.name}</h2><p className="catalogue-product-description">{product.shortDescription}</p><ul className="catalogue-product-highlights">{product.highlights.map((item) => <li key={item}>{item}</li>)}</ul>{product.packSizes && <div className="catalogue-product-packs" aria-label={`${product.name} pack details`}>{product.packSizes.map((size) => <span key={size}>{size}</span>)}</div>}<ProductAvailabilityLabel slug={product.slug} /><div className="catalogue-product-actions"><Link href={`/products/${product.slug}`} className="btn btn-primary btn-sm">View Details <span className="arrow">→</span></Link><a href={`/products/${product.slug}#product-enquiry`} className="btn btn-outline btn-sm" onClick={() => trackEvent("product_enquiry_cta", { product: product.name, location: "catalogue" })}>Enquire Now</a><a href={siteIdentity.whatsappHref} target="_blank" rel="noreferrer" className="catalogue-whatsapp-link" onClick={() => trackEvent("whatsapp_click", { product: product.name, location: "catalogue" })}>WhatsApp Enquiry</a></div></div></article>;
+  return (
+    <article className="catalogue-product-card">
+      <Link href={`/products/${product.slug}`} className="catalogue-product-media">
+        <img src={product.image} alt={product.imageAlt} loading="lazy" decoding="async" />
+      </Link>
+      <div className="catalogue-product-copy">
+        <h2>{product.name}</h2>
+        <p className="catalogue-product-description">{product.description}</p>
+        <ul className="catalogue-product-highlights">
+          {product.highlights.slice(0, 3).map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+        {product.packSizes && (
+          <div className="catalogue-product-packs" aria-label={`${product.name} pack sizes`}>
+            {product.packSizes.map((size) => (
+              <span key={size}>{size}</span>
+            ))}
+          </div>
+        )}
+        <ProductAvailabilityLabel slug={product.slug} />
+        <div className="catalogue-product-actions">
+          <Link href={`/products/${product.slug}`} className="btn btn-primary btn-sm">
+            Product Details <span className="arrow">→</span>
+          </Link>
+          <a
+            href={`/products/${product.slug}#product-enquiry`}
+            className="btn btn-outline btn-sm"
+            onClick={() => trackEvent("product_enquiry_cta", { product: product.name, location: "catalogue" })}
+          >
+            Enquire Now
+          </a>
+          <a
+            href={siteIdentity.whatsappHref}
+            target="_blank"
+            rel="noreferrer"
+            className="catalogue-whatsapp-link"
+            onClick={() => trackEvent("whatsapp_click", { product: product.name, location: "catalogue" })}
+          >
+            WhatsApp Enquiry
+          </a>
+        </div>
+      </div>
+    </article>
+  );
 }
 
 function Feature({ icon: Icon, title, copy }: { icon: typeof Leaf; title: string; copy: string }) {
-  return <div className="feature"><div className="feature-icon"><Icon /></div><h3>{title}</h3><p>{copy}</p></div>;
+  return (
+    <div className="feature">
+      <div className="feature-icon">
+        <Icon />
+      </div>
+      <h3>{title}</h3>
+      <p>{copy}</p>
+    </div>
+  );
 }
 
 export function HomePage() {
@@ -247,7 +318,6 @@ export function HomePage() {
     "garam-masala": "/assets/garam-hero_d8754d54.webp",
   };
   const heroProducts = products.filter((product) => product.slug !== "red-chilli-powder").map((product) => ({ ...product, heroImage: heroPackAssets[product.slug] || product.image }));
-  const homeCollectionProducts = ["sambar-powder", "rasam-powder", "garam-masala", "coriander-powder", "pepper-powder"].map((slug) => products.find((product) => product.slug === slug)).filter((product): product is (typeof products)[number] => Boolean(product));
   const carouselProducts = [...heroProducts, ...heroProducts.slice(0, 3)];
 
   useEffect(() => {
@@ -276,20 +346,23 @@ export function HomePage() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const elements = Array.from(document.querySelectorAll<HTMLElement>(".home-page .reveal"));
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("in-view");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.15 });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in-view");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
     elements.forEach((element) => observer.observe(element));
     return () => observer.disconnect();
   }, []);
 
   const moveNext = () => {
-    setStart((current) => current < heroProducts.length ? current + 1 : current);
+    setStart((current) => (current < heroProducts.length ? current + 1 : current));
     trackEvent("hero_carousel_next");
   };
   const movePrevious = () => {
@@ -332,61 +405,999 @@ export function HomePage() {
     touchEndX.current = null;
   };
 
-  const steps = [
-    ["01", "Available Products", "Explore HIPA Masalas products for everyday Indian cooking."],
-    ["02", "Product Information", "Contact HIPA Masalas for further ingredient and recipe details."],
-    ["03", "Traditional Inspiration", "The HIPA range is inspired by Indian kitchen recipes."],
-    ["04", "Pack Details", "Contact HIPA Masalas for further pack and product details."],
-    ["05", "Further Details", "Contact HIPA Masalas for the latest available product information."],
-  ];
-  return <div className="home-page">
-    <section className="hero" id="home"><img className="hero-bg-img" src={siteIdentity.heroImage} alt="" aria-hidden="true" fetchPriority="high" decoding="async" /><div className="container hero-inner"><div className="hero-copy hero-copy-enter"><p className="eyebrow">Indian Spice Powders &amp; Masala Blends</p><h1>HIPA Masalas<br /><span>Indian Spice Powders for<br />Every Kitchen</span></h1><p className="hero-desc">HIPA Masalas is a Chennai, Tamil Nadu spice and masala manufacturer serving everyday consumers and enquiries from distributors, dealers, wholesalers, retailers, supermarkets, restaurants and exporters. Explore the current range or contact HIPA for product, pack and supply information.</p><div className="hero-btns"><Link href="/products" className="btn btn-primary">Explore Products <span className="arrow">→</span></Link><a href="/assets/hipa-masalas-brochure.pdf" download="HIPA-Masalas-Brochure.pdf" className="btn btn-brochure-download"><Download size={16} aria-hidden="true" />Download Brochure</a><a href="#story" className="btn btn-outline">Our Story <span className="arrow">→</span></a></div></div><div className="hero-art hero-art-enter" onMouseEnter={() => setPauseCarousel(true)} onMouseLeave={() => setPauseCarousel(false)}><div className="hero-art-glow" /><div className="hero-badge"><span>HIPA</span><small>Masalas</small></div><div className="hero-carousel-container"><div className="hero-carousel-track-wrapper" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}><div className="hero-carousel-track" style={{ transform: `translateX(-${start * (100 / itemsPerPage)}%)`, transition: animateCarousel ? "transform 0.7s cubic-bezier(0.25, 1, 0.5, 1)" : "none" }}>{carouselProducts.map((product, index) => <div className="hero-carousel-item" key={`${product.slug}-${index}`} style={{ flex: `0 0 ${100 / itemsPerPage}%`, width: `${100 / itemsPerPage}%`, maxWidth: `${100 / itemsPerPage}%` }}><Link href={`/products/${product.slug}`} className="hero-carousel-card"><img className="hero-carousel-img" src={product.heroImage} alt={product.imageAlt} loading={index < 3 ? "eager" : "lazy"} fetchPriority={index < 3 ? "high" : "low"} decoding="async" /><span className="hero-carousel-title">{product.name}</span></Link></div>)}</div></div></div><button className="hero-slider-nav prev" type="button" aria-label="Previous product" onClick={movePrevious}><ChevronLeft /></button><button className="hero-slider-nav next" type="button" aria-label="Next product" onClick={moveNext}><ChevronRight /></button><div className="hero-slider-dots">{heroProducts.map((product, index) => <button key={product.slug} type="button" className={`hero-dot ${index === start % heroProducts.length ? "is-active" : ""}`} aria-label={`Show ${product.name}`} onClick={() => selectSlide(index)} />)}</div></div></div></section>
-    <section className="features reveal"><div className="container features-grid"><Feature icon={Leaf} title="Traditional Spice Powders" copy="Explore the available HIPA Masala product range." /><Feature icon={Sparkles} title="Product Information" copy="Contact HIPA for further ingredient and recipe details." /><Feature icon={ShieldCheck} title="Pack Details" copy="Contact HIPA for current pack details." /><Feature icon={Heart} title="Everyday Cooking" copy="Discover masala powders for Indian kitchen use." /><Feature icon={Package} title="Available Products" copy="Contact HIPA for further product details." /><Feature icon={Heart} title="Contact HIPA" copy="Ask the team for further information." /></div></section>
-    <section className="collection reveal" id="products"><div className="container"><div className="collection-head"><p className="eyebrow">Discover Our</p><h2>Traditional Collection</h2><p className="section-desc">Explore available HIPA Masala spice powders. Contact HIPA for further product and pack details.</p><Link href="/products" className="btn btn-outline">View All Products <span className="arrow">→</span></Link></div><div className="product-grid">{homeCollectionProducts.map((product) => <ProductCard key={product.slug} product={product} />)}</div></div></section>
-    <section className="story reveal" id="story"><div className="container story-inner"><div className="story-copy"><p className="eyebrow eyebrow-light">Our Story</p><h2>Every Spoonful Carries<br />a Family Tradition</h2><p>Indian kitchens have long celebrated the aroma and flavour of traditional spice recipes. HIPA Masala products draw inspiration from this culinary tradition.</p><p>Explore the available HIPA product range for everyday cooking, then contact HIPA for further details.</p><ul className="story-points"><li><span className="point-icon"><Leaf /></span>Traditional Inspiration</li><li><span className="point-icon"><Heart /></span>Product Information</li><li><span className="point-icon"><Sparkles /></span>Further Details</li></ul></div><div className="story-art"><img src="/assets/story-spice-mortar_d4ded661.jpg" alt="Hands grinding whole spices in a stone mortar and pestle" /><div className="story-quote">Taste of Tradition</div></div></div></section>
-    <section className="process reveal"><div className="container process-inner"><div className="process-head"><p className="eyebrow">HIPA Masala</p><h2>Available Products</h2><p>Contact HIPA for further details about the current range.</p></div><ol className="process-steps">{steps.map(([number, title, copy], index) => <li key={number}><span className="step-num">{number}</span><span className="step-icon">{index === 0 ? <Leaf /> : index === 4 ? <Truck /> : <Check />}</span><h4>{title}</h4><p>{copy}</p></li>)}</ol></div></section>
-    <section className="cta-band reveal"><div className="container cta-inner"><div><h2>Bring Tradition to Your Kitchen</h2><p>Get recipes, offers and new blends straight to your inbox.</p></div><NewsletterForm /></div></section>
-  </div>;
+  return (
+    <div className="home-page">
+      {/* SECTION 1: HERO & INTRODUCTION */}
+      <section className="hero" id="home">
+        <img className="hero-bg-img" src={siteIdentity.heroImage} alt="" aria-hidden="true" fetchPriority="high" decoding="async" />
+        <div className="container hero-inner">
+          <div className="hero-copy hero-copy-enter">
+            <p className="eyebrow">Pallavaram, Chennai · Pure Spices &amp; Traditional Masalas</p>
+            <h1>
+              HIPA Masalas — Indian Spice Powders and Masala Blends in Chennai
+            </h1>
+            <p className="hero-desc">
+              HIPA Masalas is an Indian spice brand by HIPA Enterprises, based in Pallavaram, Chennai. We craft authentic single-origin spice powders and traditional South Indian masala blends for home kitchens, retail stores, catering services, and food businesses across Tamil Nadu and India.
+            </p>
+            <div className="hero-btns">
+              <Link href="/products" className="btn btn-primary">
+                Explore Product Range <span className="arrow">→</span>
+              </Link>
+              <Link href="/b2b-enquiries" className="btn btn-outline">
+                B2B &amp; Wholesale <span className="arrow">→</span>
+              </Link>
+              <a href="/assets/hipa-masalas-brochure.pdf" download="HIPA-Masalas-Brochure.pdf" className="btn btn-brochure-download">
+                <Download size={16} aria-hidden="true" />
+                Download Brochure
+              </a>
+            </div>
+          </div>
+          <div className="hero-art hero-art-enter" onMouseEnter={() => setPauseCarousel(true)} onMouseLeave={() => setPauseCarousel(false)}>
+            <div className="hero-art-glow" />
+            <div className="hero-badge">
+              <span>HIPA</span>
+              <small>Masalas</small>
+            </div>
+            <div className="hero-carousel-container">
+              <div className="hero-carousel-track-wrapper" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
+                <div
+                  className="hero-carousel-track"
+                  style={{
+                    transform: `translateX(-${start * (100 / itemsPerPage)}%)`,
+                    transition: animateCarousel ? "transform 0.7s cubic-bezier(0.25, 1, 0.5, 1)" : "none",
+                  }}
+                >
+                  {carouselProducts.map((product, index) => (
+                    <div
+                      className="hero-carousel-item"
+                      key={`${product.slug}-${index}`}
+                      style={{ flex: `0 0 ${100 / itemsPerPage}%`, width: `${100 / itemsPerPage}%`, maxWidth: `${100 / itemsPerPage}%` }}
+                    >
+                      <Link href={`/products/${product.slug}`} className="hero-carousel-card">
+                        <img
+                          className="hero-carousel-img"
+                          src={product.heroImage}
+                          alt={product.imageAlt}
+                          loading={index < 3 ? "eager" : "lazy"}
+                          fetchPriority={index < 3 ? "high" : "low"}
+                          decoding="async"
+                        />
+                        <span className="hero-carousel-title">{product.name}</span>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <button className="hero-slider-nav prev" type="button" aria-label="Previous product" onClick={movePrevious}>
+              <ChevronLeft />
+            </button>
+            <button className="hero-slider-nav next" type="button" aria-label="Next product" onClick={moveNext}>
+              <ChevronRight />
+            </button>
+            <div className="hero-slider-dots">
+              {heroProducts.map((product, index) => (
+                <button
+                  key={product.slug}
+                  type="button"
+                  className={`hero-dot ${index === start % heroProducts.length ? "is-active" : ""}`}
+                  aria-label={`Show ${product.name}`}
+                  onClick={() => selectSlide(index)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* VALUE HIGHLIGHTS */}
+      <section className="features reveal">
+        <div className="container features-grid">
+          <Feature icon={Leaf} title="Pure Spice Sourcing" copy="Whole spices selected for authentic aroma and natural essential oil retention." />
+          <Feature icon={Sparkles} title="Traditional Blending" copy="Time-honoured South Indian culinary recipes for balanced daily cooking." />
+          <Feature icon={ShieldCheck} title="Zero Adulteration" copy="No artificial food dyes, added MSG, synthetic preservatives, or starch fillers." />
+          <Feature icon={Package} title="Diverse Pack Sizes" copy="Available in 50g, 100g, 200g, 500g, and 1kg packs for homes and commercial kitchens." />
+          <Feature icon={Building2} title="B2B & Wholesale Supply" copy="Institutional packaging and dependable batch supply for retailers, caterers, and hotels." />
+          <Feature icon={MapPin} title="Based in Chennai" copy="Operating from Pallavaram, Chennai, serving Tamil Nadu and all of India." />
+        </div>
+      </section>
+
+      {/* SECTION 2: INDIAN SPICE POWDERS AND MASALA BLENDS */}
+      <section className="section-content-block reveal">
+        <div className="container">
+          <div className="content-editorial-grid">
+            <div className="editorial-copy">
+              <p className="eyebrow">Culinary Foundations</p>
+              <h2>Indian Spice Powders and Masala Blends</h2>
+              <p>
+                Indian cooking is celebrated worldwide for its masterful orchestration of spices. Every regional cuisine — from Tamil Nadu's comforting sambar and rasam to fragrant royal biryanis — relies on two fundamental categories of ground spices: <strong>single-ingredient pure spice powders</strong> and <strong>carefully proportioned blended masalas</strong>.
+              </p>
+              <p>
+                Pure spices like Turmeric (Haldi), Red Chilli, Coriander (Dhania), Cumin (Jeera), and Black Pepper serve as the core building blocks. They govern colour, base heat, sauce consistency, and digestive warmth. Blended masalas like Sambar Powder, Rasam Powder, and Garam Masala combine whole spices and roasted lentils in precise culinary ratios to deliver complex, signature aromas in everyday dishes.
+              </p>
+              <p>
+                At HIPA Masalas, we maintain the integrity of both single spices and traditional blends by focusing on pure milling, balanced roasting, and airtight barrier packaging.
+              </p>
+            </div>
+            <div className="editorial-cards">
+              <div className="editorial-card-item">
+                <div className="card-icon"><Leaf size={24} /></div>
+                <h3>Pure Single Spices</h3>
+                <p>Turmeric, Chilli, Coriander, Cumin, and Pepper milled purely from cleaned whole spices with zero adulterants.</p>
+              </div>
+              <div className="editorial-card-item">
+                <div className="card-icon"><Sparkles size={24} /></div>
+                <h3>Traditional Blended Masalas</h3>
+                <p>Sambar Powder, Rasam Powder, and Garam Masala slow-roasted and blended following authentic South Indian proportions.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 3: EXPLORE THE PRODUCT RANGE */}
+      <section className="collection reveal" id="products">
+        <div className="container">
+          <div className="collection-head">
+            <p className="eyebrow">Our Products</p>
+            <h2>Explore the HIPA Masalas Product Range</h2>
+            <p className="section-desc">
+              Discover our complete collection of 8 pure spice powders and authentic South Indian masala blends, crafted for home kitchens and food businesses.
+            </p>
+          </div>
+          <div className="product-grid product-grid-4cols">
+            {products.map((product) => (
+              <ProductCard key={product.slug} product={product} />
+            ))}
+          </div>
+          <div className="collection-footer-cta">
+            <Link href="/products" className="btn btn-primary">
+              View Detailed Product Catalogue <span className="arrow">→</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 4: WHY PRODUCT INFORMATION MATTERS */}
+      <section className="section-content-block bg-warm reveal">
+        <div className="container">
+          <div className="content-editorial-grid reversed">
+            <div className="editorial-art">
+              <img src="/assets/story-spice-mortar_d4ded661.jpg" alt="Traditional stone mortar and pestle grinding whole spices" />
+            </div>
+            <div className="editorial-copy">
+              <p className="eyebrow">Quality &amp; Transparency</p>
+              <h2>Why Product Information Matters for Spice Powders</h2>
+              <p>
+                In an era where processed foods frequently hide behind vague marketing buzzwords, transparent product information is essential for both conscious homemakers and professional chefs. The quality of a spice powder directly influences food aroma, nutritional retention, and consistency in every meal.
+              </p>
+              <ul className="editorial-bullet-list">
+                <li>
+                  <strong>Authentic Sourcing &amp; Processing:</strong> Understanding where spices originate and ensuring they are ground without extreme friction heat protects their natural volatile essential oils.
+                </li>
+                <li>
+                  <strong>Zero Additives &amp; Extenders:</strong> Commercial spice adulteration (such as starch in coriander or dyes in chilli) dilutes taste and compromises food safety. We believe in 100% purity.
+                </li>
+                <li>
+                  <strong>Proper Storage Guidance:</strong> Ground spices require protection from moisture, UV light, and heat to prevent oxidation and flavour loss over their 12-month shelf life.
+                </li>
+                <li>
+                  <strong>Accurate Culinary Specifications:</strong> Clear ingredient breakdowns and particle sizes help cooks achieve reproducible taste across both domestic and commercial batch cooking.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 5: HIPA MASALAS IN CHENNAI */}
+      <section className="section-content-block reveal">
+        <div className="container">
+          <div className="location-feature-card">
+            <div className="location-copy">
+              <p className="eyebrow">Local Roots · Regional Reach</p>
+              <h2>HIPA Masalas in Chennai — Sourcing and Availability</h2>
+              <p>
+                HIPA Enterprises operates from Pallavaram in South Chennai, Tamil Nadu. Chennai has historically been a thriving epicentre for South Indian spice trading and culinary excellence.
+              </p>
+              <p>
+                From our facility in Zamin Pallavaram, we distribute our complete spice range to domestic households, neighbourhood retail grocers, supermarket chains, and food service partners across Chennai, Kanchipuram, Chengalpattu, and throughout Tamil Nadu.
+              </p>
+              <div className="location-details-strip">
+                <div>
+                  <strong>Official Address:</strong>
+                  <p>{siteIdentity.locationLabel}</p>
+                </div>
+                <div>
+                  <strong>Direct Inquiries:</strong>
+                  <p>Phone: {siteIdentity.phone} · Email: {siteIdentity.email}</p>
+                </div>
+              </div>
+              <div className="location-actions">
+                <Link href="/contact" className="btn btn-primary">
+                  Visit Contact Page <span className="arrow">→</span>
+                </Link>
+                <a href={siteIdentity.whatsappHref} target="_blank" rel="noreferrer" className="btn btn-whatsapp-live">
+                  Chat on WhatsApp
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 6: FOR HOMES, RETAILERS AND FOOD BUSINESSES */}
+      <section className="section-content-block bg-warm reveal">
+        <div className="container">
+          <div className="collection-head">
+            <p className="eyebrow">Serving Diverse Needs</p>
+            <h2>For Homes, Retailers and Food Businesses</h2>
+            <p className="section-desc">
+              Whether you are seasoning a daily family meal or sourcing spices for a restaurant chain or supermarket shelf, HIPA Masalas provides tailored packaging and reliable supply.
+            </p>
+          </div>
+          <div className="segments-grid">
+            <div className="segment-card">
+              <div className="segment-icon"><Utensils size={28} /></div>
+              <h3>Home Kitchens</h3>
+              <p>
+                Available in convenient 50g, 100g, 200g, and 500g zipper/pouch packs. Enjoy traditional flavours with zero guesswork and clean ingredients for your loved ones.
+              </p>
+              <Link href="/products" className="btn btn-outline btn-sm">Browse Retail Packs</Link>
+            </div>
+            <div className="segment-card">
+              <div className="segment-icon"><Store size={28} /></div>
+              <h3>Retailers &amp; Supermarkets</h3>
+              <p>
+                Attractive shelf-ready retail packaging with clear barcodes, tamper-evident seals, competitive retailer margins, and steady local replenishment.
+              </p>
+              <Link href="/b2b-enquiries" className="btn btn-outline btn-sm">Retailer Enquiries</Link>
+            </div>
+            <div className="segment-card">
+              <div className="segment-icon"><Building2 size={28} /></div>
+              <h3>Caterers, Hotels &amp; Cloud Kitchens</h3>
+              <p>
+                500g and 1kg institutional bags designed for commercial kitchens. Guaranteed batch consistency to protect your recipe reputation and customer loyalty.
+              </p>
+              <Link href="/b2b-enquiries" className="btn btn-outline btn-sm">Commercial Orders</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 7: FREQUENTLY ASKED QUESTIONS */}
+      <section className="catalogue-faq-section reveal">
+        <div className="container">
+          <div className="collection-head">
+            <p className="eyebrow">Common Queries</p>
+            <h2>Frequently Asked Questions About HIPA Masalas</h2>
+            <p className="section-desc">
+              Clear, factual answers about our brand, spice processing, product availability, and business enquiries in Chennai.
+            </p>
+          </div>
+          <div className="catalogue-faq-list">
+            {faqs.slice(0, 4).map((faq, index) => (
+              <details key={faq.question} className="catalogue-faq-item" open={index === 0}>
+                <summary>
+                  {faq.question}
+                  <ChevronDown size={16} />
+                </summary>
+                <p>{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+          <div className="faq-more-link">
+            <Link href="/faq" className="btn btn-outline">
+              View All Frequently Asked Questions <span className="arrow">→</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* NEWSLETTER CTA */}
+      <section className="cta-band reveal">
+        <div className="container cta-inner">
+          <div>
+            <h2>Stay Connected with HIPA Masalas</h2>
+            <p>Get spice guides, cooking tips, and product announcements straight to your inbox.</p>
+          </div>
+          <NewsletterForm />
+        </div>
+      </section>
+    </div>
+  );
 }
 
-export function ProductsPage() { return <><Breadcrumbs current="Products" /><section className="catalogue-page"><div className="container"><div className="collection-head catalogue-head"><p className="eyebrow">HIPA Masala</p><h1>Traditional Collection</h1><p className="section-desc">Discover available HIPA traditional spice powders. Contact HIPA for further product details.</p><div className="catalogue-filter-label" aria-label="Product category">Masala Powders</div></div><div className="catalogue-product-grid">{products.map((product) => <CatalogueProductCard product={product} key={product.slug} />)}</div></div></section><section className="catalogue-enquiry-section" id="distributor-enquiry"><div className="container catalogue-enquiry-grid"><div className="catalogue-enquiry-copy"><p className="eyebrow">Product Enquiries</p><h2>Request Product Details</h2><p>Use the form to ask about an available HIPA Masala product. Choose <strong>Distributor</strong> under Business Type if that best describes your enquiry.</p><p className="catalogue-enquiry-note">Distributor, wholesale and bulk-order information will be shared only when HIPA confirms that those operations are active.</p></div><div className="contact-form-card catalogue-enquiry-form"><h3>Distributor / Product Enquiry</h3><p>Fields marked * are required.</p><EnquiryForm formId="catalogue-enquiry" variant="distributor" /></div></div></section><section className="catalogue-faq-section"><div className="container"><div className="collection-head"><p className="eyebrow">Common Questions</p><h2>Product Information</h2><p className="section-desc">Clear answers about current HIPA Masala product information and enquiries.</p></div><div className="catalogue-faq-list">{faqs.slice(0, 4).map((faq, index) => <details key={faq.question} className="catalogue-faq-item" open={index === 0}><summary>{faq.question}<ChevronDown size={16} /></summary><p>{faq.answer}</p></details>)}</div></div></section></>; }
+export function ProductsPage() {
+  return (
+    <>
+      <Breadcrumbs current="Products" />
+      <section className="catalogue-page">
+        <div className="container">
+          <div className="collection-head catalogue-head">
+            <p className="eyebrow">HIPA Masalas · Chennai</p>
+            <h1>Traditional Spice Powders &amp; Masala Blends</h1>
+            <p className="section-desc">
+              Explore our complete range of 8 pure spice powders and authentic South Indian masala blends. Click on any product to view comprehensive ingredients, culinary applications, storage tips, and technical specifications.
+            </p>
+            <div className="catalogue-filter-label" aria-label="Product category">
+              Pure Spices &amp; Traditional Blends
+            </div>
+          </div>
+          <div className="catalogue-product-grid">
+            {products.map((product) => (
+              <CatalogueProductCard product={product} key={product.slug} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* B2B / DISTRIBUTOR CALLOUT */}
+      <section className="catalogue-enquiry-section" id="distributor-enquiry">
+        <div className="container catalogue-enquiry-grid">
+          <div className="catalogue-enquiry-copy">
+            <p className="eyebrow">Trade &amp; Business Orders</p>
+            <h2>Wholesale &amp; Retail Supply Enquiries</h2>
+            <p>
+              Are you a grocery store owner, supermarket purchaser, catering company, or restaurant chef looking for dependable spice supply in Chennai and Tamil Nadu?
+            </p>
+            <p>
+              HIPA Enterprises offers institutional packaging (500g, 1kg, bulk master cartons) with reliable batch consistency and direct commercial terms.
+            </p>
+            <div className="catalogue-enquiry-note">
+              <p>
+                <strong>Direct Assistance:</strong> You can also call us directly at{" "}
+                <a href={siteIdentity.phoneHref}>{siteIdentity.phone}</a> or send an instant WhatsApp message.
+              </p>
+            </div>
+          </div>
+          <div className="contact-form-card catalogue-enquiry-form">
+            <h3>Trade &amp; Product Enquiry</h3>
+            <p>Fill out your details below to request product information or bulk terms.</p>
+            <EnquiryForm formId="catalogue-enquiry" variant="distributor" />
+          </div>
+        </div>
+      </section>
+
+      {/* PRODUCT FAQs */}
+      <section className="catalogue-faq-section">
+        <div className="container">
+          <div className="collection-head">
+            <p className="eyebrow">Common Questions</p>
+            <h2>Product Range Questions</h2>
+            <p className="section-desc">Answers to common questions about HIPA Masalas spice products.</p>
+          </div>
+          <div className="catalogue-faq-list">
+            {faqs.slice(4, 8).map((faq, index) => (
+              <details key={faq.question} className="catalogue-faq-item" open={index === 0}>
+                <summary>
+                  {faq.question}
+                  <ChevronDown size={16} />
+                </summary>
+                <p>{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
 
 export function ProductDetailPage() {
   const [, params] = useRoute("/products/:slug");
   const product = getProduct(params?.slug || "");
   if (!product) return <NotFoundPage />;
-  const guide = productGuidesBySlug[product.slug];
+
+  const relatedProducts = (product.relatedProductSlugs || [])
+    .map((slug) => getProduct(slug))
+    .filter((p): p is (typeof products)[number] => Boolean(p));
+
+  const guide = articleResourcesBySlug[product.slug];
   const productFaqs = getProductFaqs(product);
-  return <><Breadcrumbs current={product.name} /><section className="product-replica"><div className="container product-replica-grid"><div className="product-replica-image product-detail-enter"><img src={product.image} alt={product.imageAlt} fetchPriority="high" decoding="async" /></div><div className="product-replica-copy product-detail-enter"><p className="eyebrow">HIPA MASALAS · TASTE OF TRADITION</p><h1>{product.name}</h1><p>{product.description}</p><ProductAvailabilityLabel slug={product.slug} /><ul className="product-highlights">{product.highlights.map((item) => <li key={item}>{item}</li>)}</ul>{product.packSizes && <div className="replica-packs" aria-label={`${product.name} pack sizes`}>{product.packSizes.map((size) => <span key={size}>{size}</span>)}</div>}{guide && <p className="product-guide-link"><Link href={guide.href}>{guide.label}</Link><span>{guide.detail}</span></p>}<div className="replica-product-actions"><Link href="/contact#enquire" className="btn btn-outline" onClick={() => trackEvent("product_enquiry_cta", { product: product.name })}>Enquire Now</Link><a href={siteIdentity.whatsappHref} target="_blank" rel="noreferrer" className="btn btn-whatsapp-live" onClick={() => trackEvent("whatsapp_click", { product: product.name })}>WhatsApp Enquiry</a></div></div></div></section><section className="product-faq-section"><div className="container"><div className="product-faq-heading"><p className="eyebrow">Product Questions</p><h2>{product.name} Questions and Answers</h2><p>Concise information based on the current product page and enquiry options.</p></div><div className="product-faq-list">{productFaqs.map((faq, index) => <details key={faq.question} className="product-faq-item" open={index === 0}><summary>{faq.question}<ChevronDown size={16} /></summary><p>{faq.answer}</p></details>)}</div></div></section><section className="related-products"><div className="container"><h2>Explore More Products</h2><div className="product-grid product-grid-compact">{products.filter((item) => item.slug !== product.slug).map((item) => <ProductCard key={item.slug} product={item} compact />)}</div></div></section></>;
+
+  return (
+    <>
+      <Breadcrumbs current={product.name} parent={{ label: "Products", href: "/products" }} />
+
+      {/* 1. HERO SECTION */}
+      <section className="product-replica">
+        <div className="container product-replica-grid">
+          <div className="product-replica-image product-detail-enter">
+            <img src={product.image} alt={product.imageAlt} fetchPriority="high" decoding="async" />
+          </div>
+          <div className="product-replica-copy product-detail-enter">
+            <p className="eyebrow">HIPA MASALAS · PALLAVARAM, CHENNAI</p>
+            <h1>{product.name}</h1>
+            <p className="product-hero-summary">{product.description}</p>
+            <ProductAvailabilityLabel slug={product.slug} />
+
+            <div className="product-quick-specs">
+              <ul className="product-highlights">
+                {product.highlights.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+
+            {product.packSizes && (
+              <div className="replica-packs-wrap">
+                <span className="packs-title">Available Pack Sizes:</span>
+                <div className="replica-packs" aria-label={`${product.name} pack sizes`}>
+                  {product.packSizes.map((size) => (
+                    <span key={size}>{size}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="replica-product-actions">
+              <a href="#product-enquiry" className="btn btn-primary" onClick={() => trackEvent("product_enquiry_cta", { product: product.name })}>
+                Enquire About This Product <span className="arrow">↓</span>
+              </a>
+              <a href={siteIdentity.whatsappHref} target="_blank" rel="noreferrer" className="btn btn-whatsapp-live" onClick={() => trackEvent("whatsapp_click", { product: product.name })}>
+                WhatsApp Enquiry
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. DEEP SEARCH INTENT SECTIONS (700-1000 words per product) */}
+      <section className="product-deep-content">
+        <div className="container product-content-container">
+
+          {/* WHAT IS THIS PRODUCT */}
+          <article className="content-card">
+            <h2>What is HIPA Masalas {product.name}?</h2>
+            {product.whatIs.map((paragraph, idx) => (
+              <p key={idx}>{paragraph}</p>
+            ))}
+          </article>
+
+          {/* INGREDIENTS & AROMA */}
+          <article className="content-card">
+            <h2>Ingredients, Flavour &amp; Aroma Profile</h2>
+            {product.ingredientsAndAroma.map((item, idx) => (
+              <p key={idx}>{item}</p>
+            ))}
+          </article>
+
+          {/* CULINARY USES */}
+          <article className="content-card">
+            <h2>Common Culinary Uses &amp; Everyday Dishes</h2>
+            <ul className="culinary-uses-list">
+              {product.commonUses.map((use, idx) => (
+                <li key={idx}>
+                  <Check size={18} className="check-icon" />
+                  <span>{use}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+
+          {/* SELECTION FACTORS */}
+          <article className="content-card">
+            <h2>Quality, Purity &amp; Selection Factors</h2>
+            <ul className="factors-list">
+              {product.selectionFactors.map((factor, idx) => (
+                <li key={idx}>
+                  <ShieldCheck size={18} className="shield-icon" />
+                  <span>{factor}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+
+          {/* STORAGE GUIDANCE */}
+          <article className="content-card">
+            <h2>Packaging &amp; Storage Guidance</h2>
+            <ul className="storage-list">
+              {product.storageGuidance.map((tip, idx) => (
+                <li key={idx}>
+                  <Clock size={18} className="clock-icon" />
+                  <span>{tip}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+
+          {/* COMMERCIAL APPLICATIONS */}
+          <article className="content-card">
+            <h2>For Commercial Kitchens, Caterers &amp; Retailers</h2>
+            <ul className="commercial-list">
+              {product.commercialApplications.map((app, idx) => (
+                <li key={idx}>
+                  <Building2 size={18} className="building-icon" />
+                  <span>{app}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+
+          {/* SPECIFICATIONS TABLE */}
+          {product.specs && (
+            <article className="content-card specs-card">
+              <h2>Product Specifications</h2>
+              <div className="table-responsive">
+                <table className="specs-table">
+                  <tbody>
+                    {product.specs.map((spec) => (
+                      <tr key={spec.label}>
+                        <th scope="row">{spec.label}</th>
+                        <td>{spec.value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </article>
+          )}
+
+        </div>
+      </section>
+
+      {/* 3. PRODUCT FAQS */}
+      <section className="product-faq-section">
+        <div className="container">
+          <div className="product-faq-heading">
+            <p className="eyebrow">Product Questions</p>
+            <h2>Frequently Asked Questions About {product.name}</h2>
+            <p>Factual information about ingredients, usage, pack sizes, and culinary techniques.</p>
+          </div>
+          <div className="product-faq-list">
+            {productFaqs.map((faq, index) => (
+              <details key={faq.question} className="product-faq-item" open={index === 0}>
+                <summary>
+                  {faq.question}
+                  <ChevronDown size={16} />
+                </summary>
+                <p>{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4. RELATED PRODUCTS */}
+      {relatedProducts.length > 0 && (
+        <section className="related-products">
+          <div className="container">
+            <h2>Related Spice Powders &amp; Masalas</h2>
+            <div className="product-grid product-grid-3cols">
+              {relatedProducts.map((item) => (
+                <ProductCard key={item.slug} product={item} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 5. INLINE PRODUCT ENQUIRY FORM */}
+      <section className="product-enquiry-section" id="product-enquiry">
+        <div className="container product-enquiry-grid">
+          <div className="product-enquiry-copy">
+            <p className="eyebrow">Direct Enquiry</p>
+            <h2>Enquire About {product.name}</h2>
+            <p>
+              Interested in retail supply, restaurant supply, or bulk distribution of <strong>{product.name}</strong> in Chennai or beyond? Fill out the form and our team will get back to you promptly with product details.
+            </p>
+            <div className="product-enquiry-note">
+              <p>
+                <strong>Need Immediate Assistance?</strong> Message us on WhatsApp or call our Chennai office at{" "}
+                <a href={siteIdentity.phoneHref}>{siteIdentity.phone}</a>.
+              </p>
+            </div>
+          </div>
+          <div className="contact-form-card product-enquiry-form-card">
+            <h3>Send an Enquiry</h3>
+            <p>Fields marked * are required.</p>
+            <EnquiryForm formId={`enquiry-${product.slug}`} />
+          </div>
+        </div>
+      </section>
+    </>
+  );
 }
 
-export function FaqPage() { return <><Breadcrumbs current="FAQ" /><section className="faq-hero"><div className="container"><h1>Frequently Asked Questions</h1><p>Clear information about HIPA Masalas, the current product range and ways to contact the Chennai team.</p></div></section><section className="faq-shell"><div className="faq-container">{faqs.map((faq, index) => <details className="faq-live-item" key={faq.question} open={index === 0}><summary>{faq.question}<span><ChevronDown size={15} /></span></summary><p>{faq.answer}</p></details>)}<div className="faq-support"><h2>Have More Questions?</h2><p>Contact HIPA Masalas for current product information.</p><div className="hero-btns"><Link href="/contact#enquire" className="btn btn-outline">Send an Enquiry</Link><a href={siteIdentity.whatsappHref} target="_blank" rel="noreferrer" className="btn btn-outline" onClick={() => trackEvent("whatsapp_click", { location: "faq" })}>WhatsApp Support</a></div></div></div></section></>; }
+export function AboutPage() {
+  return (
+    <>
+      <Breadcrumbs current="About" />
+      <section className="contact-hero">
+        <div className="container contact-hero-inner">
+          <p className="eyebrow">About HIPA Enterprises · Chennai</p>
+          <h1>About HIPA Masalas — Our Story, Vision and Approach to Indian Spices</h1>
+          <p>
+            HIPA Masalas is an Indian spice and masala brand owned and operated by HIPA Enterprises in Pallavaram, Chennai, Tamil Nadu. We are dedicated to providing pure, unadulterated spice powders and traditionally formulated masala blends for everyday cooking.
+          </p>
+        </div>
+      </section>
 
-function InfoCard({ icon: Icon, title, children }: { icon: typeof MapPin; title: string; children: React.ReactNode }) { return <div className="info-card"><div className="info-card-icon"><Icon /></div><h3>{title}</h3><p>{children}</p></div>; }
+      <section className="journal-replica about-page">
+        <div className="container" style={{ maxWidth: 880 }}>
+
+          {/* SECTION 1: THE STORY */}
+          <div className="about-content-section">
+            <p className="eyebrow">Heritage &amp; Beginnings</p>
+            <h2>The Story Behind HIPA Masalas</h2>
+            <p className="section-desc">
+              Food in an Indian home is far more than sustenance — it is a daily celebration of culture, family connection, and wellness. At the core of every memorable meal is the aroma of freshly ground spices simmering in warm ghee or oil.
+            </p>
+            <p className="section-desc">
+              HIPA Masalas was founded by HIPA Enterprises with a clear mission: to bring the authentic taste and aroma of traditional South Indian kitchen masalas to modern homes and food businesses. Inspired by ancestral recipes passed down through generations, we set out to create spice products that honour authentic regional flavours without relying on shortcuts, synthetic additives, or artificial colours.
+            </p>
+          </div>
+
+          {/* SECTION 2: APPROACH TO SPICE BLENDING */}
+          <div className="about-content-section">
+            <p className="eyebrow">Craft &amp; Consistency</p>
+            <h2>Our Approach to Spice Blending</h2>
+            <p className="section-desc">
+              Exceptional masala starts with raw ingredient selection. We source premium-grade whole spices — plump coriander seeds, pungent Guntur red chillies, high-curcumin turmeric rhizomes, Tellicherry black peppercorns, and aromatic whole spices.
+            </p>
+            <p className="section-desc">
+              Each ingredient is carefully cleaned and milled under controlled low temperatures. This critical step preserves the delicate, volatile essential oils that give each spice its signature aroma and therapeutic properties. In our blended masalas, whole spices and lentils are slow-roasted before grinding to replicate the authentic texture and aroma of stone-ground home podis.
+            </p>
+          </div>
+
+          {/* SECTION 3: SERVING HOMES AND BUSINESSES */}
+          <div className="about-content-section">
+            <p className="eyebrow">Community &amp; Commerce</p>
+            <h2>Serving Homes and Food Businesses</h2>
+            <p className="section-desc">
+              We take pride in serving two vibrant culinary communities:
+            </p>
+            <ul className="about-points-list">
+              <li>
+                <strong>Everyday Home Cooks:</strong> Offering convenient retail pouch packaging (50g to 1kg) that keeps spices fresh and makes authentic daily cooking effortless.
+              </li>
+              <li>
+                <strong>Food Businesses &amp; Retailers:</strong> Supplying caterers, restaurants, mess establishments, and supermarket chains with consistent, high-volume batch supplies in 500g and 1kg institutional packaging.
+              </li>
+            </ul>
+          </div>
+
+          {/* SECTION 4: LOCATED IN PALLAVARAM, CHENNAI */}
+          <div className="about-content-section">
+            <p className="eyebrow">Entity &amp; Location</p>
+            <h2>Located in Pallavaram, Chennai</h2>
+            <p className="section-desc">
+              Our business operations are anchored in Pallavaram, Chennai — a vibrant suburban commercial hub with deep ties to South Indian trade routes.
+            </p>
+            <div className="about-entity-box">
+              <p><strong>Business Legal Entity:</strong> HIPA Enterprises</p>
+              <p><strong>Brand:</strong> HIPA Masalas</p>
+              <p><strong>Official Address:</strong> {siteIdentity.locationLabel}</p>
+              <p><strong>Phone:</strong> {siteIdentity.phone} | <strong>Email:</strong> {siteIdentity.email}</p>
+            </div>
+          </div>
+
+          {/* SECTION 5: OUR CORE VALUES */}
+          <div className="about-content-section">
+            <p className="eyebrow">Principles</p>
+            <h2>Our Core Values</h2>
+            <div className="about-values-grid">
+              <div className="about-value-card">
+                <h3>Purity First</h3>
+                <p>Zero artificial dyes, chemical preservatives, or synthetic flavour enhancers.</p>
+              </div>
+              <div className="about-value-card">
+                <h3>Authentic Taste</h3>
+                <p>Recipes crafted to deliver true traditional South Indian taste and aroma.</p>
+              </div>
+              <div className="about-value-card">
+                <h3>Consistency</h3>
+                <p>Uniform milling and calibrated roasting for dependable results in every pack.</p>
+              </div>
+              <div className="about-value-card">
+                <h3>People-First Service</h3>
+                <p>Direct, responsive communication for domestic and commercial partners alike.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="about-cta-bar">
+            <Link href="/products" className="btn btn-primary">
+              Explore Our Products <span className="arrow">→</span>
+            </Link>
+            <Link href="/contact" className="btn btn-outline">
+              Contact Us <span className="arrow">→</span>
+            </Link>
+          </div>
+
+        </div>
+      </section>
+    </>
+  );
+}
+
+export function FaqPage() {
+  const cluster1 = faqs.slice(0, 4);
+  const cluster2 = faqs.slice(4, 8);
+  const cluster3 = faqs.slice(8, 12);
+
+  return (
+    <>
+      <Breadcrumbs current="FAQ" />
+      <section className="faq-hero">
+        <div className="container">
+          <p className="eyebrow">Questions &amp; Answers</p>
+          <h1>Frequently Asked Questions About HIPA Masalas</h1>
+          <p>
+            Find comprehensive, clear answers about our spice sourcing, product formulations, pack sizes, Chennai location, and B2B ordering options.
+          </p>
+        </div>
+      </section>
+
+      <section className="faq-shell">
+        <div className="faq-container">
+
+          {/* CLUSTER 1 */}
+          <div className="faq-cluster">
+            <h2 className="faq-cluster-title">1. About HIPA Masalas &amp; Sourcing</h2>
+            {cluster1.map((faq, index) => (
+              <details className="faq-live-item" key={faq.question} open={index === 0}>
+                <summary>
+                  {faq.question}
+                  <span><ChevronDown size={15} /></span>
+                </summary>
+                <p>{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+
+          {/* CLUSTER 2 */}
+          <div className="faq-cluster">
+            <h2 className="faq-cluster-title">2. Product Range &amp; Culinary Usage</h2>
+            {cluster2.map((faq, index) => (
+              <details className="faq-live-item" key={faq.question} open={index === 0}>
+                <summary>
+                  {faq.question}
+                  <span><ChevronDown size={15} /></span>
+                </summary>
+                <p>{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+
+          {/* CLUSTER 3 */}
+          <div className="faq-cluster">
+            <h2 className="faq-cluster-title">3. B2B Enquiries, Wholesale &amp; Contact</h2>
+            {cluster3.map((faq, index) => (
+              <details className="faq-live-item" key={faq.question} open={index === 0}>
+                <summary>
+                  {faq.question}
+                  <span><ChevronDown size={15} /></span>
+                </summary>
+                <p>{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+
+          <div className="faq-support">
+            <h2>Have More Questions?</h2>
+            <p>Our team in Chennai is here to assist with product details, bulk orders, and retailer terms.</p>
+            <div className="hero-btns">
+              <Link href="/contact#enquire" className="btn btn-outline">Send an Enquiry</Link>
+              <a href={siteIdentity.whatsappHref} target="_blank" rel="noreferrer" className="btn btn-outline" onClick={() => trackEvent("whatsapp_click", { location: "faq" })}>
+                WhatsApp Support
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function InfoCard({ icon: Icon, title, children }: { icon: typeof MapPin; title: string; children: React.ReactNode }) {
+  return (
+    <div className="info-card">
+      <div className="info-card-icon">
+        <Icon />
+      </div>
+      <h3>{title}</h3>
+      <p>{children}</p>
+    </div>
+  );
+}
 
 export function ContactPage() {
   const cityMapUrl = `https://www.google.com/maps?q=${encodeURIComponent(siteIdentity.locationLabel)}`;
   const cityMapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(siteIdentity.locationLabel)}&output=embed`;
-  return <><section className="contact-hero"><div className="container contact-hero-inner"><p className="eyebrow">Get in Touch</p><h1>Contact HIPA Masalas</h1><p>HIPA Masalas is based in Chennai, Tamil Nadu, India. Contact the team for current product information or general support.</p></div></section><section className="info-cards-section"><div className="container info-cards-row"><InfoCard icon={MapPin} title="Location">{siteIdentity.locationLabel}</InfoCard><InfoCard icon={Phone} title="Phone Number"><a href={siteIdentity.phoneHref} onClick={() => trackEvent("phone_click", { location: "contact" })}>{siteIdentity.phone}</a></InfoCard><InfoCard icon={Mail} title="Email Address"><a href={`mailto:${siteIdentity.email}`}>{siteIdentity.email}</a></InfoCard></div></section><section className="contact-main" id="enquire"><div className="container contact-grid"><div className="contact-form-card"><h2>Send Us an Enquiry</h2><p>Fill in the form below for further product details. Fields marked * are required.</p><EnquiryForm /></div><aside className="contact-side"><div className="map-card"><iframe className="contact-map-frame" src={cityMapEmbedUrl} title="HIPA Masalas Chennai map" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /><div className="map-card-info"><h3>Find Us Here</h3><p>{siteIdentity.locationLabel}</p><a className="map-open-link" href={cityMapUrl} target="_blank" rel="noreferrer">Open in Google Maps</a></div></div><div className="whatsapp-cta"><h3>Prefer a Quick Chat?</h3><p>For further product details, message HIPA Masalas directly on WhatsApp or give the team a call.</p><a id="whatsappCtaBtn" href={siteIdentity.whatsappHref} target="_blank" rel="noreferrer" className="btn btn-primary" onClick={() => trackEvent("whatsapp_click", { location: "contact" })}>Chat on WhatsApp</a></div></aside></div></section></>;
+
+  return (
+    <>
+      <Breadcrumbs current="Contact" />
+      <section className="contact-hero">
+        <div className="container contact-hero-inner">
+          <p className="eyebrow">Get in Touch · Pallavaram, Chennai</p>
+          <h1>Contact HIPA Masalas</h1>
+          <p>
+            Reach out to HIPA Enterprises for product details, retailer inquiries, catering supply, and business partnerships in Chennai and across India.
+          </p>
+        </div>
+      </section>
+
+      <section className="info-cards-section">
+        <div className="container info-cards-row">
+          <InfoCard icon={MapPin} title="Official Address">
+            {siteIdentity.locationLabel}
+          </InfoCard>
+          <InfoCard icon={Phone} title="Phone Number">
+            <a href={siteIdentity.phoneHref} onClick={() => trackEvent("phone_click", { location: "contact" })}>
+              {siteIdentity.phone}
+            </a>
+          </InfoCard>
+          <InfoCard icon={Mail} title="Email Address">
+            <a href={`mailto:${siteIdentity.email}`}>{siteIdentity.email}</a>
+          </InfoCard>
+        </div>
+      </section>
+
+      <section className="contact-main" id="enquire">
+        <div className="container contact-grid">
+          <div className="contact-form-card">
+            <h2>Send Us an Enquiry</h2>
+            <p>Fill in the form below for product information, trade queries, or general assistance. Fields marked * are required.</p>
+            <EnquiryForm />
+          </div>
+          <aside className="contact-side">
+            <div className="map-card">
+              <iframe className="contact-map-frame" src={cityMapEmbedUrl} title="HIPA Masalas Chennai map" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+              <div className="map-card-info">
+                <h3>Find Us in Chennai</h3>
+                <p>{siteIdentity.locationLabel}</p>
+                <a className="map-open-link" href={cityMapUrl} target="_blank" rel="noreferrer">Open in Google Maps</a>
+              </div>
+            </div>
+            <div className="whatsapp-cta">
+              <h3>Prefer an Instant Chat?</h3>
+              <p>For immediate product questions or bulk price inquiries, message us directly on WhatsApp.</p>
+              <a id="whatsappCtaBtn" href={siteIdentity.whatsappHref} target="_blank" rel="noreferrer" className="btn btn-primary" onClick={() => trackEvent("whatsapp_click", { location: "contact" })}>
+                Chat on WhatsApp
+              </a>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </>
+  );
 }
 
-export function B2BEnquiriesPage() { return <><Breadcrumbs current="Product Enquiry" /><section className="contact-hero"><div className="container contact-hero-inner"><p className="eyebrow">Business Product Enquiries</p><h1>Masala Manufacturer for Distributor, Dealer & Export Enquiries</h1><p>HIPA Masalas supplies spice powders and masala blends for consumer, wholesale, distributor, dealer, retail, food-service and export enquiries. Use this page to tell us what products and supply information you need.</p></div></section><section className="b2b-enquiry-section"><div className="container b2b-enquiry-grid"><div className="b2b-enquiry-copy"><p className="eyebrow">Before You Submit</p><h2>Help HIPA Masalas understand your enquiry</h2><p>Share the product you are interested in, your business type and your city or region. You can also include an expected monthly volume if it is known.</p><ul><li>Choose the current product you want to ask about.</li><li>Select the business type that best describes your enquiry.</li><li>Add your city or region for context.</li><li>Use the message field for any further product questions.</li></ul><p className="b2b-enquiry-note">HIPA Masalas will respond with current product information relevant to the enquiry. Commercial availability, pricing, minimum order quantities, delivery, private-label and export details are confirmed directly for each enquiry.</p></div><div className="contact-form-card b2b-enquiry-form"><h2>Send an Enquiry</h2><p>Fields marked * are required.</p><EnquiryForm formId="b2b-enquiry" variant="distributor" /></div></div></section></>; }
+export function B2BEnquiriesPage() {
+  return (
+    <>
+      <Breadcrumbs current="B2B Enquiries" />
+      <section className="contact-hero">
+        <div className="container contact-hero-inner">
+          <p className="eyebrow">Wholesale, Retail &amp; Food Service Supply</p>
+          <h1>B2B Enquiries — Wholesale, Distribution and Food Business Requirements</h1>
+          <p>
+            HIPA Enterprises supplies high-quality pure spice powders and authentic masala blends for retail distributors, supermarket chains, hotels, restaurants, caterers, and food businesses.
+          </p>
+        </div>
+      </section>
 
-export function PrivacyPage() { return <><Breadcrumbs current="Privacy" /><section className="journal-replica"><div className="container" style={{ maxWidth: 840 }}><p className="eyebrow">Privacy</p><h1>Privacy Policy</h1><p className="section-desc">HIPA Masalas uses the details submitted through this website to respond to enquiries. When no database is configured, newsletter signup requests are saved only in the visitor’s browser on that device.</p><div className="article-body"><h2>Information submitted through this website</h2><p className="section-desc">Enquiry forms may collect a name, mobile number, email address, business type, product interest, message and, where provided, city or region and expected monthly volume. Newsletter subscriptions collect an email address and consent.</p><h2>How HIPA Masalas uses this information</h2><p className="section-desc">HIPA Masalas uses submitted enquiry details to respond to the relevant request and manage product enquiries. Without a database, newsletter signup details remain in the visitor’s browser only and are not centrally collected. You can contact HIPA Masalas through the Contact page to ask about information you have submitted.</p><h2>Consent</h2><p className="section-desc">The enquiry and newsletter forms require consent before submission. Do not submit information you do not wish HIPA Masalas to use for the stated purpose.</p></div></div></section></>; }
+      <section className="b2b-enquiry-section">
+        <div className="container b2b-enquiry-grid">
+          <div className="b2b-enquiry-copy">
+            <p className="eyebrow">Partnership Opportunities</p>
+            <h2>How We Support Your Food Business</h2>
+            <p>
+              Whether you manage an independent supermarket, a chain of South Indian restaurants, or an institutional catering enterprise, HIPA Masalas provides dependable product consistency and flexible packaging options.
+            </p>
+            <div className="b2b-benefits-block">
+              <div className="b2b-benefit-item">
+                <Store size={20} />
+                <div>
+                  <strong>Retail Supermarkets &amp; Grocers:</strong>
+                  <span>High-shelf-appeal pouch packs (50g, 100g, 200g, 500g, 1kg) with clear labelling, barcodes, and fast replenishment in Chennai.</span>
+                </div>
+              </div>
+              <div className="b2b-benefit-item">
+                <Utensils size={20} />
+                <div>
+                  <strong>Caterers &amp; Commercial Kitchens:</strong>
+                  <span>500g and 1kg institutional bags formulated for high-volume cooking consistency.</span>
+                </div>
+              </div>
+              <div className="b2b-benefit-item">
+                <Truck size={20} />
+                <div>
+                  <strong>Wholesale &amp; Regional Distributors:</strong>
+                  <span>Attractive trade margins, reliable batch delivery, and direct manufacturer support from Chennai.</span>
+                </div>
+              </div>
+            </div>
 
-export function AboutPage() {
-  return <>
-    <Breadcrumbs current="About" />
-    <section className="contact-hero"><div className="container contact-hero-inner"><p className="eyebrow">About HIPA Masalas</p><h1>A Taste of Tradition from Chennai</h1><p>HIPA Masalas is an Indian spice and masala brand based in Chennai, Tamil Nadu, India. The website presents the current range of spice powders and masala blends for everyday cooking.</p></div></section>
-    <section className="journal-replica about-page"><div className="container" style={{ maxWidth: 840 }}><p className="eyebrow">Our Story</p><h2>Indian spice inspiration for everyday kitchens</h2><p className="section-desc">Indian kitchens have long celebrated the aroma and flavour of traditional spice recipes. HIPA Masalas draws inspiration from this culinary tradition and shares product information for people exploring familiar Indian cooking ingredients.</p><p className="section-desc">Explore the current HIPA Masalas range, read practical spice guides, or contact the team for further product and pack information.</p><div className="hero-btns"><Link href="/products" className="btn btn-primary">Explore Products <span className="arrow">→</span></Link><Link href="/contact#enquire" className="btn btn-outline">Contact HIPA <span className="arrow">→</span></Link></div></div></section>
-  </>;
+            <div className="b2b-enquiry-note">
+              <p>
+                <strong>Direct Business Hotline:</strong> Call <a href={siteIdentity.phoneHref}>{siteIdentity.phone}</a> or email <a href={`mailto:${siteIdentity.email}`}>{siteIdentity.email}</a> for immediate bulk quotations.
+              </p>
+            </div>
+          </div>
+
+          <div className="contact-form-card b2b-enquiry-form">
+            <h2>Submit a Business Enquiry</h2>
+            <p>Tell us about your business type, required products, and estimated monthly volumes. Fields marked * are required.</p>
+            <EnquiryForm formId="b2b-enquiry" variant="distributor" />
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+export function PrivacyPage() {
+  return (
+    <>
+      <Breadcrumbs current="Privacy" />
+      <section className="journal-replica">
+        <div className="container" style={{ maxWidth: 840 }}>
+          <p className="eyebrow">Privacy</p>
+          <h1>Privacy Policy</h1>
+          <p className="section-desc">
+            HIPA Enterprises is committed to protecting your privacy. This policy outlines how information submitted through the HIPA Masalas website is managed.
+          </p>
+          <div className="article-body">
+            <h2>Information Collected Through Enquiry Forms</h2>
+            <p className="section-desc">
+              When you submit a contact or B2B enquiry, we may collect your name, email address, mobile number, business type, city or region, and message content solely to respond to your specific request.
+            </p>
+            <h2>How We Use Your Information</h2>
+            <p className="section-desc">
+              Your contact details are used exclusively by HIPA Enterprises to answer product inquiries, provide quotations, and facilitate customer support. We do not sell, rent, or distribute your personal data to third parties.
+            </p>
+            <h2>Newsletter Subscriptions</h2>
+            <p className="section-desc">
+              Newsletter signups are stored securely in compliance with consent guidelines and used solely to deliver occasional spice guides and product announcements.
+            </p>
+            <h2>Contact Regarding Privacy</h2>
+            <p className="section-desc">
+              If you have any questions regarding your submitted details, please reach out to us at <a href={`mailto:${siteIdentity.email}`}>{siteIdentity.email}</a>.
+            </p>
+          </div>
+        </div>
+      </section>
+    </>
+  );
 }
 
 export function TermsOfServicePage() {
-  return <>
-    <Breadcrumbs current="Terms of Service" />
-    <section className="journal-replica terms-page"><div className="container" style={{ maxWidth: 840 }}><p className="eyebrow">Website Terms</p><h1>Terms of Service</h1><p className="section-desc">These terms describe the general use of the HIPA Masalas website and its product-information, blog and enquiry features.</p><div className="article-body"><h2>Using this website</h2><p className="section-desc">You may use this website to read information about HIPA Masalas, review the current listed product range, read published guides and contact the team. Please use the website lawfully and do not attempt to disrupt, misuse or gain unauthorised access to any part of it.</p><h2>Product and enquiry information</h2><p className="section-desc">Product names, descriptions, pack details and availability shown on the website are current informational listings and may change. Pricing, commercial terms, minimum quantities, delivery, private-label and export details are confirmed directly by HIPA Masalas for each enquiry.</p><h2>Enquiry details</h2><p className="section-desc">When you submit an enquiry, provide information that is accurate enough for HIPA Masalas to respond. The website privacy page explains how submitted enquiry and newsletter details are handled.</p><h2>External links</h2><p className="section-desc">The website may link to external services such as WhatsApp, Google Maps and social-media pages. Those services have their own terms and privacy practices.</p><h2>Changes to these terms</h2><p className="section-desc">HIPA Masalas may update these website terms when the website features or information change. The current version will remain available on this page.</p><h2>Contact</h2><p className="section-desc">For questions about these terms or the information on this website, contact HIPA Masalas through the <Link href="/contact">Contact page</Link>.</p></div></div></section>
-  </>;
+  return (
+    <>
+      <Breadcrumbs current="Terms of Service" />
+      <section className="journal-replica terms-page">
+        <div className="container" style={{ maxWidth: 840 }}>
+          <p className="eyebrow">Website Terms</p>
+          <h1>Terms of Service</h1>
+          <p className="section-desc">
+            These terms govern the informational use of the HIPA Masalas website.
+          </p>
+          <div className="article-body">
+            <h2>Informational &amp; Enquiry Website</h2>
+            <p className="section-desc">
+              This website is published by HIPA Enterprises for informational, product discovery, and business enquiry purposes. It is not an e-commerce platform and does not conduct online financial transactions or automated order checkouts.
+            </p>
+            <h2>Product Information &amp; Availability</h2>
+            <p className="section-desc">
+              While we strive to keep all product specifications, pack sizes, and descriptions accurate and up to date, listings are subject to ongoing refinement. Commercial terms, minimum order quantities, and wholesale pricing are provided directly upon inquiry.
+            </p>
+            <h2>Intellectual Property</h2>
+            <p className="section-desc">
+              All branding, text, photographs, graphics, and layout on this website are the intellectual property of HIPA Enterprises and may not be copied or reproduced without prior written permission.
+            </p>
+            <h2>Contact</h2>
+            <p className="section-desc">
+              For any questions concerning these terms, contact us through our <Link href="/contact">Contact page</Link>.
+            </p>
+          </div>
+        </div>
+      </section>
+    </>
+  );
 }
 
 export function BlogPage() {
@@ -395,13 +1406,80 @@ export function BlogPage() {
   const normalizedQuery = query.trim().toLowerCase();
   const visibleArticles = (publishedPosts.data || []).filter((article) => !normalizedQuery || `${article.title} ${article.description}`.toLowerCase().includes(normalizedQuery));
 
-  return <>
-    <Breadcrumbs current="Blog" />
-    <section className="blog-live-hero"><div className="container"><p className="eyebrow">Recipes &amp; Spice Knowledge</p><h1>HIPA Masalas Blog</h1><p>Explore practical spice guides, South Indian cooking ideas and current product information from HIPA Masalas.</p></div></section>
-    <section className="blog-live-toolbar"><div className="container blog-live-toolbar-inner"><div className="blog-category-tabs" role="tablist" aria-label="Filter blog articles"><button className="is-active" type="button" role="tab" aria-selected="true">All</button></div><label className="blog-search-field"><span className="sr-only">Search blog articles</span><input value={query} type="search" name="blog-query" placeholder="Search blog articles..." onChange={(event) => setQuery(event.target.value)} /><span aria-hidden="true">⌕</span></label></div></section>
-    <section className="blog-live-collection"><div className="container">{publishedPosts.isLoading ? <div className="blog-live-empty"><span aria-hidden="true">▤</span><h2>Loading articles</h2><p>Please wait while the latest published articles load.</p></div> : publishedPosts.isError ? <div className="blog-live-empty"><span aria-hidden="true">▤</span><h2>Articles are temporarily unavailable</h2><p>Please try again shortly.</p></div> : visibleArticles.length ? <div className="blog-live-grid">{visibleArticles.map((article) => <article className="blog-live-card" key={article.slug}>{article.coverImageUrl ? <img className="blog-live-card-cover" src={article.coverImageUrl} alt={article.coverImageAlt || ""} loading="lazy" decoding="async" /> : null}<div className="blog-live-card-copy"><p className="eyebrow">HIPA Journal</p><h2>{article.title}</h2><p>{article.description}</p><Link href={`/blog/${article.slug}`} className="btn btn-outline btn-sm">Read Article <span className="arrow">→</span></Link></div></article>)}</div> : <div className="blog-live-empty"><span aria-hidden="true">▤</span><h2>{normalizedQuery ? "No articles found" : "Coming Soon"}</h2><p>{normalizedQuery ? "Try a different search term." : "Our latest blogs will appear here."}</p></div>}</div></section>
-    <section className="blog-live-newsletter"><div className="container blog-live-newsletter-inner"><div><h2>Stay Updated with HIPA Masalas</h2><p>Subscribe to receive practical spice guides, cooking tips and product updates.</p></div><NewsletterForm /></div></section>
-  </>;
+  return (
+    <>
+      <Breadcrumbs current="Blog" />
+      <section className="blog-live-hero">
+        <div className="container">
+          <p className="eyebrow">Recipes &amp; Spice Knowledge</p>
+          <h1>HIPA Masalas Blog</h1>
+          <p>Explore practical spice guides, South Indian cooking ideas and current product information from HIPA Masalas.</p>
+        </div>
+      </section>
+      <section className="blog-live-toolbar">
+        <div className="container blog-live-toolbar-inner">
+          <div className="blog-category-tabs" role="tablist" aria-label="Filter blog articles">
+            <button className="is-active" type="button" role="tab" aria-selected="true">All</button>
+          </div>
+          <label className="blog-search-field">
+            <span className="sr-only">Search blog articles</span>
+            <input value={query} type="search" name="blog-query" placeholder="Search blog articles..." onChange={(event) => setQuery(event.target.value)} />
+            <span aria-hidden="true">⌕</span>
+          </label>
+        </div>
+      </section>
+      <section className="blog-live-collection">
+        <div className="container">
+          {publishedPosts.isLoading ? (
+            <div className="blog-live-empty">
+              <span aria-hidden="true">▤</span>
+              <h2>Loading articles</h2>
+              <p>Please wait while the latest published articles load.</p>
+            </div>
+          ) : publishedPosts.isError ? (
+            <div className="blog-live-empty">
+              <span aria-hidden="true">▤</span>
+              <h2>Articles are temporarily unavailable</h2>
+              <p>Please try again shortly.</p>
+            </div>
+          ) : visibleArticles.length ? (
+            <div className="blog-live-grid">
+              {visibleArticles.map((article) => (
+                <article className="blog-live-card" key={article.slug}>
+                  {article.coverImageUrl ? (
+                    <img className="blog-live-card-cover" src={article.coverImageUrl} alt={article.coverImageAlt || ""} loading="lazy" decoding="async" />
+                  ) : null}
+                  <div className="blog-live-card-copy">
+                    <p className="eyebrow">HIPA Journal</p>
+                    <h2>{article.title}</h2>
+                    <p>{article.description}</p>
+                    <Link href={`/blog/${article.slug}`} className="btn btn-outline btn-sm">
+                      Read Article <span className="arrow">→</span>
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="blog-live-empty">
+              <span aria-hidden="true">▤</span>
+              <h2>{normalizedQuery ? "No articles found" : "Coming Soon"}</h2>
+              <p>{normalizedQuery ? "Try a different search term." : "Our latest blogs will appear here."}</p>
+            </div>
+          )}
+        </div>
+      </section>
+      <section className="blog-live-newsletter">
+        <div className="container blog-live-newsletter-inner">
+          <div>
+            <h2>Stay Updated with HIPA Masalas</h2>
+            <p>Subscribe to receive practical spice guides, cooking tips and product updates.</p>
+          </div>
+          <NewsletterForm />
+        </div>
+      </section>
+    </>
+  );
 }
 
 export function ArticlePage() {
@@ -415,9 +1493,15 @@ export function ArticlePage() {
   }, [article]);
 
   if (!article) {
-    return postQuery.isLoading
-      ? <section className="journal-replica"><div className="container"><p className="section-desc">Loading article…</p></div></section>
-      : <NotFoundPage />;
+    return postQuery.isLoading ? (
+      <section className="journal-replica">
+        <div className="container">
+          <p className="section-desc">Loading article…</p>
+        </div>
+      </section>
+    ) : (
+      <NotFoundPage />
+    );
   }
 
   const publishedDate = (article.publishedAt || article.createdAt).toISOString().slice(0, 10);
@@ -425,86 +1509,114 @@ export function ArticlePage() {
   const relatedResources = articleResourcesBySlug[article.slug] || [];
   const inlineResources = [...relatedResources, ...(articleInlineLinksBySlug[article.slug] || [])];
 
-  return <>
-    <Breadcrumbs current={article.title} />
-    <article className="journal-replica">
-      <div className="container" style={{ maxWidth: 840 }}>
-        <p className="eyebrow">HIPA Journal</p>
-        <h1>{article.title}</h1>
-        <p className="section-desc">By {article.authorName} · {publishedDate}</p>
-        {article.coverImageUrl && <img src={article.coverImageUrl} alt={article.coverImageAlt || ""} loading="eager" fetchPriority="high" decoding="async" style={{ borderRadius: 18, marginBottom: 28 }} />}
-        <div className="article-body">
-          {blocks.map((block, index) => {
-            switch (block.type) {
-              case "heading":
-                return <h2 key={`h2-${index}`}>{renderArticleInlineLinks(block.content, inlineResources)}</h2>;
-              case "subheading":
-                return <h3 key={`h3-${index}`}>{renderArticleInlineLinks(block.content, inlineResources)}</h3>;
-              case "blockquote":
-                return (
-                  <blockquote key={`bq-${index}`} className="article-blockquote">
-                    <p>{renderArticleInlineLinks(block.content, inlineResources)}</p>
-                  </blockquote>
-                );
-              case "list":
-                return (
-                  <ul key={`ul-${index}`} className="article-list">
-                    {block.items.map((item, i) => (
-                      <li key={`li-${i}`}>{renderArticleInlineLinks(item, inlineResources)}</li>
-                    ))}
-                  </ul>
-                );
-              case "ordered-list":
-                return (
-                  <ol key={`ol-${index}`} className="article-ordered-list">
-                    {block.items.map((item, i) => (
-                      <li key={`oli-${i}`}>{renderArticleInlineLinks(item, inlineResources)}</li>
-                    ))}
-                  </ol>
-                );
-              case "table":
-                return (
-                  <div key={`tbl-${index}`} className="article-table-wrap">
-                    <table className="article-table">
-                      <thead>
-                        <tr>
-                          {block.headers.map((h, i) => (
-                            <th key={`th-${i}`}>{renderArticleInlineLinks(h, inlineResources)}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {block.rows.map((row, ri) => (
-                          <tr key={`tr-${ri}`}>
-                            {row.map((cell, ci) => (
-                              <td key={`td-${ci}`}>{renderArticleInlineLinks(cell, inlineResources)}</td>
+  return (
+    <>
+      <Breadcrumbs current={article.title} parent={{ label: "Blog", href: "/blog" }} />
+      <article className="journal-replica">
+        <div className="container" style={{ maxWidth: 840 }}>
+          <p className="eyebrow">HIPA Journal</p>
+          <h1>{article.title}</h1>
+          <p className="section-desc">By {article.authorName} · {publishedDate}</p>
+          {article.coverImageUrl && (
+            <img
+              src={article.coverImageUrl}
+              alt={article.coverImageAlt || ""}
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+              style={{ borderRadius: 18, marginBottom: 28 }}
+            />
+          )}
+          <div className="article-body">
+            {blocks.map((block, index) => {
+              switch (block.type) {
+                case "heading":
+                  return <h2 key={`h2-${index}`}>{renderArticleInlineLinks(block.content, inlineResources)}</h2>;
+                case "subheading":
+                  return <h3 key={`h3-${index}`}>{renderArticleInlineLinks(block.content, inlineResources)}</h3>;
+                case "blockquote":
+                  return (
+                    <blockquote key={`bq-${index}`} className="article-blockquote">
+                      <p>{renderArticleInlineLinks(block.content, inlineResources)}</p>
+                    </blockquote>
+                  );
+                case "list":
+                  return (
+                    <ul key={`ul-${index}`} className="article-list">
+                      {block.items.map((item, i) => (
+                        <li key={`li-${i}`}>{renderArticleInlineLinks(item, inlineResources)}</li>
+                      ))}
+                    </ul>
+                  );
+                case "ordered-list":
+                  return (
+                    <ol key={`ol-${index}`} className="article-ordered-list">
+                      {block.items.map((item, i) => (
+                        <li key={`oli-${i}`}>{renderArticleInlineLinks(item, inlineResources)}</li>
+                      ))}
+                    </ol>
+                  );
+                case "table":
+                  return (
+                    <div key={`tbl-${index}`} className="article-table-wrap">
+                      <table className="article-table">
+                        <thead>
+                          <tr>
+                            {block.headers.map((h, i) => (
+                              <th key={`th-${i}`}>{renderArticleInlineLinks(h, inlineResources)}</th>
                             ))}
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                );
-              case "paragraph":
-              default:
-                return <p key={`p-${index}`} className="section-desc">{renderArticleInlineLinks(block.content, inlineResources)}</p>;
-            }
-          })}
+                        </thead>
+                        <tbody>
+                          {block.rows.map((row, ri) => (
+                            <tr key={`tr-${ri}`}>
+                              {row.map((cell, ci) => (
+                                <td key={`td-${ci}`}>{renderArticleInlineLinks(cell, inlineResources)}</td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  );
+                case "paragraph":
+                default:
+                  return <p key={`p-${index}`} className="section-desc">{renderArticleInlineLinks(block.content, inlineResources)}</p>;
+              }
+            })}
+          </div>
+          {relatedResources.length > 0 && (
+            <aside className="article-related-links" aria-labelledby="related-hipa-pages">
+              <p className="eyebrow">Continue exploring</p>
+              <h2 id="related-hipa-pages">Related HIPA pages</h2>
+              <p>Use these links to explore relevant product information or ask HIPA for further details.</p>
+              <ul>
+                {relatedResources.map((resource) => (
+                  <li key={resource.href}>
+                    <Link href={resource.href}>{resource.label}</Link>
+                    <span>{resource.detail}</span>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )}
         </div>
-        {relatedResources.length > 0 && <aside className="article-related-links" aria-labelledby="related-hipa-pages">
-          <p className="eyebrow">Continue exploring</p>
-          <h2 id="related-hipa-pages">Related HIPA pages</h2>
-          <p>Use these links to explore relevant product information or ask HIPA for further details.</p>
-          <ul>
-            {relatedResources.map((resource) => <li key={resource.href}>
-              <Link href={resource.href}>{resource.label}</Link>
-              <span>{resource.detail}</span>
-            </li>)}
-          </ul>
-        </aside>}
-      </div>
-    </article>
-  </>;
+      </article>
+    </>
+  );
 }
 
-export function NotFoundPage() { return <section className="journal-replica"><div className="container"><div className="empty-state"><p className="eyebrow">404</p><h1>That page is not available.</h1><p>The page may have moved to a clean HIPA URL or may not be ready for publication.</p><Link href="/" className="btn btn-primary">Return Home</Link></div></div></section>; }
+export function NotFoundPage() {
+  return (
+    <section className="journal-replica">
+      <div className="container">
+        <div className="empty-state">
+          <p className="eyebrow">404</p>
+          <h1>That page is not available.</h1>
+          <p>The page may have moved to a clean HIPA URL or may not be ready for publication.</p>
+          <Link href="/" className="btn btn-primary">Return Home</Link>
+        </div>
+      </div>
+    </section>
+  );
+}
