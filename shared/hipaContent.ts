@@ -58,7 +58,7 @@ export type PageHead = {
 };
 
 export const siteIdentity = {
-  name: "HIPA Masalas",
+  name: "HIPA Masala",
   legalName: "HIPA Enterprises",
   tagline: "Taste of Tradition",
   phone: "+91 70580 53055",
@@ -77,20 +77,20 @@ export const siteIdentity = {
   facebook: "https://www.facebook.com/profile.php?id=61592093192345",
   instagram: "https://www.instagram.com/hipa_masala/",
   whatsappHref:
-    "https://wa.me/917058053055?text=Hi%20HIPA%20Masalas%2C%20I%27d%20like%20to%20know%20more%20about%20your%20products.",
+    "https://wa.me/917058053055?text=Hi%20HIPA%20Masala%2C%20I%27d%20like%20to%20know%20more%20about%20your%20products.",
 } as const;
 
 export const products: Product[] = [
   {
     slug: "sambar-powder",
     name: "Sambar Powder",
-    seoTitle: "Sambar Powder | South Indian Sambar Masala | HIPA Masalas Chennai",
-    metaDescription: "HIPA Masalas Sambar Powder is a traditional South Indian spice blend crafted for authentic sambar. Available for homes, retailers and B2B in Chennai.",
+    seoTitle: "Sambar Powder | South Indian Sambar Masala | HIPA Masala Chennai",
+    metaDescription: "HIPA Masala Sambar Powder is a traditional South Indian spice blend crafted for authentic sambar. Available for homes, retailers and B2B in Chennai.",
     shortDescription: "A South Indian spice blend crafted for everyday authentic sambar.",
     description:
-      "HIPA Masalas Sambar Powder is formulated with selected coriander seeds, dried red chillies, cumin, fenugreek, lentils and aromatic spices for a balanced, traditional South Indian flavour.",
+      "HIPA Masala Sambar Powder is formulated with selected coriander seeds, dried red chillies, cumin, fenugreek, lentils and aromatic spices for a balanced, traditional South Indian flavour.",
     image: "/assets/sambar_96379996.png",
-    imageAlt: "HIPA Masalas Sambar Powder retail pack — South Indian sambar spice blend",
+    imageAlt: "HIPA Masala Sambar Powder retail pack — South Indian sambar spice blend",
     highlights: [
       "Traditional South Indian recipe formulation",
       "Aromatic coriander, cumin, fenugreek & roasted dal base",
@@ -100,7 +100,7 @@ export const products: Product[] = [
     packSizes: ["100g", "200g", "500g", "1kg"],
     whatIs: [
       "Sambar Powder is the cornerstone spice blend of South Indian cuisine. A classic sambar requires a harmonious balance of roasted lentils, whole spices, and sun-dried chillies to achieve its signature rich aroma and hearty texture.",
-      "HIPA Masalas Sambar Powder is prepared according to traditional culinary proportions. Each batch combines slow-roasted toor and chana lentils with fragrant coriander seeds, cumin, fenugreek, and select red chillies. The result is an authentic, full-bodied masala that dissolves smoothly into tamarind-vegetable broths without grittiness or artificial flavouring.",
+      "HIPA Masala Sambar Powder is prepared according to traditional culinary proportions. Each batch combines slow-roasted toor and chana lentils with fragrant coriander seeds, cumin, fenugreek, and select red chillies. The result is an authentic, full-bodied masala that dissolves smoothly into tamarind-vegetable broths without grittiness or artificial flavouring.",
       "Whether you are preparing a quick morning tiffin sambar for idlis and dosas or a slow-simmered feast sambar with drumsticks, shallots, and yellow pumpkin, this blend provides a dependable, consistent foundation that tastes just like home-ground masala.",
     ],
     ingredientsAndAroma: [
@@ -116,7 +116,7 @@ export const products: Product[] = [
     selectionFactors: [
       "Lentil Roast & Particle Fineness: Superior sambar powder requires properly roasted lentils that impart body without causing clumping when mixed into warm boiling broth.",
       "Freshness of Coriander & Fenugreek: Coriander must retain its essential oils for floral fragrance, while fenugreek must be carefully toasted to eliminate raw bitterness while retaining pleasant pungency.",
-      "Clean Sourcing & Consistent Quality: HIPA Masalas prioritises whole spices sourced and ground under hygienic conditions in Chennai, ensuring zero artificial colours, synthetic aromas, or chemical fillers.",
+      "Clean Sourcing & Consistent Quality: HIPA Masala prioritises whole spices sourced and ground under hygienic conditions in Chennai, ensuring zero artificial colours, synthetic aromas, or chemical fillers.",
     ],
     storageGuidance: [
       "Store in a cool, dry, and dark pantry space away from direct sunlight and stovetop steam.",
@@ -159,13 +159,13 @@ export const products: Product[] = [
   {
     slug: "rasam-powder",
     name: "Rasam Powder",
-    seoTitle: "Rasam Powder | South Indian Rasam Masala | HIPA Masalas Chennai",
-    metaDescription: "HIPA Masalas Rasam Powder delivers classic South Indian aroma with black pepper, cumin and coriander. Available for homes and food businesses in Chennai.",
+    seoTitle: "Rasam Powder | South Indian Rasam Masala | HIPA Masala Chennai",
+    metaDescription: "HIPA Masala Rasam Powder delivers classic South Indian aroma with black pepper, cumin and coriander. Available for homes and food businesses in Chennai.",
     shortDescription: "A fragrant South Indian spice blend crafted for light, aromatic everyday rasam.",
     description:
-      "HIPA Masalas Rasam Powder combines roasted cumin, whole black peppercorns, coriander seeds, lentils and red chillies for an authentic, soothing rasam experience.",
+      "HIPA Masala Rasam Powder combines roasted cumin, whole black peppercorns, coriander seeds, lentils and red chillies for an authentic, soothing rasam experience.",
     image: "/assets/rasam_b3831405.png",
-    imageAlt: "HIPA Masalas Rasam Powder retail pack — South Indian rasam spice blend",
+    imageAlt: "HIPA Masala Rasam Powder retail pack — South Indian rasam spice blend",
     highlights: [
       "Pepper and cumin-forward aromatic balance",
       "Ideal for quick tomato, tamarind, and pepper rasam preparations",
@@ -175,7 +175,7 @@ export const products: Product[] = [
     packSizes: ["100g", "200g", "500g", "1kg"],
     whatIs: [
       "Rasam is the soul of South Indian comfort food — a light, tangy, and aromatic broth celebrated both as a daily meal staple and as a traditional digestive soup.",
-      "HIPA Masalas Rasam Powder captures the vibrant essence of traditional home-pounded rasam podi. Formulated with a dominant base of tellicherry black pepper and aromatic cumin seeds, balanced by whole coriander and toasted lentils, it releases an invigorating aroma the moment it hits hot tamarind water.",
+      "HIPA Masala Rasam Powder captures the vibrant essence of traditional home-pounded rasam podi. Formulated with a dominant base of tellicherry black pepper and aromatic cumin seeds, balanced by whole coriander and toasted lentils, it releases an invigorating aroma the moment it hits hot tamarind water.",
       "The coarse-to-medium grind is carefully calibrated so the essential oils infuse quickly during a gentle simmer, giving you the classic froth and peppery bite that South Indian rasam lovers expect.",
     ],
     ingredientsAndAroma: [
@@ -226,7 +226,7 @@ export const products: Product[] = [
       },
       {
         question: "Are bulk quantities available for restaurants and caterers?",
-        answer: "Yes, HIPA Masalas supplies 500g, 1kg, and custom bulk bags for hotels, canteens, and catering contractors in Chennai and surrounding areas.",
+        answer: "Yes, HIPA Masala supplies 500g, 1kg, and custom bulk bags for hotels, canteens, and catering contractors in Chennai and surrounding areas.",
       },
     ],
     relatedProductSlugs: ["sambar-powder", "pepper-powder", "cumin-powder"],
@@ -234,13 +234,13 @@ export const products: Product[] = [
   {
     slug: "turmeric-powder",
     name: "Turmeric Powder",
-    seoTitle: "Turmeric Powder | Haldi Powder for Indian Cooking | HIPA Masalas",
-    metaDescription: "HIPA Masalas Turmeric Powder is finely ground from selected turmeric rhizomes for rich golden colour and warm earthy flavour. Chennai, Tamil Nadu.",
+    seoTitle: "Turmeric Powder | Haldi Powder for Indian Cooking | HIPA Masala",
+    metaDescription: "HIPA Masala Turmeric Powder is finely ground from selected turmeric rhizomes for rich golden colour and warm earthy flavour. Chennai, Tamil Nadu.",
     shortDescription: "Pure ground turmeric powder with natural golden colour and earthy aroma.",
     description:
-      "HIPA Masalas Turmeric Powder is processed from carefully chosen whole turmeric rhizomes, delivering a rich natural golden colour, warm earthy aroma, and pure culinary quality.",
+      "HIPA Masala Turmeric Powder is processed from carefully chosen whole turmeric rhizomes, delivering a rich natural golden colour, warm earthy aroma, and pure culinary quality.",
     image: "/assets/turmeric_1bd08fa7.png",
-    imageAlt: "HIPA Masalas Turmeric Powder retail pack — ground turmeric for Indian cooking",
+    imageAlt: "HIPA Masala Turmeric Powder retail pack — ground turmeric for Indian cooking",
     highlights: [
       "Vibrant natural golden yellow colour",
       "Finely milled for uniform blending in gravies and marinades",
@@ -250,7 +250,7 @@ export const products: Product[] = [
     packSizes: ["100g", "200g", "500g", "1kg"],
     whatIs: [
       "Turmeric (Haldi / Manjal) is the sacred golden foundation of Indian cooking, revered for millennia for its vibrant pigmentation, warm earthy fragrance, and natural health-supporting properties.",
-      "HIPA Masalas Turmeric Powder is produced from high-quality dried turmeric fingers (Curcuma longa). The rhizomes are thoroughly cleaned, gently polished, and low-temperature ground to preserve their natural essential oils and active curcumin content.",
+      "HIPA Masala Turmeric Powder is produced from high-quality dried turmeric fingers (Curcuma longa). The rhizomes are thoroughly cleaned, gently polished, and low-temperature ground to preserve their natural essential oils and active curcumin content.",
       "Our turmeric powder delivers an authentic bright yellow colour that enlivens dals, vegetable stir-fries, and gravies without leaving any chalky residue, bitter aftertaste, or artificial colouring agents.",
     ],
     ingredientsAndAroma: [
@@ -309,13 +309,13 @@ export const products: Product[] = [
   {
     slug: "red-chilli-powder",
     name: "Red Chilli Powder",
-    seoTitle: "Red Chilli Powder | Indian Chilli Powder | HIPA Masalas Chennai",
-    metaDescription: "HIPA Masalas Red Chilli Powder offers balanced heat and vibrant colour for Indian cooking. Ground from quality dried red chillies in Chennai.",
+    seoTitle: "Red Chilli Powder | Indian Chilli Powder | HIPA Masala Chennai",
+    metaDescription: "HIPA Masala Red Chilli Powder offers balanced heat and vibrant colour for Indian cooking. Ground from quality dried red chillies in Chennai.",
     shortDescription: "Pure ground red chilli powder delivering balanced heat and rich culinary colour.",
     description:
-      "HIPA Masalas Red Chilli Powder is milled from selected sun-dried red chillies, offering an optimal balance of sharp pungency, deep natural red colour, and clean flavour.",
+      "HIPA Masala Red Chilli Powder is milled from selected sun-dried red chillies, offering an optimal balance of sharp pungency, deep natural red colour, and clean flavour.",
     image: "/assets/hipa-red-chilli-powder-pack_2e2de7c8.webp",
-    imageAlt: "HIPA Masalas Red Chilli Powder retail pack — ground red chilli for Indian cooking",
+    imageAlt: "HIPA Masala Red Chilli Powder retail pack — ground red chilli for Indian cooking",
     highlights: [
       "Balanced pungency and vibrant natural red tone",
       "Uniform fine grind for smooth sauces, gravies and tandoori bases",
@@ -325,7 +325,7 @@ export const products: Product[] = [
     packSizes: ["100g", "200g", "500g", "1kg"],
     whatIs: [
       "Red Chilli Powder (Lal Mirch Powder / Milagai Thool) is the primary driver of fiery warmth, depth, and vibrant colour in Indian cuisine.",
-      "HIPA Masalas Red Chilli Powder is processed from mature, sun-dried red chillies with stems removed. We select chillies that offer the perfect intersection of appetising natural red pigmentation and a calibrated, pleasant heat level that enlivens curries without overpowering delicate secondary spices.",
+      "HIPA Masala Red Chilli Powder is processed from mature, sun-dried red chillies with stems removed. We select chillies that offer the perfect intersection of appetising natural red pigmentation and a calibrated, pleasant heat level that enlivens curries without overpowering delicate secondary spices.",
       "Milled to a uniform fine consistency, it dissolves evenly in hot oil and ghee during tadka, creating a rich red gravy sheen (rogan) that enhances both the taste and presentation of everyday meals.",
     ],
     ingredientsAndAroma: [
@@ -384,13 +384,13 @@ export const products: Product[] = [
   {
     slug: "coriander-powder",
     name: "Coriander Powder",
-    seoTitle: "Coriander Powder | Ground Dhania for Indian Cooking | HIPA Masalas",
-    metaDescription: "HIPA Masalas Coriander Powder brings fresh, mild citrusy aroma and body to curries, gravies and marinades. Available in Chennai and across India.",
+    seoTitle: "Coriander Powder | Ground Dhania for Indian Cooking | HIPA Masala",
+    metaDescription: "HIPA Masala Coriander Powder brings fresh, mild citrusy aroma and body to curries, gravies and marinades. Available in Chennai and across India.",
     shortDescription: "Aromatic ground coriander powder providing mild citrusy notes and rich gravy body.",
     description:
-      "HIPA Masalas Coriander Powder is ground from cleaned whole coriander seeds (dhania), imparting a refreshing mild citrusy aroma and essential gravy consistency to everyday curries.",
+      "HIPA Masala Coriander Powder is ground from cleaned whole coriander seeds (dhania), imparting a refreshing mild citrusy aroma and essential gravy consistency to everyday curries.",
     image: "/assets/coriander_6db70131.png",
-    imageAlt: "HIPA Masalas Coriander Powder retail pack — ground coriander for Indian cooking",
+    imageAlt: "HIPA Masala Coriander Powder retail pack — ground coriander for Indian cooking",
     highlights: [
       "Mild, cooling and subtly citrusy flavour profile",
       "Adds rich body and thickness to traditional Indian gravies and curries",
@@ -400,7 +400,7 @@ export const products: Product[] = [
     packSizes: ["100g", "200g", "500g", "1kg"],
     whatIs: [
       "Coriander Powder (Dhania Powder / Kothamalli Thool) is the unsung hero of the Indian spice rack. While chillies provide heat and turmeric gives colour, coriander powder provides the foundational substance, body, and gentle sweetness in Indian curries and sauces.",
-      "HIPA Masalas Coriander Powder is produced from select whole green-to-golden coriander seeds that have been sun-dried and precision-milled. This retains their delicate linalool essential oils, delivering a pleasant floral-citrus fragrance when cooked.",
+      "HIPA Masala Coriander Powder is produced from select whole green-to-golden coriander seeds that have been sun-dried and precision-milled. This retains their delicate linalool essential oils, delivering a pleasant floral-citrus fragrance when cooked.",
       "Its naturally fibrous structure acts as a gentle thickening agent, turning watery tomato-onion gravies into luscious, cohesive curry sauces without requiring artificial starches or flours.",
     ],
     ingredientsAndAroma: [
@@ -459,13 +459,13 @@ export const products: Product[] = [
   {
     slug: "cumin-powder",
     name: "Cumin Powder",
-    seoTitle: "Cumin Powder | Jeera Powder for Indian Cooking | HIPA Masalas",
-    metaDescription: "HIPA Masalas Cumin Powder is ground from aromatic cumin seeds, delivering warm, earthy depth to dals, stir-fries and buttermilk. Chennai, Tamil Nadu.",
+    seoTitle: "Cumin Powder | Jeera Powder for Indian Cooking | HIPA Masala",
+    metaDescription: "HIPA Masala Cumin Powder is ground from aromatic cumin seeds, delivering warm, earthy depth to dals, stir-fries and buttermilk. Chennai, Tamil Nadu.",
     shortDescription: "Aromatic ground cumin powder with intense earthy warmth and roasted notes.",
     description:
-      "HIPA Masalas Cumin Powder is milled from aromatic cumin seeds (jeera), offering an intense warm, nutty aroma and digestive benefits for both cooked dishes and finishing seasonings.",
+      "HIPA Masala Cumin Powder is milled from aromatic cumin seeds (jeera), offering an intense warm, nutty aroma and digestive benefits for both cooked dishes and finishing seasonings.",
     image: "/assets/cumin_cd53cea5.png",
-    imageAlt: "HIPA Masalas Cumin Powder retail pack — ground cumin for Indian cooking",
+    imageAlt: "HIPA Masala Cumin Powder retail pack — ground cumin for Indian cooking",
     highlights: [
       "Deeply roasted aroma and warm earthy notes",
       "Versatile for cooking, tadka bases, chaats, and cooling beverages",
@@ -475,7 +475,7 @@ export const products: Product[] = [
     packSizes: ["100g", "200g", "500g"],
     whatIs: [
       "Cumin Powder (Jeera Powder / Seeraga Thool) is one of the most distinctive and widely utilised spices in world gastronomy, occupying a place of honour in Indian, Middle Eastern, and Latin culinary traditions.",
-      "HIPA Masalas Cumin Powder is prepared from selected whole cumin seeds known for their high cuminaldehyde oil content. The seeds undergo gentle cleaning and controlled milling to produce a fine, fragrant powder that immediately releases its warm, nutty, and slightly smoky aroma upon contact with heat.",
+      "HIPA Masala Cumin Powder is prepared from selected whole cumin seeds known for their high cuminaldehyde oil content. The seeds undergo gentle cleaning and controlled milling to produce a fine, fragrant powder that immediately releases its warm, nutty, and slightly smoky aroma upon contact with heat.",
       "Whether bloomed in ghee for a classic dal tadka, stirred into cooling spiced buttermilk (mor / chaas), or dusted over fresh cucumber raita, this cumin powder delivers robust flavour and natural digestive comfort in every pinch.",
     ],
     ingredientsAndAroma: [
@@ -526,7 +526,7 @@ export const products: Product[] = [
       },
       {
         question: "Are trade quantities available for distributors?",
-        answer: "Yes, HIPA Masalas provides commercial master cartons for retailers, supermarket suppliers, and regional distributors.",
+        answer: "Yes, HIPA Masala provides commercial master cartons for retailers, supermarket suppliers, and regional distributors.",
       },
     ],
     relatedProductSlugs: ["coriander-powder", "pepper-powder", "rasam-powder"],
@@ -534,13 +534,13 @@ export const products: Product[] = [
   {
     slug: "pepper-powder",
     name: "Pepper Powder",
-    seoTitle: "Black Pepper Powder | Ground Pepper for Indian Cooking | HIPA Masalas",
-    metaDescription: "HIPA Masalas Black Pepper Powder delivers sharp, pungent heat and robust aroma from selected black peppercorns. Ground in Chennai, Tamil Nadu.",
+    seoTitle: "Black Pepper Powder | Ground Pepper for Indian Cooking | HIPA Masala",
+    metaDescription: "HIPA Masala Black Pepper Powder delivers sharp, pungent heat and robust aroma from selected black peppercorns. Ground in Chennai, Tamil Nadu.",
     shortDescription: "Pure ground black pepper powder with robust piperine heat and sharp woody aroma.",
     description:
-      "HIPA Masalas Black Pepper Powder is milled from premium sun-dried black peppercorns (Piper nigrum), providing a sharp, pungent bite and warm aroma for traditional South Indian and global recipes.",
+      "HIPA Masala Black Pepper Powder is milled from premium sun-dried black peppercorns (Piper nigrum), providing a sharp, pungent bite and warm aroma for traditional South Indian and global recipes.",
     image: "/assets/pepper_36d6b66d.png",
-    imageAlt: "HIPA Masalas Pepper Powder retail pack — ground black pepper for cooking",
+    imageAlt: "HIPA Masala Pepper Powder retail pack — ground black pepper for cooking",
     highlights: [
       "Bold piperine heat and fresh peppery fragrance",
       "Consistent grind suitable for direct seasoning and simmering",
@@ -550,7 +550,7 @@ export const products: Product[] = [
     packSizes: ["50g", "100g", "200g", "500g"],
     whatIs: [
       "Black Pepper, historically crowned as the 'King of Spices', is indigenous to the lush Western Ghats of Southern India and has been traded across the globe for thousands of years.",
-      "HIPA Masalas Pepper Powder is milled from high-density, fully mature sun-dried black peppercorns. Selected for their rich piperine content and robust essential oil concentration, these peppercorns are gently crushed to achieve a medium-fine grind that releases explosive aroma upon contact with food.",
+      "HIPA Masala Pepper Powder is milled from high-density, fully mature sun-dried black peppercorns. Selected for their rich piperine content and robust essential oil concentration, these peppercorns are gently crushed to achieve a medium-fine grind that releases explosive aroma upon contact with food.",
       "Unlike pre-ground commercial powders that lose their punch, HIPA Pepper Powder delivers a sharp, clean peppery heat followed by complex piney and citrusy undertones that elevate morning eggs, comforting Ven Pongal, and fiery Chettinad gravies alike.",
     ],
     ingredientsAndAroma: [
@@ -609,13 +609,13 @@ export const products: Product[] = [
   {
     slug: "garam-masala",
     name: "Garam Masala",
-    seoTitle: "Garam Masala | Aromatic Indian Spice Blend | HIPA Masalas Chennai",
-    metaDescription: "HIPA Masalas Garam Masala is an aromatic blend of whole spices providing warm, finishing depth to biryanis, curries and gravies. Chennai, Tamil Nadu.",
+    seoTitle: "Garam Masala | Aromatic Indian Spice Blend | HIPA Masala Chennai",
+    metaDescription: "HIPA Masala Garam Masala is an aromatic blend of whole spices providing warm, finishing depth to biryanis, curries and gravies. Chennai, Tamil Nadu.",
     shortDescription: "An exquisite blend of aromatic whole spices for finishing curries, gravies and biryanis.",
     description:
-      "HIPA Masalas Garam Masala brings together cinnamon, cloves, cardamom, cumin, black pepper, and fragrant whole spices for a rich, regal aroma in royal Indian dishes.",
+      "HIPA Masala Garam Masala brings together cinnamon, cloves, cardamom, cumin, black pepper, and fragrant whole spices for a rich, regal aroma in royal Indian dishes.",
     image: "/assets/garam-masala_6b465bcd.png",
-    imageAlt: "HIPA Masalas Garam Masala retail pack — aromatic Indian spice blend",
+    imageAlt: "HIPA Masala Garam Masala retail pack — aromatic Indian spice blend",
     highlights: [
       "Exquisite warm aromatic profile with cinnamon, clove & cardamom",
       "Ideal finishing spice to sprinkle towards the end of cooking",
@@ -625,7 +625,7 @@ export const products: Product[] = [
     packSizes: ["100g", "200g", "500g"],
     whatIs: [
       "Garam Masala (literally 'warm spice blend') represents the pinnacle of Indian spice blending artistry, bringing together the most prized whole sweet and savoury aromatics into a harmonious finish.",
-      "HIPA Masalas Garam Masala is formulated following classic culinary traditions. We balance warm whole spices — including Ceylon cinnamon quills, aromatic green cardamom, pungent cloves, black cardamom, star anise, nutmeg, and mace — with toasted cumin and black pepper.",
+      "HIPA Masala Garam Masala is formulated following classic culinary traditions. We balance warm whole spices — including Ceylon cinnamon quills, aromatic green cardamom, pungent cloves, black cardamom, star anise, nutmeg, and mace — with toasted cumin and black pepper.",
       "Unlike harsh, chilli-heavy commercial mixtures, our blend focuses purely on fragrance and depth. When sprinkled over a simmering dish in its final minutes of cooking, the residual heat releases an unforgettable regal aroma that transforms everyday gravies into restaurant-quality delicacies.",
     ],
     ingredientsAndAroma: [
@@ -684,27 +684,27 @@ export const products: Product[] = [
 ];
 
 export const faqs: Faq[] = [
-  // Cluster 1: About HIPA Masalas & Sourcing
+  // Cluster 1: About HIPA Masala & Sourcing
   {
-    question: "What is HIPA Masalas and who owns the brand?",
-    answer: "HIPA Masalas is a premier Indian spice and masala brand owned and operated by HIPA Enterprises, based in Pallavaram, Chennai, Tamil Nadu, India. The brand provides authentic, high-quality pure spice powders and traditional masala blends for home kitchens, catering businesses, and retail partners.",
+    question: "What is HIPA Masala and who owns the brand?",
+    answer: "HIPA Masala is a premier Indian spice and masala brand owned and operated by HIPA Enterprises, based in Pallavaram, Chennai, Tamil Nadu, India. The brand provides authentic, high-quality pure spice powders and traditional masala blends for home kitchens, catering businesses, and retail partners.",
   },
   {
-    question: "Where is HIPA Masalas located in Chennai?",
-    answer: "HIPA Masalas is located at Plot No. 10, (Highway Colony), 5th Main Road, Zamin Pallavaram, Highway Nagar, Perumal Nagar, Old Pallavaram, Chennai – 600117, Tamil Nadu, India.",
+    question: "Where is HIPA Masala located in Chennai?",
+    answer: "HIPA Masala is located at Plot No. 10, (Highway Colony), 5th Main Road, Zamin Pallavaram, Highway Nagar, Perumal Nagar, Old Pallavaram, Chennai – 600117, Tamil Nadu, India.",
   },
   {
     question: "How are HIPA spice powders processed and packaged?",
     answer: "Our spices are carefully sourced from reputed cultivation regions across India, cleaned, gently processed to preserve essential oils, and packed under strict hygienic standards in tamper-evident food-grade pouches.",
   },
   {
-    question: "Do HIPA Masalas products contain artificial colours, MSG, or chemical preservatives?",
-    answer: "No. All HIPA Masalas products are 100% free from artificial food colourings, added MSG, synthetic preservatives, and foreign fillers. What you get is pure, authentic spice goodness.",
+    question: "Do HIPA Masala products contain artificial colours, MSG, or chemical preservatives?",
+    answer: "No. All HIPA Masala products are 100% free from artificial food colourings, added MSG, synthetic preservatives, and foreign fillers. What you get is pure, authentic spice goodness.",
   },
 
   // Cluster 2: Product Range & Culinary Usage
   {
-    question: "What products are currently available in the HIPA Masalas range?",
+    question: "What products are currently available in the HIPA Masala range?",
     answer: "Our current product range includes 8 signature spices and blends: Sambar Powder, Rasam Powder, Turmeric Powder, Red Chilli Powder, Coriander Powder, Cumin Powder, Black Pepper Powder, and Garam Masala.",
   },
   {
@@ -717,7 +717,7 @@ export const faqs: Faq[] = [
   },
   {
     question: "What is the shelf life of HIPA spice powders?",
-    answer: "HIPA Masalas products have a shelf life of 12 months from the date of manufacture when stored in a cool, dry place away from direct moisture and sunlight.",
+    answer: "HIPA Masala products have a shelf life of 12 months from the date of manufacture when stored in a cool, dry place away from direct moisture and sunlight.",
   },
 
   // Cluster 3: B2B Enquiries, Wholesale & Contact
@@ -730,86 +730,224 @@ export const faqs: Faq[] = [
     answer: "You can submit a direct business enquiry through our B2B Enquiries page, email us at info@hipamasalas.com, call us at +91 70580 53055, or reach out directly on WhatsApp.",
   },
   {
-    question: "Does HIPA Masalas support export and out-of-state distribution enquiries?",
+    question: "Does HIPA Masala support export and out-of-state distribution enquiries?",
     answer: "Yes, we welcome inquiries from domestic regional distributors outside Tamil Nadu as well as international merchant exporters seeking authentic South Indian spice products.",
   },
   {
-    question: "How can I contact HIPA Masalas for customer support?",
+    question: "How can I contact HIPA Masala for customer support?",
     answer: "You can call us at +91 70580 53055, send an email to info@hipamasalas.com, or use the instant WhatsApp chat button on our website for prompt assistance.",
   },
 ];
 
 export const articles: Article[] = [
   {
-    slug: "best-masala-manufacturer-in-chennai",
-    title: "Best Masala Manufacturer in Chennai? What Buyers Should Actually Check",
-    description: "Looking for the best masala manufacturer in Chennai? Use this practical checklist to assess blends, packs, consistency, B2B fit and supplier communication.",
-    body: [
-      "Finding the best masala manufacturer in Chennai is not only about comparing a price list. Restaurants, retailers, distributors, caterers and hotels need a supplier whose products fit their menu, pack requirements and expectations for repeatable flavour. The right decision comes from checking practical evidence before regular buying."
+    "slug": "best-masala-manufacturer-in-chennai",
+    "title": "Best Masala Manufacturer in Chennai? What Buyers Should Actually Check",
+    "description": "Looking for the best masala manufacturer in Chennai? Use this practical checklist to assess blends, packs, consistency, B2B fit and supplier communication.",
+    "body": [
+      "Finding the **best masala manufacturer in Chennai** is not only about comparing a price list. Restaurants, retailers, distributors, caterers and hotels need a supplier whose products fit their menu, pack requirements and expectations for repeatable flavour. The right decision comes from checking practical evidence before regular buying.",
+      "## Answer first: what makes the best masala manufacturer in Chennai?",
+      "The best masala manufacturer in Chennai is the one that can demonstrate a suitable product range, a clear ingredient and processing approach, useful pack formats, dependable communication and a workable fit for your business. A manufacturer may be a good choice for one buyer and a poor fit for another: a restaurant may prioritise blend performance in high-volume cooking, while a retailer may care more about consumer-ready packs and range breadth."
     ],
-    authorName: "HIPA Masalas",
-    publishedAt: "2026-09-24T09:00:00.000Z",
-    modifiedAt: "2026-09-24T09:00:00.000Z",
-    image: "/assets/best-masala-manufacturer-in-chennai.webp",
-    imageAlt: "B2B buyer guide cover showing supplier comparison documents in a Chennai food-industry setting",
-    complete: true,
+    "authorName": "HIPA Masala",
+    "publishedAt": "2026-09-24T09:00:00.000Z",
+    "modifiedAt": "2026-09-24T09:00:00.000Z",
+    "image": "/assets/best-masala-manufacturer-in-chennai.webp",
+    "imageAlt": "B2B buyer guide cover showing supplier comparison documents in a Chennai food-industry setting",
+    "complete": true
   },
   {
-    slug: "how-to-choose-a-masala-manufacturer-in-chennai-for-your-business",
-    title: "How to Choose a Masala Manufacturer in Chennai for Your Business",
-    description: "Learn how Chennai food businesses can compare masala manufacturers by product fit, processing, pack sizes, consistency and B2B communication.",
-    body: [
-      "Choosing a masala manufacturer in Chennai is a commercial decision, not just a search for a spice powder supplier. Restaurants, retailers, distributors, caterers, hotels and other food businesses need a partner whose products, pack formats and communication fit the way they buy and operate."
+    "slug": "how-to-choose-a-masala-manufacturer-in-chennai-for-your-business",
+    "title": "How to Choose a Masala Manufacturer in Chennai for Your Business",
+    "description": "Learn how Chennai food businesses can compare masala manufacturers by product fit, processing, pack sizes, consistency and B2B communication.",
+    "body": [
+      "Choosing a **masala manufacturer in Chennai** is a commercial decision, not just a search for a spice powder supplier. Restaurants, retailers, distributors, caterers, hotels and other food businesses need a partner whose products, pack formats and communication fit the way they buy and operate.",
+      "**Answer first:** compare manufacturers on five practical points: the masala range you actually need, the stated approach to ingredient selection and processing, pack sizes for your sales or kitchen use, how the supplier addresses consistency, and how clearly the business handles B2B enquiries. Then ask for product and commercial details before making a purchase decision. This process helps a Chennai buyer assess suitability without relying on broad promises.",
+      "## Why the right masala manufacturer in Chennai matters"
     ],
-    authorName: "HIPA Masalas",
-    publishedAt: "2026-09-24T09:00:00.000Z",
-    modifiedAt: "2026-09-24T09:00:00.000Z",
-    image: "/assets/how-to-choose-masala-manufacturer-in-chennai.webp",
-    imageAlt: "B2B guide cover showing a supplier selection and procurement workspace in a food manufacturing environment",
-    complete: true,
+    "authorName": "HIPA Masala",
+    "publishedAt": "2026-09-24T09:00:00.000Z",
+    "modifiedAt": "2026-09-24T09:00:00.000Z",
+    "image": "/assets/how-to-choose-masala-manufacturer-in-chennai.webp",
+    "imageAlt": "B2B guide cover showing a supplier selection and procurement workspace in a food manufacturing environment",
+    "complete": true
   },
   {
-    slug: "what-makes-a-good-masala-manufacturer-8-things-buyers-should-check",
-    title: "What Makes a Good Masala Manufacturer? 8 Things Buyers Should Check",
-    description: "Learn what restaurants, retailers and distributors should check before choosing a masala manufacturer or spice manufacturer in Chennai and Tamil Nadu.",
-    body: [
-      "Choosing a masala manufacturer is a business decision, not only a taste test. Restaurants, retailers, distributors, caterers, hotels and other food businesses need a spice manufacturer whose products, pack formats and communication fit the way they buy and sell. This guide gives buyers a practical framework for comparing suppliers without relying on vague promises."
+    "slug": "what-makes-a-good-masala-manufacturer-8-things-buyers-should-check",
+    "title": "What Makes a Good Masala Manufacturer? 8 Things Buyers Should Check",
+    "description": "Learn what restaurants, retailers and distributors should check before choosing a masala manufacturer or spice manufacturer in Chennai and Tamil Nadu.",
+    "body": [
+      "Choosing a masala manufacturer is a business decision, not only a taste test. Restaurants, retailers, distributors, caterers, hotels and other food businesses need a spice manufacturer whose products, pack formats and communication fit the way they buy and sell. This guide gives buyers a practical framework for comparing suppliers without relying on vague promises.",
+      "## What should you look for in a masala manufacturer?",
+      "A good masala manufacturer should make its product range and intended use clear, explain how it approaches ingredient selection and processing, offer formats that suit the buyer’s operation, and communicate consistently about batches and support. Buyers should check eight areas: product fit, ingredient approach, processing, blend method, consistency, packaging and pack size, B2B suitability, and accessible business communication. The right choice is the supplier that can answer these questions clearly and match the answer to your day-to-day requirements."
     ],
-    authorName: "HIPA Masalas",
-    publishedAt: "2026-09-24T09:00:00.000Z",
-    modifiedAt: "2026-09-24T09:00:00.000Z",
-    image: "/assets/what-makes-a-good-masala-manufacturer.webp",
-    imageAlt: "B2B quality guide cover showing quality-control and process documents in a food manufacturing environment",
-    complete: true,
+    "authorName": "HIPA Masala",
+    "publishedAt": "2026-09-24T09:00:00.000Z",
+    "modifiedAt": "2026-09-24T09:00:00.000Z",
+    "image": "/assets/what-makes-a-good-masala-manufacturer.webp",
+    "imageAlt": "B2B quality guide cover showing quality-control and process documents in a food manufacturing environment",
+    "complete": true
   },
   {
-    slug: "masala-manufacturer-vs-supplier-vs-distributor",
-    title: "Masala Manufacturer Chennai vs Supplier vs Distributor: What’s the Difference?",
-    description: "Learn the difference between a masala manufacturer, supplier and distributor in Chennai, and choose the right spice partner for your business.",
-    body: [
-      "When a restaurant, retailer, hotel, caterer or food business searches for a masala manufacturer Chennai partner or a masala supplier Chennai contact, the terms can sound interchangeable. They are not. A manufacturer makes or processes the masala, a supplier arranges products for business buyers, and a distributor moves products through a wider channel."
+    "slug": "masala-manufacturer-vs-supplier-vs-distributor",
+    "title": "Masala Manufacturer Chennai vs Supplier vs Distributor: What’s the Difference?",
+    "description": "Learn the difference between a masala manufacturer, supplier and distributor in Chennai, and choose the right spice partner for your business.",
+    "body": [
+      "When a restaurant, retailer, hotel, caterer or food business searches for a **masala manufacturer Chennai** partner or a **masala supplier Chennai** contact, the terms can sound interchangeable. They are not. A manufacturer makes or processes the masala, a supplier arranges products for business buyers, and a distributor moves products through a wider channel. Understanding the difference helps you ask better questions, compare the right options and choose a relationship that fits your purchasing needs.",
+      "## Quick answer: manufacturer, supplier and distributor are different roles",
+      "A **masala manufacturer** produces, processes, blends or packs spice products under its own operation or brand. A **masala supplier** is a business-facing source that provides products to a buyer; it may supply its own manufactured range or arrange products from another producer. A **distributor** purchases or handles products for resale to retailers, food-service buyers or other trade customers, usually with a focus on territory, stock movement and delivery. One company can perform more than one role, so the label alone is not enough. Ask who makes the product, who owns the customer relationship and who is responsible for fulfilment."
     ],
-    authorName: "HIPA Masalas",
-    publishedAt: "2026-09-24T09:00:00.000Z",
-    modifiedAt: "2026-09-24T09:00:00.000Z",
-    image: "/assets/masala-manufacturer-vs-supplier-vs-distributor.webp",
-    imageAlt: "B2B channel guide cover showing manufacturing, supply and distribution logistics in Chennai",
-    complete: true,
+    "authorName": "HIPA Masala",
+    "publishedAt": "2026-09-24T09:00:00.000Z",
+    "modifiedAt": "2026-09-24T09:00:00.000Z",
+    "image": "/assets/masala-manufacturer-vs-supplier-vs-distributor.webp",
+    "imageAlt": "B2B supply chain guide cover showing manufacturer, supplier and distributor stages in a food-industry facility",
+    "complete": true
   },
   {
-    slug: "masala-manufacturer-for-restaurants-retailers-chennai",
-    title: "How to Evaluate a Masala Manufacturer for Restaurants / Retailers Chennai",
-    description: "Practical guide for Chennai restaurants and retailers on evaluating masala manufacturers by menu fit, pack sizes, consistency and B2B communication.",
-    body: [
-      "Evaluating a masala manufacturer for restaurants / retailers Chennai operations requires a structured approach. Food businesses need spice blends that deliver consistent flavour, institutional or retail pack sizes, and reliable supply communication."
+    "slug": "masala-manufacturer-for-restaurants-retailers-chennai",
+    "title": "How to Evaluate a Masala Manufacturer for Restaurants / Retailers Chennai",
+    "description": "A practical Chennai buyer guide for evaluating masala manufacturers on consistency, formats, sourcing, support and fit for food businesses.",
+    "body": [
+      "Choosing a **masala manufacturer for restaurants / retailers Chennai** is not simply a packet-price comparison. Restaurants need dependable flavour in repeated cooking. Retailers need a sensible range and pack formats. Distributors need clear communication across business types. Start with operational fit, product transparency and the supplier’s ability to discuss your requirements.",
+      "## Answer first: what should a Chennai buyer evaluate?",
+      "Restaurants, retailers, distributors, caterers, hotels and other food businesses should assess five areas: range, stated production approach, institutional pack suitability, support conversations, and location or communication convenience. Ask for exact products and formats, understand stated ingredient and processing information, and compare how clearly the supplier answers practical questions. Treat claims such as low-temperature milling, slow-roasting, no artificial dyes or batch consistency as the manufacturer’s stated approach unless independently verified."
     ],
-    authorName: "HIPA Masalas",
-    publishedAt: "2026-09-24T09:00:00.000Z",
-    modifiedAt: "2026-09-24T09:00:00.000Z",
-    image: "/assets/how-to-evaluate-masala-manufacturer-in-chennai.webp",
-    imageAlt: "B2B commercial kitchen and retail procurement evaluation workspace in Chennai",
-    complete: true,
+    "authorName": "HIPA Masala",
+    "publishedAt": "2026-09-24T09:00:00.000Z",
+    "modifiedAt": "2026-09-24T09:00:00.000Z",
+    "image": "/assets/how-to-evaluate-masala-manufacturer-in-chennai.webp",
+    "imageAlt": "B2B buyer guide cover showing supplier evaluation documents in a commercial food-industry setting",
+    "complete": true
   },
+  {
+    "slug": "masala-supplier-for-supermarkets-in-chennai",
+    "title": "Masala Supplier for Supermarkets in Chennai: What Retail Buyers Should Check",
+    "description": "A practical guide for supermarket and retail buyers evaluating masala suppliers in Chennai. Learn what to check for shelf suitability, pack sizes, and supplier communication.",
+    "body": [
+      "Supermarket buyers need more than a masala product list. They need a supplier with a relevant product range, clear pack information, dependable communication, and products that fit the needs of local shoppers. When evaluating a **masala supplier for supermarkets in Chennai**, retailers should consider product demand, shelf suitability, available pack sizes, labelling, supply communication, and future enquiry support.",
+      "**HIPA Masala is a Chennai-based Indian spice and masala brand serving everyday consumers and enquiries from distributors, dealers, wholesalers, retailers, supermarkets, restaurants, and exporters.** The current range includes spice powders and masala blends for everyday Indian cooking.",
+      "This guide explains what supermarket buyers should check before selecting a masala supplier in Chennai, how to evaluate a product range, what information to include in a retailer enquiry, and how the current HIPA Masala range may fit a supermarket shelf."
+    ],
+    "authorName": "HIPA Masala",
+    "publishedAt": "2026-09-10T11:16:00.000Z",
+    "modifiedAt": "2026-09-10T11:16:00.000Z",
+    "image": "/assets/masala-supplier-supermarkets-chennai-cover.jpg",
+    "imageAlt": "Masala Supplier for Supermarkets in Chennai - HIPA Masala",
+    "complete": true
+  },
+  {
+    "slug": "what-makes-a-good-spice-powder",
+    "title": "What Makes a Good Spice Powder? A Simple Buying Guide",
+    "description": "Learn practical, general checks for choosing spice powders, including label clarity, storage information, pack condition and recipe suitability.",
+    "body": [
+      "## What makes a good spice powder?",
+      "A good spice powder should be easy to identify, easy to store and suitable for the recipe you plan to cook. Choosing a powder does not require complicated rules. Begin with the label, the condition of the pack and the role that the powder will play in your kitchen.",
+      "## Match the powder to the recipe"
+    ],
+    "authorName": "HIPA Masala",
+    "publishedAt": "2026-08-25T09:02:59.000Z",
+    "modifiedAt": "2026-08-25T09:34:13.000Z",
+    "image": "/assets/hipa-original-good-spice-cover-web_caaa742d.webp",
+    "imageAlt": "Original HIPA guide cover for choosing a good spice powder",
+    "complete": true
+  },
+  {
+    "slug": "true-cost-of-your-spice-supplier",
+    "title": "Understanding the Total Cost of a Spice Supplier",
+    "description": "Learn general factors to consider beyond unit price when evaluating spice suppliers, including clarity, suitability and product-information needs.",
+    "body": [
+      "## Understanding the total cost of a spice supplier",
+      "Price is an important part of a purchasing decision, but it is not the only point to consider when evaluating a spice supplier. The total cost of a product can also be affected by how clearly information is presented, whether the item suits the intended use and how easily questions can be answered before a decision is made.",
+      "## Start by defining the requirement"
+    ],
+    "authorName": "HIPA Masala",
+    "publishedAt": "2026-08-25T09:02:59.000Z",
+    "modifiedAt": "2026-08-25T09:34:13.000Z",
+    "image": "/assets/hipa-original-supplier-cost-cover-web_493aea4d.webp",
+    "imageAlt": "Original HIPA guide cover about evaluating the total cost of a spice supplier",
+    "complete": true
+  },
+  {
+    "slug": "south-indian-lunch-box-recipes",
+    "title": "10 South Indian Lunch Box Recipes for Busy Mornings",
+    "description": "Explore ten practical South Indian lunch box ideas for busy mornings, from rice dishes to simple sambar and rasam pairings.",
+    "body": [
+      "## South Indian lunch box recipes for busy mornings",
+      "Busy mornings are easier when lunch box ideas are simple, familiar and easy to prepare in advance. South Indian cooking offers many practical options built around rice, vegetables, lentils, curd and straightforward spice blends. A short weekly plan can reduce last-minute decisions and make it easier to rotate meals.",
+      "## 1. Lemon rice"
+    ],
+    "authorName": "HIPA Masala",
+    "publishedAt": "2026-08-25T09:02:59.000Z",
+    "modifiedAt": "2026-08-25T09:34:13.000Z",
+    "image": "/assets/hipa-original-lunch-box-cover-web_d0df26a5.webp",
+    "imageAlt": "Original HIPA guide cover for South Indian lunch box recipes",
+    "complete": true
+  },
+  {
+    "slug": "how-spice-quality-affects-food-taste",
+    "title": "How Spice Quality Affects Food Taste and Consistency",
+    "description": "Learn how freshness, storage, label clarity and gradual seasoning can affect taste and consistency in everyday cooking.",
+    "body": [
+      "## How spice quality can affect food taste and consistency",
+      "Spice powders influence the aroma, colour and overall character of everyday dishes. When a familiar recipe tastes different from one attempt to the next, the cause is not always the recipe itself. The type of powder selected, the condition of the pack, storage habits and the quantity used can all affect how a spice powder is handled in the kitchen.",
+      "## Start with the right type of powder"
+    ],
+    "authorName": "HIPA Masala",
+    "publishedAt": "2026-08-25T09:02:59.000Z",
+    "modifiedAt": "2026-08-25T09:34:13.000Z",
+    "image": "/assets/hipa-original-spice-quality-cover-web_966bae04.webp",
+    "imageAlt": "Original HIPA guide cover about spice quality, food taste and consistency",
+    "complete": true
+  },
+  {
+    "slug": "garam-masala-vs-other-indian-masalas",
+    "title": "Garam Masala vs Other Indian Masalas: What’s the Difference?",
+    "description": "Understand the general culinary differences between garam masala, sambar powder, rasam powder, curry-style blends and single-spice powders.",
+    "body": [
+      "## Garam masala vs other Indian masalas: the short answer",
+      "Garam masala, sambar powder, rasam powder and single-spice powders are used for different cooking purposes. The simplest way to choose between them is to start with the dish you are making, then select the powder or blend that the recipe calls for. Using the right type of powder can make it easier to follow a familiar recipe and adjust the seasoning gradually.",
+      "## What is garam masala used for?"
+    ],
+    "authorName": "HIPA Masala",
+    "publishedAt": "2026-08-25T09:02:59.000Z",
+    "modifiedAt": "2026-08-25T09:34:13.000Z",
+    "image": "/assets/hipa-original-garam-masala-cover-web_977e210e.webp",
+    "imageAlt": "Original HIPA guide cover comparing garam masala with other Indian masalas",
+    "complete": true
+  },
+  {
+    "slug": "how-to-read-a-spice-powder-label",
+    "title": "What to Look for When Buying Spices: 8 Spice Label Checks",
+    "description": "Learn eight practical label checks to use when choosing spice powders, including product name, ingredients, dates, storage details and pack condition.",
+    "body": [
+      "## Why the label matters",
+      "Reading a spice powder label can make everyday shopping easier. A clear label helps you identify what the product is, how it is intended to be used and what information to check before you take it home. Instead of relying only on the front design of a pack, use the label as a practical reference when comparing spice powders for your kitchen.",
+      "## 1. Start with the product name"
+    ],
+    "authorName": "HIPA Masala",
+    "publishedAt": "2026-08-25T07:40:22.000Z",
+    "modifiedAt": "2026-08-25T09:34:13.000Z",
+    "image": "/assets/hipa-original-spice-label-cover-web_458a4d2d.webp",
+    "imageAlt": "Original HIPA guide cover showing a person checking a spice powder label",
+    "complete": true
+  },
+  {
+    "slug": "how-to-choose-sambar-powder",
+    "title": "How to Choose Sambar Powder for Everyday Cooking",
+    "description": "Learn practical ways to choose a sambar powder for everyday cooking, including recipe fit, label checks, storage and gradual seasoning.",
+    "body": [
+      "## Start with the dish you are cooking",
+      "Choosing sambar powder for everyday cooking starts with the dish you plan to make and the flavour profile your household enjoys. Sambar is often prepared with lentils, vegetables and tamarind, but every household has its own preferred balance of aroma, heat and seasoning. Begin with a clearly named sambar powder and a familiar recipe so you can notice how the blend works in your usual cooking.",
+      "## Read the product name carefully"
+    ],
+    "authorName": "HIPA Masala",
+    "publishedAt": "2026-08-25T07:39:38.000Z",
+    "modifiedAt": "2026-08-25T09:34:13.000Z",
+    "image": "/assets/hipa-original-sambar-blog-cover-web_727590c6.webp",
+    "imageAlt": "Original HIPA guide cover showing sambar powder, a bowl of sambar and whole spices",
+    "complete": true
+  }
 ];
 
 export function getProduct(slug: string): Product | null {
@@ -822,9 +960,9 @@ export function getProductFaqs(product: Product): Faq[] {
   }
   const packs = product.packSizes?.join(", ") || "the current listed pack sizes";
   return [
-    { question: `What is HIPA Masalas ${product.name} used for?`, answer: product.description },
-    { question: `What pack sizes are shown for HIPA Masalas ${product.name}?`, answer: `The current listed pack sizes for HIPA Masalas ${product.name} are ${packs}. Contact HIPA Masalas for the latest product and pack information.` },
-    { question: `How can I enquire about HIPA Masalas ${product.name}?`, answer: `Use the Enquire Now or WhatsApp Enquiry option on the ${product.name} page to ask HIPA Masalas for current product information.` },
+    { question: `What is HIPA Masala ${product.name} used for?`, answer: product.description },
+    { question: `What pack sizes are shown for HIPA Masala ${product.name}?`, answer: `The current listed pack sizes for HIPA Masala ${product.name} are ${packs}. Contact HIPA Masala for the latest product and pack information.` },
+    { question: `How can I enquire about HIPA Masala ${product.name}?`, answer: `Use the Enquire Now or WhatsApp Enquiry option on the ${product.name} page to ask HIPA Masala for current product information.` },
   ];
 }
 
@@ -847,25 +985,25 @@ export function getIndexablePaths() {
 }
 
 const defaultDescription =
-  "Discover HIPA Masalas spice powders, masala blends and current product information from Chennai, Tamil Nadu.";
+  "Discover HIPA Masala spice powders, masala blends and current product information from Chennai, Tamil Nadu.";
 
 export function getPageHead(pathname: string): PageHead {
   const path = pathname.replace(/\/+$/, "") || "/";
 
   if (path === "/") {
     return {
-      title: "HIPA Masalas | Indian Spice Powders & Masala Blends, Chennai",
-      description: "HIPA Masalas is an Indian spice and masala brand in Pallavaram, Chennai, offering Sambar, Rasam, Turmeric, Chilli, Coriander, Cumin, Pepper and Garam Masala.",
+      title: "HIPA Masala | Indian Spice Powders & Masala Blends, Chennai",
+      description: "HIPA Masala is an Indian spice and masala brand in Pallavaram, Chennai, offering Sambar, Rasam, Turmeric, Chilli, Coriander, Cumin, Pepper and Garam Masala.",
       canonicalPath: "/",
       ogImage: siteIdentity.heroImage,
-      ogImageAlt: "HIPA Masalas spice powder collection",
+      ogImageAlt: "HIPA Masala spice powder collection",
     };
   }
 
   if (path === "/products") {
     return {
-      title: "Masala Powders & Spice Blends | HIPA Masalas",
-      description: "Browse the current HIPA Masalas range of spice powders and masala blends. Contact HIPA for product and pack information.",
+      title: "Masala Powders & Spice Blends | HIPA Masala",
+      description: "Browse the current HIPA Masala range of spice powders and masala blends. Contact HIPA for product and pack information.",
       canonicalPath: path,
       ogImage: products[0]?.image,
       ogImageAlt: products[0]?.imageAlt,
@@ -875,9 +1013,9 @@ export function getPageHead(pathname: string): PageHead {
   const productMatch = path.match(/^\/products\/([^/]+)$/);
   if (productMatch) {
     const product = getProduct(productMatch[1]);
-    if (!product) return { title: "Page not found | HIPA Masalas", description: defaultDescription, notFound: true };
+    if (!product) return { title: "Page not found | HIPA Masala", description: defaultDescription, notFound: true };
     return {
-      title: product.seoTitle || `${product.name} | HIPA Masalas`,
+      title: product.seoTitle || `${product.name} | HIPA Masala`,
       description: product.metaDescription || product.description,
       canonicalPath: path,
       ogImage: product.image,
@@ -887,40 +1025,40 @@ export function getPageHead(pathname: string): PageHead {
 
   if (path === "/faq") {
     return {
-      title: "Frequently Asked Questions | HIPA Masalas Chennai",
-      description: "Find answers about HIPA Masalas products, ingredients, pack sizes, Chennai location, and B2B enquiry options.",
+      title: "Frequently Asked Questions | HIPA Masala Chennai",
+      description: "Find answers about HIPA Masala products, ingredients, pack sizes, Chennai location, and B2B enquiry options.",
       canonicalPath: path,
     };
   }
 
   if (path === "/contact") {
     return {
-      title: "Contact HIPA Masalas | Chennai | Phone, Email & WhatsApp",
-      description: "Get in touch with HIPA Masalas in Pallavaram, Chennai. Phone +91 70580 53055, email info@hipamasalas.com, or message us directly on WhatsApp.",
+      title: "Contact HIPA Masala | Chennai | Phone, Email & WhatsApp",
+      description: "Get in touch with HIPA Masala in Pallavaram, Chennai. Phone +91 70580 53055, email info@hipamasalas.com, or message us directly on WhatsApp.",
       canonicalPath: path,
     };
   }
 
   if (path === "/about") {
     return {
-      title: "About HIPA Masalas | Indian Spice Brand in Chennai",
-      description: "Learn about HIPA Masalas, an Indian spice and masala brand based in Pallavaram, Chennai, offering traditional spice blends for homes and businesses.",
+      title: "About HIPA Masala | Indian Spice Brand in Chennai",
+      description: "Learn about HIPA Masala, an Indian spice and masala brand based in Pallavaram, Chennai, offering traditional spice blends for homes and businesses.",
       canonicalPath: path,
     };
   }
 
   if (path === "/b2b-enquiries") {
     return {
-      title: "B2B Enquiries | Wholesale & Distribution | HIPA Masalas Chennai",
-      description: "Contact HIPA Masalas for wholesale spice supply, retail distribution, supermarket supply, and bulk catering enquiries in Chennai and beyond.",
+      title: "B2B Enquiries | Wholesale & Distribution | HIPA Masala Chennai",
+      description: "Contact HIPA Masala for wholesale spice supply, retail distribution, supermarket supply, and bulk catering enquiries in Chennai and beyond.",
       canonicalPath: path,
     };
   }
 
   if (path === "/blog") {
     return {
-      title: "HIPA Masalas Blog | Spice & Cooking Guides",
-      description: "Read HIPA Masalas guides about spice selection, South Indian cooking and practical product information.",
+      title: "HIPA Masala Blog | Spice & Cooking Guides",
+      description: "Read HIPA Masala guides about spice selection, South Indian cooking and practical product information.",
       canonicalPath: path,
     };
   }
@@ -928,9 +1066,9 @@ export function getPageHead(pathname: string): PageHead {
   const articleMatch = path.match(/^\/blog\/([^/]+)$/);
   if (articleMatch) {
     const article = getArticle(articleMatch[1]);
-    if (!article) return { title: "Page not found | HIPA Masalas", description: defaultDescription, notFound: true };
+    if (!article) return { title: "Page not found | HIPA Masala", description: defaultDescription, notFound: true };
     return {
-      title: `${article.title} | HIPA Masalas`,
+      title: `${article.title} | HIPA Masala`,
       description: article.description,
       canonicalPath: path,
       ogType: "article",
@@ -942,18 +1080,18 @@ export function getPageHead(pathname: string): PageHead {
   }
 
   if (path === "/privacy") {
-    return { title: "Privacy Policy | HIPA Masalas", description: "Learn how HIPA Masalas uses enquiry and newsletter details submitted through this website.", canonicalPath: path, noindex: true };
+    return { title: "Privacy Policy | HIPA Masala", description: "Learn how HIPA Masala uses enquiry and newsletter details submitted through this website.", canonicalPath: path, noindex: true };
   }
 
   if (path === "/terms-of-service") {
-    return { title: "Terms of Service | HIPA Masalas", description: "Review the general terms for using the HIPA Masalas website and its product-information and enquiry features.", canonicalPath: path, noindex: true };
+    return { title: "Terms of Service | HIPA Masala", description: "Review the general terms for using the HIPA Masala website and its product-information and enquiry features.", canonicalPath: path, noindex: true };
   }
 
   if (path === "/admin" || path.startsWith("/admin/")) {
-    return { title: "HIPA Masalas Admin", description: defaultDescription, noindex: true };
+    return { title: "HIPA Masala Admin", description: defaultDescription, noindex: true };
   }
 
-  return { title: "Page not found | HIPA Masalas", description: defaultDescription, notFound: true };
+  return { title: "Page not found | HIPA Masala", description: defaultDescription, notFound: true };
 }
 
 function absoluteUrl(origin: string, path: string) {
@@ -995,7 +1133,7 @@ export function getStructuredData(pathname: string, origin: string, articleOverr
     legalName: siteIdentity.legalName,
     url: absoluteUrl(origin, "/"),
     logo: absoluteUrl(origin, siteIdentity.logo),
-    description: "HIPA Masalas is an Indian spice and masala brand owned by HIPA Enterprises, based in Pallavaram, Chennai, Tamil Nadu, India.",
+    description: "HIPA Masala is an Indian spice and masala brand owned by HIPA Enterprises, based in Pallavaram, Chennai, Tamil Nadu, India.",
     email: siteIdentity.email,
     telephone: siteIdentity.phone,
     address: postalAddress,

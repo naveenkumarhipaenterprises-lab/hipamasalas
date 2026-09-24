@@ -1,9 +1,9 @@
-// HIPA Masalas — Knowledge Base Data
+// HIPA Masala — Knowledge Base Data
 // This structured knowledge object is injected into the Gemini API prompt.
 
 export const HIPA_KNOWLEDGE_BASE = {
   brand: {
-    name: "HIPA Masalas",
+    name: "HIPA Masala",
     tagline: "Taste of Tradition",
     location: "Plot No. 10, (Highway Colony), 5th Main Road, Zamin Pallavaram, Highway Nagar, Perumal Nagar, Old Pallavaram, Chennai – 600117, Tamil Nadu, India",
     address: "Plot No. 10, (Highway Colony), 5th Main Road, Zamin Pallavaram, Highway Nagar, Perumal Nagar, Old Pallavaram, Chennai – 600117, Tamil Nadu, India",

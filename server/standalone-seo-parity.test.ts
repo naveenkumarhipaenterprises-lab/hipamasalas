@@ -5,7 +5,7 @@ import { getIndexablePaths, getPageHead, getProduct, getProductFaqs, getStructur
 
 describe("standalone SEO parity", () => {
   it("keeps the validated official HIPA entity with complete address and LocalBusiness schema", () => {
-    expect(siteIdentity.name).toBe("HIPA Masalas");
+    expect(siteIdentity.name).toBe("HIPA Masala");
     expect(siteIdentity.legalName).toBe("HIPA Enterprises");
     expect(siteIdentity.locationLabel).toBe("Plot No. 10, (Highway Colony), 5th Main Road, Zamin Pallavaram, Highway Nagar, Perumal Nagar, Old Pallavaram, Chennai – 600117, Tamil Nadu, India");
     expect(siteIdentity.address.postalCode).toBe("600117");
@@ -19,7 +19,7 @@ describe("standalone SEO parity", () => {
       expect(getPageHead(`/products/${product.slug}`).notFound).toBeUndefined();
       expect(product.whatIs.length).toBeGreaterThan(0);
       expect(product.specs.length).toBeGreaterThan(0);
-      expect(product.seoTitle).toContain("HIPA Masalas");
+      expect(product.seoTitle).toContain("HIPA Masala");
     }
   });
 
@@ -29,7 +29,7 @@ describe("standalone SEO parity", () => {
     const schemas = getStructuredData("/products/sambar-powder", "https://www.hipamasalas.com");
     expect(schemas.map((schema) => schema["@type"])).toEqual(expect.arrayContaining(["Product"]));
     expect(getPageHead("/privacy")).toMatchObject({ canonicalPath: "/privacy", noindex: true });
-    expect(getPageHead("/about")).toMatchObject({ title: "About HIPA Masalas | Indian Spice Brand in Chennai", canonicalPath: "/about" });
+    expect(getPageHead("/about")).toMatchObject({ title: "About HIPA Masala | Indian Spice Brand in Chennai", canonicalPath: "/about" });
     expect(getPageHead("/terms-of-service")).toMatchObject({ canonicalPath: "/terms-of-service", noindex: true });
     expect(getStructuredData("/about", "https://www.hipamasalas.com").map((schema) => schema["@type"])).toContain("BreadcrumbList");
     expect(getStructuredData("/", "https://www.hipamasalas.com").map((schema) => schema["@type"])).toContain("LocalBusiness");

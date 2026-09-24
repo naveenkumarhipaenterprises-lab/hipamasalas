@@ -1,4 +1,4 @@
-# HIPA Masalas Independent Website Source
+# HIPA Masala Independent Website Source
 
 This is a portable React, Vite, Express and tRPC source export. Every public website image is included under `client/public/assets`, and all public image references use local `/assets/...` paths. No hosted assets from the previous build environment are required.
 

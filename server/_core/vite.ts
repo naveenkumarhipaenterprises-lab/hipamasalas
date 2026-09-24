@@ -5,7 +5,7 @@ import superjson from "superjson";
 import { getStructuredData, type PageHead } from "../../shared/hipaContent";
 
 const canonicalOrigin = (process.env.CANONICAL_ORIGIN || "https://www.hipamasalas.com").replace(/\/$/, "");
-const siteName = process.env.SITE_NAME ?? "HIPA Masalas";
+const siteName = process.env.SITE_NAME ?? "HIPA Masala";
 
 function escapeHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
@@ -89,7 +89,7 @@ export function serveStatic(app: Express) {
     } catch (error) {
       console.error("[SSR] render failed, serving shell:", error);
       const template = await fs.promises.readFile(templatePath, "utf-8");
-      res.status(200).set({ "Content-Type": "text/html", "Cache-Control": "no-cache" }).end(template.replace("<!--app-head-->", () => buildHead({ title: siteName, description: "HIPA Masalas product and enquiry information." })));
+      res.status(200).set({ "Content-Type": "text/html", "Cache-Control": "no-cache" }).end(template.replace("<!--app-head-->", () => buildHead({ title: siteName, description: "HIPA Masala product and enquiry information." })));
     }
   });
 }

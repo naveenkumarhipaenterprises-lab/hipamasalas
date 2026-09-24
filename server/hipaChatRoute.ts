@@ -1,9 +1,9 @@
 import type { Express, Request, Response } from "express";
 
-export const HIPA_SYSTEM_PROMPT = `You are a real human team member at HIPA Masalas in Old Pallavaram, Chennai, Tamil Nadu. Talk warmly, naturally, and wittily to visitors on the official HIPA website like a friendly, helpful colleague chatting on WhatsApp.
+export const HIPA_SYSTEM_PROMPT = `You are a real human team member at HIPA Masala in Old Pallavaram, Chennai, Tamil Nadu. Talk warmly, naturally, and wittily to visitors on the official HIPA website like a friendly, helpful colleague chatting on WhatsApp.
 
 IDENTITY & BRAND VALUES:
-- Brand Name: HIPA Masalas (Taste of Tradition), a unit of HIPA Enterprises.
+- Brand Name: HIPA Masala (Taste of Tradition), a unit of HIPA Enterprises.
 - Location: Plot No. 10, (Highway Colony), 5th Main Road, Zamin Pallavaram, Highway Nagar, Perumal Nagar, Old Pallavaram, Chennai – 600117, Tamil Nadu, India.
 - Pillars: Traditional stone-ground processing, farm-to-factory quality control, no artificial colours, no unnecessary additives.
 - Contact: Phone/WhatsApp: +91 70580 53055 | Email: info@hipamasalas.com | Website: https://www.hipamasalas.com
@@ -32,11 +32,11 @@ HOW TO ANSWER VISITORS (HUMAN TALKING RULES):
 
 3. CASUAL BANTER vs SALES:
    - "hi" / "hello" / "epdi iruka?" -> Respond warmly and casually ("Nalla iruken 😄 Neenga epdi irukinga?") without forcing a sales pitch.
-   - "thank you" / "nandri" -> Respond warmly ("Most welcome! 😊 Happy cooking with HIPA Masalas! Vera edhavadhu help venum-na sollunga!").
+   - "thank you" / "nandri" -> Respond warmly ("Most welcome! 😊 Happy cooking with HIPA Masala! Vera edhavadhu help venum-na sollunga!").
 
 4. BUSINESS & B2B BULK ORDERS (HOTELS, RESTAURANTS, CATERERS, DISTRIBUTORS):
    - If user mentions "hotel", "restaurant", "bulk", "50kg", "100kg", "wholesale", "catering", or asks for bulk supply:
-     * Immediately acknowledge bulk supply capability ("Super! HIPA Masalas-la hotel, restaurant & commercial bulk orders supply panrom 🏨📦.").
+     * Immediately acknowledge bulk supply capability ("Super! HIPA Masala-la hotel, restaurant & commercial bulk orders supply panrom 🏨📦.").
      * Ask for required product name, estimated monthly quantity (kg), and city location in 1 single friendly sentence.
      * Share direct sales contact: +91 70580 53055 / info@hipamasalas.com.
 
@@ -152,11 +152,11 @@ function getIntelligentFallback(input: string, history: Array<{ role: string; co
 
   // Greetings & Casual Conversation
   if (msg.includes("epdi iruka") || msg.includes("epdi irukinga") || msg.includes("how are you")) {
-    return "Nalla iruken 😄 Neenga epdi irukinga? HIPA Masalas website-ku welcome!";
+    return "Nalla iruken 😄 Neenga epdi irukinga? HIPA Masala website-ku welcome!";
   }
 
   if (msg === "hi" || msg === "hello" || msg === "hey" || msg === "vanakkam") {
-    return "Hey 👋 Welcome to HIPA Masalas! Enna cooking or product help venum?";
+    return "Hey 👋 Welcome to HIPA Masala! Enna cooking or product help venum?";
   }
 
   if (msg.includes("saptiya") || msg.includes("saapadu")) {
@@ -164,25 +164,25 @@ function getIntelligentFallback(input: string, history: Array<{ role: string; co
   }
 
   if (msg.includes("thank") || msg.includes("nandri") || msg.includes("thx") || msg === "ok thankyou" || msg === "okay thankyou") {
-    return "Most welcome! 😊 Happy cooking with HIPA Masalas! Vera edhavadhu help venum-na sollunga!";
+    return "Most welcome! 😊 Happy cooking with HIPA Masala! Vera edhavadhu help venum-na sollunga!";
   }
 
   // Bulk & Commercial Requirements
   if (msg.includes("bulk") || msg.includes("hotel") || msg.includes("wholesale") || msg.includes("catering") || msg.includes("commercial") || msg.includes("supply")) {
-    return "Super! HIPA Masalas-la hotel & commercial bulk orders supply panrom 🏨📦. Enna product & monthly quantity venum sollunga! Direct sales contact: +91 70580 53055 / info@hipamasalas.com";
+    return "Super! HIPA Masala-la hotel & commercial bulk orders supply panrom 🏨📦. Enna product & monthly quantity venum sollunga! Direct sales contact: +91 70580 53055 / info@hipamasalas.com";
   }
 
   // Product List
   if (msg.includes("product") || msg.includes("list") || msg.includes("masala") || msg.includes("what do you have")) {
-    return "HIPA Masalas offers authentic Sambar Powder, Rasam Powder, Garam Masala, Turmeric, Red Chilli, Thaniya, Seeragam, Pepper, Garlic Podi & Paruppu Podi! Order & product details-ku HIPA team contact: +91 70580 53055 / info@hipamasalas.com";
+    return "HIPA Masala offers authentic Sambar Powder, Rasam Powder, Garam Masala, Turmeric, Red Chilli, Thaniya, Seeragam, Pepper, Garlic Podi & Paruppu Podi! Order & product details-ku HIPA team contact: +91 70580 53055 / info@hipamasalas.com";
   }
 
   // Recipe Guidance
   if (msg.includes("recipe") || msg.includes("sambar epdi") || msg.includes("rasam epdi")) {
-    return "Simple-a sollren 😄 HIPA Masalas authentic traditional spices use panni easy-a cook pannalam! Sambar & Rasam powders 50g to 1kg packs-la kidaikudhu.";
+    return "Simple-a sollren 😄 HIPA Masala authentic traditional spices use panni easy-a cook pannalam! Sambar & Rasam powders 50g to 1kg packs-la kidaikudhu.";
   }
 
-  return "Got it! 👍 HIPA Masalas products, recipes, or bulk order details pathi edhavadhu kekka poringala? HIPA team direct contact: +91 70580 53055 / info@hipamasalas.com!";
+  return "Got it! 👍 HIPA Masala products, recipes, or bulk order details pathi edhavadhu kekka poringala? HIPA team direct contact: +91 70580 53055 / info@hipamasalas.com!";
 }
 
 export function registerHipaChatRoute(app: Express) {
@@ -233,7 +233,7 @@ export function registerHipaChatRoute(app: Express) {
       process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
     res.json({
-      name: "HIPA Masalas AI Assistant API",
+      name: "HIPA Masala AI Assistant API",
       status: "ok",
       hasGeminiKey: Boolean(apiKey && apiKey !== "your_free_gemini_api_key_here"),
       model: process.env.GEMINI_MODEL || "gemini-1.5-flash",

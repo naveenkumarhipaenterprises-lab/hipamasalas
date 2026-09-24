@@ -21,7 +21,7 @@ const emptyForm: BlogForm = {
   slug: "",
   description: "",
   body: "",
-  authorName: "HIPA Masalas",
+  authorName: "HIPA Masala",
   coverImageUrl: "",
   coverImageAlt: "",
   status: "draft",
@@ -193,7 +193,7 @@ export function AdminBlogPage() {
     <main className="admin-blog-shell">
       <div className="admin-blog-topbar">
         <div>
-          <p className="admin-kicker">HIPA Masalas</p>
+          <p className="admin-kicker">HIPA Masala</p>
           <h1>Blog administration</h1>
           <p>Draft an article privately, then select “Published” when it is ready to appear on the website.</p>
         </div>
@@ -296,7 +296,7 @@ export function AdminBlogPage() {
                     title: form.title.trim(),
                     description: form.description.trim(),
                     body: form.body.trim(),
-                    authorName: form.authorName.trim() || "HIPA Masalas",
+                    authorName: form.authorName.trim() || "HIPA Masala",
                     coverImageUrl: form.coverImageUrl.trim() || null,
                     coverImageAlt: form.coverImageAlt.trim() || null,
                     status: form.status,

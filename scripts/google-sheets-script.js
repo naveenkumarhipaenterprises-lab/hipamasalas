@@ -1,8 +1,8 @@
 /**
- * Google Apps Script for HIPA Masalas Website
+ * Google Apps Script for HIPA Masala Website
  * 
  * Instructions:
- * 1. Open Google Sheets (https://sheets.new) and create a new spreadsheet named "HIPA Masalas - Enquiries".
+ * 1. Open Google Sheets (https://sheets.new) and create a new spreadsheet named "HIPA Masala - Enquiries".
  * 2. Rename the first sheet tab to "Enquiries".
  * 3. Add these header columns in Row 1:
  *    A: Timestamp | B: Full Name | C: Mobile Number | D: Email | E: City / Region | F: Business Type | G: Volume | H: Product | I: Message | J: Source

@@ -1,6 +1,6 @@
 # Vercel Deployment Guide (Zero-Database Architecture)
 
-The HIPA Masalas website uses a fast, reliable, zero-database architecture:
+The HIPA Masala website uses a fast, reliable, zero-database architecture:
 - **Hosting**: Vercel Serverless & Static CDN
 - **Blog Content**: Git-backed (`data/blog-posts.json`)
 - **Customer & B2B Enquiries**: Direct integration with Google Sheets

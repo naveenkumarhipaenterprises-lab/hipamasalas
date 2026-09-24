@@ -42,7 +42,7 @@ export function NewsletterForm() {
     <button className="btn btn-primary" type="submit" disabled={subscribeMutation.isPending} data-analytics-event="newsletter_submit">
       {subscribeMutation.isPending ? "Subscribing…" : "Subscribe"}
     </button>
-    <label className="newsletter-consent"><input name="newsletterConsent" type="checkbox" required /> <span>I agree that HIPA Masalas may use my email for product updates.</span></label>
+    <label className="newsletter-consent"><input name="newsletterConsent" type="checkbox" required /> <span>I agree that HIPA Masala may use my email for product updates.</span></label>
     {status === "error" && <p className="newsletter-error" role="alert">We could not record your subscription. Please try again.</p>}
   </form>;
 }

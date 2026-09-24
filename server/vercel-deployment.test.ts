@@ -30,7 +30,7 @@ describe("Vercel deployment configuration", () => {
     expect(packageJson.scripts.start).toContain("server/index.ts");
     expect(fs.existsSync(path.join(projectRoot, "client", "public", "assets", "hipa-masalas-brochure.pdf"))).toBe(true);
     const homePage = fs.readFileSync(path.join(projectRoot, "client", "src", "pages", "HipaPages.tsx"), "utf8");
-    expect(homePage).toContain('download="HIPA-Masalas-Brochure.pdf"');
+    expect(homePage).toContain('download="HIPA-Masala-Brochure.pdf"');
     const copyPublic = fs.readFileSync(path.join(projectRoot, "scripts", "copy-public.mjs"), "utf8");
     expect(copyPublic).toContain("SSR index excluded");
     const viteSource = fs.readFileSync(path.join(projectRoot, "server", "_core", "vite.ts"), "utf8");

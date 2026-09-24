@@ -12,7 +12,7 @@ export interface Message {
 const INITIAL_WELCOME: Message = {
   id: "welcome-1",
   role: "assistant",
-  content: "Hey 👋 Welcome to HIPA Masalas!\n\nAsk me about traditional masalas, recipes, cooking guidance, products, or bulk orders.\n\nTamil or Tanglish-la kooda kekkalam 😄",
+  content: "Hey 👋 Welcome to HIPA Masala!\n\nAsk me about traditional masalas, recipes, cooking guidance, products, or bulk orders.\n\nTamil or Tanglish-la kooda kekkalam 😄",
 };
 
 const QUICK_CHIPS = [

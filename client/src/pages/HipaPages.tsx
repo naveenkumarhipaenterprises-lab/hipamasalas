@@ -15,37 +15,37 @@ type ArticleResource = {
 
 const articleResourcesBySlug: Record<string, ArticleResource[]> = {
   "best-masala-manufacturer-in-chennai": [
-    { href: "/products", label: "Browse HIPA Masalas Product Range", detail: "Explore all pure spice powders and traditional South Indian blends." },
+    { href: "/products", label: "Browse HIPA Masala Product Range", detail: "Explore all pure spice powders and traditional South Indian blends." },
     { href: "/b2b-enquiries", label: "Submit B2B Enquiry", detail: "Connect with our team for bulk, restaurant, and distribution terms." },
-    { href: "/contact", label: "Contact HIPA Masalas", detail: "Reach out to our Chennai office via phone, email, or WhatsApp." },
+    { href: "/contact", label: "Contact HIPA Masala", detail: "Reach out to our Chennai office via phone, email, or WhatsApp." },
   ],
   "how-to-choose-a-masala-manufacturer-in-chennai-for-your-business": [
-    { href: "/products", label: "Browse HIPA Masalas Product Range", detail: "Explore all pure spice powders and traditional South Indian blends." },
+    { href: "/products", label: "Browse HIPA Masala Product Range", detail: "Explore all pure spice powders and traditional South Indian blends." },
     { href: "/b2b-enquiries", label: "Submit B2B Enquiry", detail: "Connect with our team for retail, food-service, and institutional packs." },
-    { href: "/about", label: "About HIPA Masalas", detail: "Learn more about our spice processing approach and heritage." },
+    { href: "/about", label: "About HIPA Masala", detail: "Learn more about our spice processing approach and heritage." },
   ],
   "what-makes-a-good-masala-manufacturer-8-things-buyers-should-check": [
-    { href: "/products", label: "Explore HIPA Masalas Products", detail: "View complete specifications for single spices and South Indian blends." },
+    { href: "/products", label: "Explore HIPA Masala Products", detail: "View complete specifications for single spices and South Indian blends." },
     { href: "/b2b-enquiries", label: "B2B & Distribution Enquiries", detail: "Discuss custom order volumes and sample kits for your business." },
-    { href: "/faq", label: "Read HIPA Masalas FAQs", detail: "Answers regarding batch consistency, shelf life, and packaging formats." },
+    { href: "/faq", label: "Read HIPA Masala FAQs", detail: "Answers regarding batch consistency, shelf life, and packaging formats." },
   ],
   "masala-manufacturer-vs-supplier-vs-distributor": [
-    { href: "/products", label: "Browse HIPA Masalas Range", detail: "Review our single spice powders and authentic blends." },
+    { href: "/products", label: "Browse HIPA Masala Range", detail: "Review our single spice powders and authentic blends." },
     { href: "/b2b-enquiries", label: "B2B Trade & Dealership Enquiries", detail: "Enquire for direct manufacturer supply, wholesale, and distribution." },
-    { href: "/contact", label: "Contact HIPA Masalas Chennai", detail: "Reach our Pallavaram, Chennai office directly." },
+    { href: "/contact", label: "Contact HIPA Masala Chennai", detail: "Reach our Pallavaram, Chennai office directly." },
   ],
   "masala-manufacturer-for-restaurants-retailers-chennai": [
     { href: "/products", label: "Explore Products for Food Businesses", detail: "Review household, 500g, and 1kg institutional packs." },
     { href: "/b2b-enquiries", label: "Restaurant & Retailer Enquiries", detail: "Get in touch for commercial samples and wholesale rates." },
-    { href: "/about", label: "About HIPA Masalas", detail: "Read about our authentic South Indian spice processing approach." },
+    { href: "/about", label: "About HIPA Masala", detail: "Read about our authentic South Indian spice processing approach." },
   ],
   "how-to-choose-sambar-powder": [
     { href: "/products/sambar-powder", label: "Explore Sambar Powder", detail: "View the complete HIPA Sambar Powder specifications and culinary uses." },
-    { href: "/products", label: "Browse all HIPA products", detail: "Compare the available HIPA Masalas range for everyday cooking." },
+    { href: "/products", label: "Browse all HIPA products", detail: "Compare the available HIPA Masala range for everyday cooking." },
     { href: "/contact#enquire", label: "Contact HIPA for product details", detail: "Ask for further pack or product information." },
   ],
   "how-to-read-a-spice-powder-label": [
-    { href: "/products", label: "Browse HIPA Masalas products", detail: "Explore the current HIPA product range." },
+    { href: "/products", label: "Browse HIPA Masala products", detail: "Explore the current HIPA product range." },
     { href: "/faq", label: "Read product questions and answers", detail: "Review the current HIPA product-information FAQ." },
     { href: "/contact#enquire", label: "Contact HIPA for product details", detail: "Ask for further pack or product information." },
   ],
@@ -55,27 +55,27 @@ const articleResourcesBySlug: Record<string, ArticleResource[]> = {
     { href: "/products/rasam-powder", label: "Explore Rasam Powder", detail: "Compare a product intended for rasam-style dishes." },
   ],
   "how-spice-quality-affects-food-taste": [
-    { href: "/products", label: "Browse HIPA Masalas products", detail: "Explore the current HIPA product range." },
+    { href: "/products", label: "Browse HIPA Masala products", detail: "Explore the current HIPA product range." },
     { href: "/faq", label: "Read product questions and answers", detail: "Review the current HIPA product-information FAQ." },
     { href: "/contact#enquire", label: "Contact HIPA for product details", detail: "Ask for further pack or product information." },
   ],
   "south-indian-lunch-box-recipes": [
     { href: "/products/sambar-powder", label: "Explore Sambar Powder", detail: "View the complete HIPA Sambar Powder specifications." },
     { href: "/products/rasam-powder", label: "Explore Rasam Powder", detail: "View the complete HIPA Rasam Powder specifications." },
-    { href: "/products", label: "Browse all HIPA products", detail: "Explore the available HIPA Masalas range." },
+    { href: "/products", label: "Browse all HIPA products", detail: "Explore the available HIPA Masala range." },
   ],
   "true-cost-of-your-spice-supplier": [
-    { href: "/products", label: "Browse HIPA Masalas products", detail: "Explore the current HIPA product range." },
+    { href: "/products", label: "Browse HIPA Masala products", detail: "Explore the current HIPA product range." },
     { href: "/faq", label: "Read product questions and answers", detail: "Review the current HIPA product-information FAQ." },
     { href: "/contact#enquire", label: "Contact HIPA for product details", detail: "Ask for further product or pack information." },
   ],
   "what-makes-a-good-spice-powder": [
-    { href: "/products", label: "Browse HIPA Masalas products", detail: "Explore the current HIPA product range." },
+    { href: "/products", label: "Browse HIPA Masala products", detail: "Explore the current HIPA product range." },
     { href: "/faq", label: "Read product questions and answers", detail: "Review the current HIPA product-information FAQ." },
     { href: "/contact#enquire", label: "Contact HIPA for product details", detail: "Ask for further pack or product information." },
   ],
   "masala-supplier-for-supermarkets-in-chennai": [
-    { href: "/products", label: "Browse HIPA Masalas products", detail: "Explore the current HIPA retail and bulk product range." },
+    { href: "/products", label: "Browse HIPA Masala products", detail: "Explore the current HIPA retail and bulk product range." },
     { href: "/b2b-enquiries", label: "Contact HIPA for wholesale & retail inquiries", detail: "Connect with our team for supermarket sample kits and distributor terms." },
     { href: "/faq", label: "Read HIPA FAQs", detail: "Review answers regarding shelf-life, batch consistency, and certification." },
   ],
@@ -439,10 +439,10 @@ export function HomePage() {
           <div className="hero-copy hero-copy-enter">
             <p className="eyebrow">Pallavaram, Chennai · Pure Spices &amp; Traditional Masalas</p>
             <h1>
-              HIPA Masalas — Indian Spice Powders and Masala Blends in Chennai
+              HIPA Masala — Indian Spice Powders and Masala Blends in Chennai
             </h1>
             <p className="hero-desc">
-              HIPA Masalas is an Indian spice brand by HIPA Enterprises, based in Pallavaram, Chennai. We craft authentic single-origin spice powders and traditional South Indian masala blends for home kitchens, retail stores, catering services, and food businesses across Tamil Nadu and India.
+              HIPA Masala is an Indian spice brand by HIPA Enterprises, based in Pallavaram, Chennai. We craft authentic single-origin spice powders and traditional South Indian masala blends for home kitchens, retail stores, catering services, and food businesses across Tamil Nadu and India.
             </p>
             <div className="hero-btns">
               <Link href="/products" className="btn btn-primary">
@@ -451,7 +451,7 @@ export function HomePage() {
               <Link href="/b2b-enquiries" className="btn btn-outline">
                 B2B &amp; Wholesale <span className="arrow">→</span>
               </Link>
-              <a href="/assets/hipa-masalas-brochure.pdf" download="HIPA-Masalas-Brochure.pdf" className="btn btn-brochure-download">
+              <a href="/assets/hipa-masalas-brochure.pdf" download="HIPA-Masala-Brochure.pdf" className="btn btn-brochure-download">
                 <Download size={16} aria-hidden="true" />
                 Download Brochure
               </a>
@@ -461,7 +461,7 @@ export function HomePage() {
             <div className="hero-art-glow" />
             <div className="hero-badge">
               <span>HIPA</span>
-              <small>Masalas</small>
+              <small>Masala</small>
             </div>
             <div className="hero-carousel-container">
               <div className="hero-carousel-track-wrapper" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
@@ -541,7 +541,7 @@ export function HomePage() {
                 Pure spices like Turmeric (Haldi), Red Chilli, Coriander (Dhania), Cumin (Jeera), and Black Pepper serve as the core building blocks. They govern colour, base heat, sauce consistency, and digestive warmth. Blended masalas like Sambar Powder, Rasam Powder, and Garam Masala combine whole spices and roasted lentils in precise culinary ratios to deliver complex, signature aromas in everyday dishes.
               </p>
               <p>
-                At HIPA Masalas, we maintain the integrity of both single spices and traditional blends by focusing on pure milling, balanced roasting, and airtight barrier packaging.
+                At HIPA Masala, we maintain the integrity of both single spices and traditional blends by focusing on pure milling, balanced roasting, and airtight barrier packaging.
               </p>
             </div>
             <div className="editorial-cards">
@@ -565,7 +565,7 @@ export function HomePage() {
         <div className="container">
           <div className="collection-head">
             <p className="eyebrow">Our Products</p>
-            <h2>Explore the HIPA Masalas Product Range</h2>
+            <h2>Explore the HIPA Masala Product Range</h2>
             <p className="section-desc">
               Discover our complete collection of 8 pure spice powders and authentic South Indian masala blends, crafted for home kitchens and food businesses.
             </p>
@@ -615,13 +615,13 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 5: HIPA MASALAS IN CHENNAI */}
+      {/* SECTION 5: HIPA MASALA IN CHENNAI */}
       <section className="section-content-block reveal">
         <div className="container">
           <div className="location-feature-card">
             <div className="location-copy">
               <p className="eyebrow">Local Roots · Regional Reach</p>
-              <h2>HIPA Masalas in Chennai — Sourcing and Availability</h2>
+              <h2>HIPA Masala in Chennai — Sourcing and Availability</h2>
               <p>
                 HIPA Enterprises operates from Pallavaram in South Chennai, Tamil Nadu. Chennai has historically been a thriving epicentre for South Indian spice trading and culinary excellence.
               </p>
@@ -658,7 +658,7 @@ export function HomePage() {
             <p className="eyebrow">Serving Diverse Needs</p>
             <h2>For Homes, Retailers and Food Businesses</h2>
             <p className="section-desc">
-              Whether you are seasoning a daily family meal or sourcing spices for a restaurant chain or supermarket shelf, HIPA Masalas provides tailored packaging and reliable supply.
+              Whether you are seasoning a daily family meal or sourcing spices for a restaurant chain or supermarket shelf, HIPA Masala provides tailored packaging and reliable supply.
             </p>
           </div>
           <div className="segments-grid">
@@ -695,7 +695,7 @@ export function HomePage() {
         <div className="container">
           <div className="collection-head">
             <p className="eyebrow">Common Queries</p>
-            <h2>Frequently Asked Questions About HIPA Masalas</h2>
+            <h2>Frequently Asked Questions About HIPA Masala</h2>
             <p className="section-desc">
               Clear, factual answers about our brand, spice processing, product availability, and business enquiries in Chennai.
             </p>
@@ -723,7 +723,7 @@ export function HomePage() {
       <section className="cta-band reveal">
         <div className="container cta-inner">
           <div>
-            <h2>Stay Connected with HIPA Masalas</h2>
+            <h2>Stay Connected with HIPA Masala</h2>
             <p>Get spice guides, cooking tips, and product announcements straight to your inbox.</p>
           </div>
           <NewsletterForm />
@@ -740,7 +740,7 @@ export function ProductsPage() {
       <section className="catalogue-page">
         <div className="container">
           <div className="collection-head catalogue-head">
-            <p className="eyebrow">HIPA Masalas · Chennai</p>
+            <p className="eyebrow">HIPA Masala · Chennai</p>
             <h1>Traditional Spice Powders &amp; Masala Blends</h1>
             <p className="section-desc">
               Explore our complete range of 8 pure spice powders and authentic South Indian masala blends. Click on any product to view comprehensive ingredients, culinary applications, storage tips, and technical specifications.
@@ -790,7 +790,7 @@ export function ProductsPage() {
           <div className="collection-head">
             <p className="eyebrow">Common Questions</p>
             <h2>Product Range Questions</h2>
-            <p className="section-desc">Answers to common questions about HIPA Masalas spice products.</p>
+            <p className="section-desc">Answers to common questions about HIPA Masala spice products.</p>
           </div>
           <div className="catalogue-faq-list">
             {faqs.slice(4, 8).map((faq, index) => (
@@ -832,7 +832,7 @@ export function ProductDetailPage() {
             <img src={product.image} alt={product.imageAlt} fetchPriority="high" decoding="async" />
           </div>
           <div className="product-replica-copy product-detail-enter">
-            <p className="eyebrow">HIPA MASALAS · PALLAVARAM, CHENNAI</p>
+            <p className="eyebrow">HIPA MASALA · PALLAVARAM, CHENNAI</p>
             <h1>{product.name}</h1>
             <p className="product-hero-summary">{product.description}</p>
             <ProductAvailabilityLabel slug={product.slug} />
@@ -874,7 +874,7 @@ export function ProductDetailPage() {
 
           {/* WHAT IS THIS PRODUCT */}
           <article className="content-card">
-            <h2>What is HIPA Masalas {product.name}?</h2>
+            <h2>What is HIPA Masala {product.name}?</h2>
             {product.whatIs.map((paragraph, idx) => (
               <p key={idx}>{paragraph}</p>
             ))}
@@ -1032,9 +1032,9 @@ export function AboutPage() {
       <section className="contact-hero">
         <div className="container contact-hero-inner">
           <p className="eyebrow">About HIPA Enterprises · Chennai</p>
-          <h1>About HIPA Masalas — Our Story, Vision and Approach to Indian Spices</h1>
+          <h1>About HIPA Masala — Our Story, Vision and Approach to Indian Spices</h1>
           <p>
-            HIPA Masalas is an Indian spice and masala brand owned and operated by HIPA Enterprises in Pallavaram, Chennai, Tamil Nadu. We are dedicated to providing pure, unadulterated spice powders and traditionally formulated masala blends for everyday cooking.
+            HIPA Masala is an Indian spice and masala brand owned and operated by HIPA Enterprises in Pallavaram, Chennai, Tamil Nadu. We are dedicated to providing pure, unadulterated spice powders and traditionally formulated masala blends for everyday cooking.
           </p>
         </div>
       </section>
@@ -1045,12 +1045,12 @@ export function AboutPage() {
           {/* SECTION 1: THE STORY */}
           <div className="about-content-section">
             <p className="eyebrow">Heritage &amp; Beginnings</p>
-            <h2>The Story Behind HIPA Masalas</h2>
+            <h2>The Story Behind HIPA Masala</h2>
             <p className="section-desc">
               Food in an Indian home is far more than sustenance — it is a daily celebration of culture, family connection, and wellness. At the core of every memorable meal is the aroma of freshly ground spices simmering in warm ghee or oil.
             </p>
             <p className="section-desc">
-              HIPA Masalas was founded by HIPA Enterprises with a clear mission: to bring the authentic taste and aroma of traditional South Indian kitchen masalas to modern homes and food businesses. Inspired by ancestral recipes passed down through generations, we set out to create spice products that honour authentic regional flavours without relying on shortcuts, synthetic additives, or artificial colours.
+              HIPA Masala was founded by HIPA Enterprises with a clear mission: to bring the authentic taste and aroma of traditional South Indian kitchen masalas to modern homes and food businesses. Inspired by ancestral recipes passed down through generations, we set out to create spice products that honour authentic regional flavours without relying on shortcuts, synthetic additives, or artificial colours.
             </p>
           </div>
 
@@ -1092,7 +1092,7 @@ export function AboutPage() {
             </p>
             <div className="about-entity-box">
               <p><strong>Business Legal Entity:</strong> HIPA Enterprises</p>
-              <p><strong>Brand:</strong> HIPA Masalas</p>
+              <p><strong>Brand:</strong> HIPA Masala</p>
               <p><strong>Official Address:</strong> {siteIdentity.locationLabel}</p>
               <p><strong>Phone:</strong> {siteIdentity.phone} | <strong>Email:</strong> {siteIdentity.email}</p>
             </div>
@@ -1148,7 +1148,7 @@ export function FaqPage() {
       <section className="faq-hero">
         <div className="container">
           <p className="eyebrow">Questions &amp; Answers</p>
-          <h1>Frequently Asked Questions About HIPA Masalas</h1>
+          <h1>Frequently Asked Questions About HIPA Masala</h1>
           <p>
             Find comprehensive, clear answers about our spice sourcing, product formulations, pack sizes, Chennai location, and B2B ordering options.
           </p>
@@ -1160,7 +1160,7 @@ export function FaqPage() {
 
           {/* CLUSTER 1 */}
           <div className="faq-cluster">
-            <h2 className="faq-cluster-title">1. About HIPA Masalas &amp; Sourcing</h2>
+            <h2 className="faq-cluster-title">1. About HIPA Masala &amp; Sourcing</h2>
             {cluster1.map((faq, index) => (
               <details className="faq-live-item" key={faq.question} open={index === 0}>
                 <summary>
@@ -1238,7 +1238,7 @@ export function ContactPage() {
       <section className="contact-hero">
         <div className="container contact-hero-inner">
           <p className="eyebrow">Get in Touch · Pallavaram, Chennai</p>
-          <h1>Contact HIPA Masalas</h1>
+          <h1>Contact HIPA Masala</h1>
           <p>
             Reach out to HIPA Enterprises for product details, retailer inquiries, catering supply, and business partnerships in Chennai and across India.
           </p>
@@ -1270,7 +1270,7 @@ export function ContactPage() {
           </div>
           <aside className="contact-side">
             <div className="map-card">
-              <iframe className="contact-map-frame" src={cityMapEmbedUrl} title="HIPA Masalas Chennai map" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+              <iframe className="contact-map-frame" src={cityMapEmbedUrl} title="HIPA Masala Chennai map" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
               <div className="map-card-info">
                 <h3>Find Us in Chennai</h3>
                 <p>{siteIdentity.locationLabel}</p>
@@ -1311,7 +1311,7 @@ export function B2BEnquiriesPage() {
             <p className="eyebrow">Partnership Opportunities</p>
             <h2>How We Support Your Food Business</h2>
             <p>
-              Whether you manage an independent supermarket, a chain of South Indian restaurants, or an institutional catering enterprise, HIPA Masalas provides dependable product consistency and flexible packaging options.
+              Whether you manage an independent supermarket, a chain of South Indian restaurants, or an institutional catering enterprise, HIPA Masala provides dependable product consistency and flexible packaging options.
             </p>
             <div className="b2b-benefits-block">
               <div className="b2b-benefit-item">
@@ -1364,7 +1364,7 @@ export function PrivacyPage() {
           <p className="eyebrow">Privacy</p>
           <h1>Privacy Policy</h1>
           <p className="section-desc">
-            HIPA Enterprises is committed to protecting your privacy. This policy outlines how information submitted through the HIPA Masalas website is managed.
+            HIPA Enterprises is committed to protecting your privacy. This policy outlines how information submitted through the HIPA Masala website is managed.
           </p>
           <div className="article-body">
             <h2>Information Collected Through Enquiry Forms</h2>
@@ -1399,7 +1399,7 @@ export function TermsOfServicePage() {
           <p className="eyebrow">Website Terms</p>
           <h1>Terms of Service</h1>
           <p className="section-desc">
-            These terms govern the informational use of the HIPA Masalas website.
+            These terms govern the informational use of the HIPA Masala website.
           </p>
           <div className="article-body">
             <h2>Informational &amp; Enquiry Website</h2>
@@ -1437,8 +1437,8 @@ export function BlogPage() {
       <section className="blog-live-hero">
         <div className="container">
           <p className="eyebrow">Recipes &amp; Spice Knowledge</p>
-          <h1>HIPA Masalas Blog</h1>
-          <p>Explore practical spice guides, South Indian cooking ideas and current product information from HIPA Masalas.</p>
+          <h1>HIPA Masala Blog</h1>
+          <p>Explore practical spice guides, South Indian cooking ideas and current product information from HIPA Masala.</p>
         </div>
       </section>
       <section className="blog-live-toolbar">
@@ -1497,7 +1497,7 @@ export function BlogPage() {
       <section className="blog-live-newsletter">
         <div className="container blog-live-newsletter-inner">
           <div>
-            <h2>Stay Updated with HIPA Masalas</h2>
+            <h2>Stay Updated with HIPA Masala</h2>
             <p>Subscribe to receive practical spice guides, cooking tips and product updates.</p>
           </div>
           <NewsletterForm />
@@ -1514,7 +1514,7 @@ export function ArticlePage() {
   const article = postQuery.data;
 
   useEffect(() => {
-    if (article) document.title = `${article.title} | HIPA Masalas`;
+    if (article) document.title = `${article.title} | HIPA Masala`;
   }, [article]);
 
   if (!article) {

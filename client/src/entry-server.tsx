@@ -69,7 +69,7 @@ export async function render(url: string, blogSource: BlogRenderSource = databas
     if (post) {
       const article = asArticle(post);
       head = {
-        title: `${article.title} | HIPA Masalas`,
+        title: `${article.title} | HIPA Masala`,
         description: article.description,
         canonicalPath: ssrPath,
         ogType: "article",

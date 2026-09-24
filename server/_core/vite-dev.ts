@@ -9,7 +9,7 @@ import superjson from "superjson";
 import { getStructuredData, type PageHead } from "../../shared/hipaContent";
 
 const canonicalOrigin = (process.env.CANONICAL_ORIGIN || "https://www.hipamasalas.com").replace(/\/$/, "");
-const siteName = process.env.SITE_NAME ?? "HIPA Masalas";
+const siteName = process.env.SITE_NAME ?? "HIPA Masala";
 
 function escapeHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
