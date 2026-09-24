@@ -5,7 +5,7 @@ describe("bundled local blog store", () => {
   it("exposes all published HIPA articles without a database", () => {
     const posts = listLocalBlogs();
 
-    expect(posts).toHaveLength(8);
+    expect(posts).toHaveLength(5);
     expect(posts.every((post) => post.status === "published")).toBe(true);
     expect(posts.every((post) => post.coverImageUrl?.startsWith("/assets/"))).toBe(true);
   });
@@ -19,9 +19,9 @@ describe("bundled local blog store", () => {
   });
 
   it("can retrieve a bundled article by its public slug", () => {
-    const post = getLocalBlogBySlug("how-to-choose-sambar-powder");
+    const post = getLocalBlogBySlug("best-masala-manufacturer-in-chennai");
 
-    expect(post?.title).toBe("How to Choose Sambar Powder for Everyday Cooking");
+    expect(post?.title).toBe("Best Masala Manufacturer in Chennai? What Buyers Should Actually Check");
     expect(post?.coverImageUrl).toMatch(/^\/assets\//);
   });
 });

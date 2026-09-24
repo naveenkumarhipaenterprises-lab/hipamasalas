@@ -14,13 +14,38 @@ type ArticleResource = {
 };
 
 const articleResourcesBySlug: Record<string, ArticleResource[]> = {
+  "best-masala-manufacturer-in-chennai": [
+    { href: "/products", label: "Browse HIPA Masalas Product Range", detail: "Explore all pure spice powders and traditional South Indian blends." },
+    { href: "/b2b-enquiries", label: "Submit B2B Enquiry", detail: "Connect with our team for bulk, restaurant, and distribution terms." },
+    { href: "/contact", label: "Contact HIPA Masalas", detail: "Reach out to our Chennai office via phone, email, or WhatsApp." },
+  ],
+  "how-to-choose-a-masala-manufacturer-in-chennai-for-your-business": [
+    { href: "/products", label: "Browse HIPA Masalas Product Range", detail: "Explore all pure spice powders and traditional South Indian blends." },
+    { href: "/b2b-enquiries", label: "Submit B2B Enquiry", detail: "Connect with our team for retail, food-service, and institutional packs." },
+    { href: "/about", label: "About HIPA Masalas", detail: "Learn more about our spice processing approach and heritage." },
+  ],
+  "what-makes-a-good-masala-manufacturer-8-things-buyers-should-check": [
+    { href: "/products", label: "Explore HIPA Masalas Products", detail: "View complete specifications for single spices and South Indian blends." },
+    { href: "/b2b-enquiries", label: "B2B & Distribution Enquiries", detail: "Discuss custom order volumes and sample kits for your business." },
+    { href: "/faq", label: "Read HIPA Masalas FAQs", detail: "Answers regarding batch consistency, shelf life, and packaging formats." },
+  ],
+  "masala-manufacturer-vs-supplier-vs-distributor": [
+    { href: "/products", label: "Browse HIPA Masalas Range", detail: "Review our single spice powders and authentic blends." },
+    { href: "/b2b-enquiries", label: "B2B Trade & Dealership Enquiries", detail: "Enquire for direct manufacturer supply, wholesale, and distribution." },
+    { href: "/contact", label: "Contact HIPA Masalas Chennai", detail: "Reach our Pallavaram, Chennai office directly." },
+  ],
+  "masala-manufacturer-for-restaurants-retailers-chennai": [
+    { href: "/products", label: "Explore Products for Food Businesses", detail: "Review household, 500g, and 1kg institutional packs." },
+    { href: "/b2b-enquiries", label: "Restaurant & Retailer Enquiries", detail: "Get in touch for commercial samples and wholesale rates." },
+    { href: "/about", label: "About HIPA Masalas", detail: "Read about our authentic South Indian spice processing approach." },
+  ],
   "how-to-choose-sambar-powder": [
     { href: "/products/sambar-powder", label: "Explore Sambar Powder", detail: "View the complete HIPA Sambar Powder specifications and culinary uses." },
-    { href: "/products", label: "Browse all HIPA products", detail: "Compare the available HIPA Masala range for everyday cooking." },
+    { href: "/products", label: "Browse all HIPA products", detail: "Compare the available HIPA Masalas range for everyday cooking." },
     { href: "/contact#enquire", label: "Contact HIPA for product details", detail: "Ask for further pack or product information." },
   ],
   "how-to-read-a-spice-powder-label": [
-    { href: "/products", label: "Browse HIPA Masala products", detail: "Explore the current HIPA product range." },
+    { href: "/products", label: "Browse HIPA Masalas products", detail: "Explore the current HIPA product range." },
     { href: "/faq", label: "Read product questions and answers", detail: "Review the current HIPA product-information FAQ." },
     { href: "/contact#enquire", label: "Contact HIPA for product details", detail: "Ask for further pack or product information." },
   ],
@@ -30,27 +55,27 @@ const articleResourcesBySlug: Record<string, ArticleResource[]> = {
     { href: "/products/rasam-powder", label: "Explore Rasam Powder", detail: "Compare a product intended for rasam-style dishes." },
   ],
   "how-spice-quality-affects-food-taste": [
-    { href: "/products", label: "Browse HIPA Masala products", detail: "Explore the current HIPA product range." },
+    { href: "/products", label: "Browse HIPA Masalas products", detail: "Explore the current HIPA product range." },
     { href: "/faq", label: "Read product questions and answers", detail: "Review the current HIPA product-information FAQ." },
     { href: "/contact#enquire", label: "Contact HIPA for product details", detail: "Ask for further pack or product information." },
   ],
   "south-indian-lunch-box-recipes": [
     { href: "/products/sambar-powder", label: "Explore Sambar Powder", detail: "View the complete HIPA Sambar Powder specifications." },
     { href: "/products/rasam-powder", label: "Explore Rasam Powder", detail: "View the complete HIPA Rasam Powder specifications." },
-    { href: "/products", label: "Browse all HIPA products", detail: "Explore the available HIPA Masala range." },
+    { href: "/products", label: "Browse all HIPA products", detail: "Explore the available HIPA Masalas range." },
   ],
   "true-cost-of-your-spice-supplier": [
-    { href: "/products", label: "Browse HIPA Masala products", detail: "Explore the current HIPA product range." },
+    { href: "/products", label: "Browse HIPA Masalas products", detail: "Explore the current HIPA product range." },
     { href: "/faq", label: "Read product questions and answers", detail: "Review the current HIPA product-information FAQ." },
     { href: "/contact#enquire", label: "Contact HIPA for product details", detail: "Ask for further product or pack information." },
   ],
   "what-makes-a-good-spice-powder": [
-    { href: "/products", label: "Browse HIPA Masala products", detail: "Explore the current HIPA product range." },
+    { href: "/products", label: "Browse HIPA Masalas products", detail: "Explore the current HIPA product range." },
     { href: "/faq", label: "Read product questions and answers", detail: "Review the current HIPA product-information FAQ." },
     { href: "/contact#enquire", label: "Contact HIPA for product details", detail: "Ask for further pack or product information." },
   ],
   "masala-supplier-for-supermarkets-in-chennai": [
-    { href: "/products", label: "Browse HIPA Masala products", detail: "Explore the current HIPA retail and bulk product range." },
+    { href: "/products", label: "Browse HIPA Masalas products", detail: "Explore the current HIPA retail and bulk product range." },
     { href: "/b2b-enquiries", label: "Contact HIPA for wholesale & retail inquiries", detail: "Connect with our team for supermarket sample kits and distributor terms." },
     { href: "/faq", label: "Read HIPA FAQs", detail: "Review answers regarding shelf-life, batch consistency, and certification." },
   ],

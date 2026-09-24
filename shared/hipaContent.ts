@@ -739,7 +739,78 @@ export const faqs: Faq[] = [
   },
 ];
 
-export const articles: Article[] = [];
+export const articles: Article[] = [
+  {
+    slug: "best-masala-manufacturer-in-chennai",
+    title: "Best Masala Manufacturer in Chennai? What Buyers Should Actually Check",
+    description: "Looking for the best masala manufacturer in Chennai? Use this practical checklist to assess blends, packs, consistency, B2B fit and supplier communication.",
+    body: [
+      "Finding the best masala manufacturer in Chennai is not only about comparing a price list. Restaurants, retailers, distributors, caterers and hotels need a supplier whose products fit their menu, pack requirements and expectations for repeatable flavour. The right decision comes from checking practical evidence before regular buying."
+    ],
+    authorName: "HIPA Masalas",
+    publishedAt: "2026-09-24T09:00:00.000Z",
+    modifiedAt: "2026-09-24T09:00:00.000Z",
+    image: "/assets/best-masala-manufacturer-in-chennai.webp",
+    imageAlt: "B2B buyer guide cover showing supplier comparison documents in a Chennai food-industry setting",
+    complete: true,
+  },
+  {
+    slug: "how-to-choose-a-masala-manufacturer-in-chennai-for-your-business",
+    title: "How to Choose a Masala Manufacturer in Chennai for Your Business",
+    description: "Learn how Chennai food businesses can compare masala manufacturers by product fit, processing, pack sizes, consistency and B2B communication.",
+    body: [
+      "Choosing a masala manufacturer in Chennai is a commercial decision, not just a search for a spice powder supplier. Restaurants, retailers, distributors, caterers, hotels and other food businesses need a partner whose products, pack formats and communication fit the way they buy and operate."
+    ],
+    authorName: "HIPA Masalas",
+    publishedAt: "2026-09-24T09:00:00.000Z",
+    modifiedAt: "2026-09-24T09:00:00.000Z",
+    image: "/assets/how-to-choose-masala-manufacturer-in-chennai.webp",
+    imageAlt: "B2B guide cover showing a supplier selection and procurement workspace in a food manufacturing environment",
+    complete: true,
+  },
+  {
+    slug: "what-makes-a-good-masala-manufacturer-8-things-buyers-should-check",
+    title: "What Makes a Good Masala Manufacturer? 8 Things Buyers Should Check",
+    description: "Learn what restaurants, retailers and distributors should check before choosing a masala manufacturer or spice manufacturer in Chennai and Tamil Nadu.",
+    body: [
+      "Choosing a masala manufacturer is a business decision, not only a taste test. Restaurants, retailers, distributors, caterers, hotels and other food businesses need a spice manufacturer whose products, pack formats and communication fit the way they buy and sell. This guide gives buyers a practical framework for comparing suppliers without relying on vague promises."
+    ],
+    authorName: "HIPA Masalas",
+    publishedAt: "2026-09-24T09:00:00.000Z",
+    modifiedAt: "2026-09-24T09:00:00.000Z",
+    image: "/assets/what-makes-a-good-masala-manufacturer.webp",
+    imageAlt: "B2B quality guide cover showing quality-control and process documents in a food manufacturing environment",
+    complete: true,
+  },
+  {
+    slug: "masala-manufacturer-vs-supplier-vs-distributor",
+    title: "Masala Manufacturer Chennai vs Supplier vs Distributor: What’s the Difference?",
+    description: "Learn the difference between a masala manufacturer, supplier and distributor in Chennai, and choose the right spice partner for your business.",
+    body: [
+      "When a restaurant, retailer, hotel, caterer or food business searches for a masala manufacturer Chennai partner or a masala supplier Chennai contact, the terms can sound interchangeable. They are not. A manufacturer makes or processes the masala, a supplier arranges products for business buyers, and a distributor moves products through a wider channel."
+    ],
+    authorName: "HIPA Masalas",
+    publishedAt: "2026-09-24T09:00:00.000Z",
+    modifiedAt: "2026-09-24T09:00:00.000Z",
+    image: "/assets/masala-manufacturer-vs-supplier-vs-distributor.webp",
+    imageAlt: "B2B channel guide cover showing manufacturing, supply and distribution logistics in Chennai",
+    complete: true,
+  },
+  {
+    slug: "masala-manufacturer-for-restaurants-retailers-chennai",
+    title: "How to Evaluate a Masala Manufacturer for Restaurants / Retailers Chennai",
+    description: "Practical guide for Chennai restaurants and retailers on evaluating masala manufacturers by menu fit, pack sizes, consistency and B2B communication.",
+    body: [
+      "Evaluating a masala manufacturer for restaurants / retailers Chennai operations requires a structured approach. Food businesses need spice blends that deliver consistent flavour, institutional or retail pack sizes, and reliable supply communication."
+    ],
+    authorName: "HIPA Masalas",
+    publishedAt: "2026-09-24T09:00:00.000Z",
+    modifiedAt: "2026-09-24T09:00:00.000Z",
+    image: "/assets/how-to-evaluate-masala-manufacturer-in-chennai.webp",
+    imageAlt: "B2B commercial kitchen and retail procurement evaluation workspace in Chennai",
+    complete: true,
+  },
+];
 
 export function getProduct(slug: string): Product | null {
   return products.find((product) => product.slug === slug) ?? null;
