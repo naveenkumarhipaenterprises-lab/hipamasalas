@@ -1,17 +1,58 @@
 import { HeadManager } from "@/components/HeadManager";
 import { SiteShell } from "@/components/SiteShell";
-import { Toaster } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { AboutPage, ArticlePage, B2BEnquiriesPage, BlogPage, ContactPage, FaqPage, HomePage, NotFoundPage, PrivacyPage, ProductDetailPage, ProductsPage, TermsOfServicePage } from "@/pages/HipaPages";
-import { AdminBlogPage } from "@/pages/AdminBlogPage";
-import { AdminProductAvailabilityPage } from "@/pages/AdminProductAvailabilityPage";
+import { HomePage } from "@/pages/HomePage";
+import { readSecondaryPages } from "@/routes";
+import { lazy, Suspense, useEffect, useState, type ComponentType } from "react";
 import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
+// Admin screens are private (noindex, password-gated) and never needed by visitors,
+// so they are split out of the public bundle and rendered client-side only.
+const AdminBlogPage = lazy(() => import("@/pages/AdminBlogPage").then((m) => ({ default: m.AdminBlogPage })));
+const AdminProductAvailabilityPage = lazy(() => import("@/pages/AdminProductAvailabilityPage").then((m) => ({ default: m.AdminProductAvailabilityPage })));
+
+function clientOnly(Page: ComponentType) {
+  return function ClientOnlyPage() {
+    // Same (empty) output on the server and the first client render → no hydration mismatch.
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+    return mounted ? (
+      <Suspense fallback={null}>
+        <Page />
+      </Suspense>
+    ) : null;
+  };
+}
+
+/** A page from the lazily loaded HipaPages chunk (see routes.ts). */
+function secondary(name: "ProductsPage" | "AboutPage" | "ProductDetailPage" | "FaqPage" | "ContactPage" | "B2BEnquiriesPage" | "PrivacyPage" | "TermsOfServicePage" | "BlogPage" | "ArticlePage" | "NotFoundPage") {
+  return function SecondaryPage() {
+    const Page = readSecondaryPages()[name];
+    return <Page />;
+  };
+}
+
+const ProductsPage = secondary("ProductsPage");
+const AboutPage = secondary("AboutPage");
+const ProductDetailPage = secondary("ProductDetailPage");
+const FaqPage = secondary("FaqPage");
+const ContactPage = secondary("ContactPage");
+const B2BEnquiriesPage = secondary("B2BEnquiriesPage");
+const PrivacyPage = secondary("PrivacyPage");
+const TermsOfServicePage = secondary("TermsOfServicePage");
+const BlogPage = secondary("BlogPage");
+const ArticlePage = secondary("ArticlePage");
+const NotFoundPage = secondary("NotFoundPage");
+
+const AdminBlogRoute = clientOnly(AdminBlogPage);
+const AdminProductsRoute = clientOnly(AdminProductAvailabilityPage);
+
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
+    // Only suspends on a client-side navigation to a page whose chunk is not loaded yet.
+    <Suspense fallback={null}>
     <Switch>
       <Route path="/" component={HomePage} />
       <Route path="/products" component={ProductsPage} />
@@ -24,11 +65,12 @@ function Router() {
       <Route path="/terms-of-service" component={TermsOfServicePage} />
       <Route path="/blog" component={BlogPage} />
       <Route path="/blog/:slug" component={ArticlePage} />
-      <Route path="/admin" component={AdminBlogPage} />
-      <Route path="/admin/products" component={AdminProductAvailabilityPage} />
+      <Route path="/admin" component={AdminBlogRoute} />
+      <Route path="/admin/products" component={AdminProductsRoute} />
       <Route path="/404" component={NotFoundPage} />
       <Route component={NotFoundPage} />
     </Switch>
+    </Suspense>
   );
 }
 
@@ -46,11 +88,8 @@ function App() {
         defaultTheme="light"
         // switchable
       >
-        <TooltipProvider>
-          <HeadManager />
-          {isAdminRoute ? <Router /> : <SiteShell><Router /></SiteShell>}
-          <Toaster />
-        </TooltipProvider>
+        <HeadManager />
+        {isAdminRoute ? <Router /> : <SiteShell><Router /></SiteShell>}
       </ThemeProvider>
     </ErrorBoundary>
   );
