@@ -741,6 +741,22 @@ export const faqs: Faq[] = [
 
 export const articles: Article[] = [
   {
+    "slug": "how-to-store-indian-spice-powders",
+    "title": "How to Store Indian Spice Powders to Preserve Freshness, Aroma and Essential Oils",
+    "description": "Learn practical ways to store Indian spice powders and masala blends. Protect natural volatile oils, prevent clumping and maintain authentic flavour in your kitchen.",
+    "body": [
+      "Indian cooking relies heavily on the vibrant fragrance and potency of ground spice powders and traditional masala blends. However, ground spices are delicate: their flavour and aroma come from volatile essential oils (such as curcumin in turmeric, piperine in black pepper, linalool in coriander, and cuminaldehyde in cumin) that degrade quickly when exposed to environmental elements.",
+      "## The Four Enemies of Spice Freshness",
+      "To preserve the peak potency and colour of your spice powders, you must protect them from four primary environmental factors:"
+    ],
+    "authorName": "HIPA Masala",
+    "publishedAt": "2026-09-30T10:00:00.000Z",
+    "modifiedAt": "2026-09-30T10:00:00.000Z",
+    "image": "/assets/how-to-store-indian-spice-powders.jpg",
+    "imageAlt": "Airtight glass jars with freshly ground Indian spices and whole spice ingredients on a kitchen counter",
+    "complete": true
+  },
+  {
     "slug": "best-masala-manufacturer-in-chennai",
     "title": "Best Masala Manufacturer in Chennai? What Buyers Should Actually Check",
     "description": "Looking for the best masala manufacturer in Chennai? Use this practical checklist to assess blends, packs, consistency, B2B fit and supplier communication.",
