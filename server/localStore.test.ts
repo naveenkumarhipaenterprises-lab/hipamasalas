@@ -5,7 +5,7 @@ describe("bundled local blog store", () => {
   it("exposes all published HIPA articles without a database", () => {
     const posts = listLocalBlogs();
 
-    expect(posts).toHaveLength(13);
+    expect(posts).toHaveLength(10);
     expect(posts.every((post) => post.status === "published")).toBe(true);
     expect(posts.every((post) => post.coverImageUrl?.startsWith("/assets/"))).toBe(true);
   });

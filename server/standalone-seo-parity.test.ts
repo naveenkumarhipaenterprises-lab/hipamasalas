@@ -45,6 +45,17 @@ describe("standalone SEO parity", () => {
     expect(source).toContain('"/b2b-enquiry": "/b2b-enquiries"');
   });
 
+  it("redirects the merged Chennai manufacturer guides and indexes the pillar page", () => {
+    const source = fs.readFileSync(new URL("./seoRoutes.ts", import.meta.url), "utf8");
+    expect(source).toContain('"/blog/how-to-choose-a-masala-manufacturer-in-chennai-for-your-business": "/blog/best-masala-manufacturer-in-chennai"');
+    expect(source).toContain('"/blog/what-makes-a-good-masala-manufacturer-8-things-buyers-should-check": "/blog/best-masala-manufacturer-in-chennai"');
+    expect(source).toContain('"/blog/masala-manufacturer-for-restaurants-retailers-chennai": MANUFACTURER_PAGE_PATH');
+    expect(getIndexablePaths()).toContain("/masala-manufacturer-in-chennai");
+    expect(getPageHead("/masala-manufacturer-in-chennai").title).toBe("Masala Manufacturer in Chennai | Wholesale Supply | HIPA Masala");
+    expect(getStructuredData("/masala-manufacturer-in-chennai", "https://www.hipamasalas.com").map((schema) => schema["@type"])).toEqual(expect.arrayContaining(["BreadcrumbList", "LocalBusiness"]));
+    expect(buildSitemapXml("https://www.hipamasalas.com")).toContain("/masala-manufacturer-in-chennai");
+  });
+
   it("builds crawler-readable sitemap and AI context without a database", () => {
     const sitemap = buildSitemapXml("https://www.hipamasalas.com");
     expect(sitemap).toContain("/products/sambar-powder");

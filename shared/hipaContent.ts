@@ -1,3 +1,5 @@
+import { MANUFACTURER_PAGE_PATH, manufacturerPage } from "./manufacturerPage";
+
 export type ProductSpec = {
   label: string;
   value: string;
@@ -78,6 +80,14 @@ export const siteIdentity = {
   instagram: "https://www.instagram.com/hipa_masala/",
   whatsappHref:
     "https://wa.me/917058053055?text=Hi%20HIPA%20Masala%2C%20I%27d%20like%20to%20know%20more%20about%20your%20products.",
+  fssaiLicence: "22426423000366",
+  gstin: "33BVIPR5839J1Z1",
+  openingHours: {
+    days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    opens: "09:00",
+    closes: "17:30",
+    label: "Monday to Saturday, 9:00 am to 5:30 pm",
+  },
 } as const;
 
 export const products: Product[] = [
@@ -979,6 +989,7 @@ export function getIndexablePaths() {
     "/contact",
     "/about",
     "/b2b-enquiries",
+    MANUFACTURER_PAGE_PATH,
     "/blog",
     ...articles.filter((article) => article.complete).map((article) => `/blog/${article.slug}`),
   ];
@@ -1052,6 +1063,16 @@ export function getPageHead(pathname: string): PageHead {
       title: "B2B Enquiries | Wholesale & Distribution | HIPA Masala Chennai",
       description: "Contact HIPA Masala for wholesale spice supply, retail distribution, supermarket supply, and bulk catering enquiries in Chennai and beyond.",
       canonicalPath: path,
+    };
+  }
+
+  if (path === MANUFACTURER_PAGE_PATH) {
+    return {
+      title: manufacturerPage.metaTitle,
+      description: manufacturerPage.metaDescription,
+      canonicalPath: path,
+      ogImage: siteIdentity.heroImage,
+      ogImageAlt: "HIPA Masala spice powders manufactured in Chennai",
     };
   }
 
@@ -1133,6 +1154,17 @@ export function getStructuredData(pathname: string, origin: string, articleOverr
   const websiteId = absoluteUrl(origin, "/#website");
   const sameAs = [siteIdentity.facebook, siteIdentity.instagram];
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${siteIdentity.name}, ${siteIdentity.locationLabel}`)}`;
+  // Registration numbers and hours are shown on the About and Contact pages, so the schema repeats visible facts.
+  const businessIdentifiers = [
+    { "@type": "PropertyValue", propertyID: "FSSAI licence number", value: siteIdentity.fssaiLicence },
+    { "@type": "PropertyValue", propertyID: "GSTIN", value: siteIdentity.gstin },
+  ];
+  const openingHoursSpecification = {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: [...siteIdentity.openingHours.days],
+    opens: siteIdentity.openingHours.opens,
+    closes: siteIdentity.openingHours.closes,
+  };
 
   const organization = {
     "@context": "https://schema.org",
@@ -1141,6 +1173,8 @@ export function getStructuredData(pathname: string, origin: string, articleOverr
     name: siteIdentity.name,
     alternateName: "HIPA Masalas",
     legalName: siteIdentity.legalName,
+    taxID: siteIdentity.gstin,
+    identifier: businessIdentifiers,
     url: absoluteUrl(origin, "/"),
     logo: { "@type": "ImageObject", url: absoluteUrl(origin, siteIdentity.logo), width: 389, height: 453 },
     description: "HIPA Masala is an Indian spice and masala brand owned by HIPA Enterprises, based in Pallavaram, Chennai, Tamil Nadu, India.",
@@ -1169,6 +1203,10 @@ export function getStructuredData(pathname: string, origin: string, articleOverr
     sameAs,
     areaServed: ["Chennai", "Tamil Nadu", "India"],
     parentOrganization: { "@id": organizationId },
+    taxID: siteIdentity.gstin,
+    identifier: businessIdentifiers,
+    openingHoursSpecification: [openingHoursSpecification],
+    currenciesAccepted: "INR",
     priceRange: "₹₹",
   };
 
@@ -1214,6 +1252,10 @@ export function getStructuredData(pathname: string, origin: string, articleOverr
 
   if (path === "/faq") {
     schemas.push(breadcrumbSchema(origin, path, ["Home", "FAQ"]));
+  }
+
+  if (path === MANUFACTURER_PAGE_PATH) {
+    schemas.push(breadcrumbSchema(origin, path, ["Home", manufacturerPage.h1]), localBusiness);
   }
 
   if (path === "/contact" || path === "/about" || path === "/b2b-enquiries" || path === "/blog") {

@@ -6,6 +6,7 @@ import { NewsletterForm } from "@/components/NewsletterForm";
 import { packSizes, ProductAvailabilityLabel, ProductCard } from "@/components/ProductCard";
 import { ResponsiveImage } from "@/components/ResponsiveImage";
 import { faqs, getProduct, getProductFaqs, products, siteIdentity } from "@shared/hipaContent";
+import { MANUFACTURER_PAGE_PATH, manufacturerPage } from "@shared/manufacturerPage";
 import { trackEvent } from "@/lib/analytics";
 import { trpc } from "@/lib/trpc";
 
@@ -17,29 +18,14 @@ type ArticleResource = {
 
 const articleResourcesBySlug: Record<string, ArticleResource[]> = {
   "best-masala-manufacturer-in-chennai": [
+    { href: MANUFACTURER_PAGE_PATH, label: "HIPA Masala: masala manufacturer in Chennai", detail: "What we make in Zamin Pallavaram, licence details, bulk formats and who we supply." },
     { href: "/products", label: "Browse HIPA Masala Product Range", detail: "Explore all pure spice powders and traditional South Indian blends." },
     { href: "/b2b-enquiries", label: "Submit B2B Enquiry", detail: "Connect with our team for bulk, restaurant, and distribution terms." },
-    { href: "/contact", label: "Contact HIPA Masala", detail: "Reach out to our Chennai office via phone, email, or WhatsApp." },
-  ],
-  "how-to-choose-a-masala-manufacturer-in-chennai-for-your-business": [
-    { href: "/products", label: "Browse HIPA Masala Product Range", detail: "Explore all pure spice powders and traditional South Indian blends." },
-    { href: "/b2b-enquiries", label: "Submit B2B Enquiry", detail: "Connect with our team for retail, food-service, and institutional packs." },
-    { href: "/about", label: "About HIPA Masala", detail: "Learn more about our spice processing approach and heritage." },
-  ],
-  "what-makes-a-good-masala-manufacturer-8-things-buyers-should-check": [
-    { href: "/products", label: "Explore HIPA Masala Products", detail: "View complete specifications for single spices and South Indian blends." },
-    { href: "/b2b-enquiries", label: "B2B & Distribution Enquiries", detail: "Discuss custom order volumes and sample kits for your business." },
-    { href: "/faq", label: "Read HIPA Masala FAQs", detail: "Answers regarding batch consistency, shelf life, and packaging formats." },
   ],
   "masala-manufacturer-vs-supplier-vs-distributor": [
+    { href: MANUFACTURER_PAGE_PATH, label: "HIPA Masala: masala manufacturer in Chennai", detail: "Buy direct from the maker: products, licence details and bulk formats." },
     { href: "/products", label: "Browse HIPA Masala Range", detail: "Review our single spice powders and authentic blends." },
     { href: "/b2b-enquiries", label: "B2B Trade & Dealership Enquiries", detail: "Enquire for direct manufacturer supply, wholesale, and distribution." },
-    { href: "/contact", label: "Contact HIPA Masala Chennai", detail: "Reach our Pallavaram, Chennai office directly." },
-  ],
-  "masala-manufacturer-for-restaurants-retailers-chennai": [
-    { href: "/products", label: "Explore Products for Food Businesses", detail: "Review household, 500g, and 1kg institutional packs." },
-    { href: "/b2b-enquiries", label: "Restaurant & Retailer Enquiries", detail: "Get in touch for commercial samples and wholesale rates." },
-    { href: "/about", label: "About HIPA Masala", detail: "Read about our authentic South Indian spice processing approach." },
   ],
   "how-to-choose-sambar-powder": [
     { href: "/products/sambar-powder", label: "Explore Sambar Powder", detail: "View the complete HIPA Sambar Powder specifications and culinary uses." },
@@ -77,9 +63,9 @@ const articleResourcesBySlug: Record<string, ArticleResource[]> = {
     { href: "/contact#enquire", label: "Contact HIPA for product details", detail: "Ask for further pack or product information." },
   ],
   "masala-supplier-for-supermarkets-in-chennai": [
+    { href: MANUFACTURER_PAGE_PATH, label: "HIPA Masala: masala manufacturer in Chennai", detail: "Retail pack sizes, licence details and how supermarkets buy direct from the maker." },
     { href: "/products", label: "Browse HIPA Masala products", detail: "Explore the current HIPA retail and bulk product range." },
-    { href: "/b2b-enquiries", label: "Contact HIPA for wholesale & retail inquiries", detail: "Connect with our team for supermarket sample kits and distributor terms." },
-    { href: "/faq", label: "Read HIPA FAQs", detail: "Review answers regarding shelf-life, batch consistency, and certification." },
+    { href: "/b2b-enquiries", label: "Contact HIPA for wholesale & retail inquiries", detail: "Connect with our team for supermarket and distributor terms." },
   ],
 };
 
@@ -648,6 +634,8 @@ export function AboutPage() {
               <p><strong>Brand:</strong> HIPA Masala</p>
               <p><strong>Official Address:</strong> {siteIdentity.locationLabel}</p>
               <p><strong>Phone:</strong> {siteIdentity.phone} | <strong>Email:</strong> {siteIdentity.email}</p>
+              <p><strong>FSSAI Licence No.:</strong> {siteIdentity.fssaiLicence} | <strong>GSTIN:</strong> {siteIdentity.gstin}</p>
+              <p><strong>Working Hours:</strong> {siteIdentity.openingHours.label}</p>
             </div>
           </div>
 
@@ -827,6 +815,8 @@ export function ContactPage() {
               <div className="map-card-info">
                 <h3>Find Us in Chennai</h3>
                 <p>{siteIdentity.locationLabel}</p>
+                <p><strong>Working hours:</strong> {siteIdentity.openingHours.label}</p>
+                <p><strong>FSSAI Lic. No.:</strong> {siteIdentity.fssaiLicence} · <strong>GSTIN:</strong> {siteIdentity.gstin}</p>
                 <a className="map-open-link" href={cityMapUrl} target="_blank" rel="noreferrer">Open in Google Maps</a>
               </div>
             </div>
@@ -1188,6 +1178,138 @@ export function ArticlePage() {
           )}
         </div>
       </article>
+    </>
+  );
+}
+
+const manufacturerGuides = [
+  { href: "/blog/best-masala-manufacturer-in-chennai", label: "Best masala manufacturer in Chennai? What buyers should check", detail: "The buyer checklist: products, process, packs, consistency and communication." },
+  { href: "/blog/masala-manufacturer-vs-supplier-vs-distributor", label: "Manufacturer vs supplier vs distributor", detail: "Which channel a Chennai food business should buy from, and when." },
+  { href: "/blog/masala-supplier-for-supermarkets-in-chennai", label: "Supermarket masala supplier checklist", detail: "What retail buyers should confirm before listing a masala range." },
+];
+
+export function MasalaManufacturerChennaiPage() {
+  const page = manufacturerPage;
+  const productsSection = page.sections.find((section) => section.id === "what-we-make");
+  const remainingSections = page.sections.filter((section) => section.id !== "what-we-make");
+
+  const renderSection = (section: (typeof page.sections)[number]) => (
+    <div key={section.id} id={section.id} className="about-content-section">
+      <h2>{renderArticleInlineLinks(section.heading, [])}</h2>
+      {section.paragraphs.map((paragraph, index) => (
+        <p key={`${section.id}-p-${index}`} className="section-desc">{renderArticleInlineLinks(paragraph, [])}</p>
+      ))}
+      {section.bullets && section.bullets.length > 0 && (
+        <ul className="about-points-list">
+          {section.bullets.map((bullet, index) => (
+            <li key={`${section.id}-b-${index}`}>{renderArticleInlineLinks(bullet, [])}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+
+  return (
+    <>
+      <Breadcrumbs current={page.h1} />
+      <section className="contact-hero">
+        <div className="container contact-hero-inner">
+          <p className="eyebrow">Masala &amp; Spice Powder Manufacturer · Zamin Pallavaram, Chennai</p>
+          <h1>{page.h1}</h1>
+          <p>{renderArticleInlineLinks(page.answerCapsule, [])}</p>
+          <div className="hero-btns">
+            <a href="#manufacturer-enquiry" className="btn btn-primary">Request a B2B quotation <span className="arrow">→</span></a>
+            <a href={siteIdentity.whatsappHref} target="_blank" rel="noreferrer" className="btn btn-outline" onClick={() => trackEvent("whatsapp_click", { location: "manufacturer_page" })}>WhatsApp {siteIdentity.phone}</a>
+          </div>
+        </div>
+      </section>
+
+      <section className="journal-replica about-page">
+        <div className="container" style={{ maxWidth: 880 }}>
+          {productsSection && renderSection(productsSection)}
+        </div>
+      </section>
+
+      <section className="catalogue-page" aria-labelledby="manufactured-range">
+        <div className="container">
+          <div className="collection-head catalogue-head">
+            <p className="eyebrow">Manufactured in Chennai</p>
+            <h2 id="manufactured-range">The eight products HIPA Masala makes</h2>
+            <p className="section-desc">Every product below is milled and packed by HIPA Enterprises in Zamin Pallavaram. Pack sizes are listed on each product page.</p>
+          </div>
+          <div className="catalogue-product-grid">
+            {products.map((product) => (
+              <CatalogueProductCard key={product.slug} product={product} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="journal-replica about-page">
+        <div className="container" style={{ maxWidth: 880 }}>
+          {remainingSections.map(renderSection)}
+
+          <div className="about-content-section">
+            <p className="eyebrow">Registered business</p>
+            <h2>HIPA Enterprises at a glance</h2>
+            <div className="about-entity-box">
+              <p><strong>Brand:</strong> {siteIdentity.name} | <strong>Legal entity:</strong> {siteIdentity.legalName}</p>
+              <p><strong>Manufacturing address:</strong> {siteIdentity.locationLabel}</p>
+              <p><strong>FSSAI Licence No.:</strong> {siteIdentity.fssaiLicence} | <strong>GSTIN:</strong> {siteIdentity.gstin}</p>
+              <p><strong>Working hours:</strong> {siteIdentity.openingHours.label}</p>
+              <p><strong>Phone / WhatsApp:</strong> <a href={siteIdentity.phoneHref} onClick={() => trackEvent("phone_click", { location: "manufacturer_page" })}>{siteIdentity.phone}</a> | <strong>Email:</strong> <a href={`mailto:${siteIdentity.email}`}>{siteIdentity.email}</a></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="product-faq-section" aria-labelledby="manufacturer-faq">
+        <div className="container">
+          <div className="product-faq-heading">
+            <p className="eyebrow">Buyer questions</p>
+            <h2 id="manufacturer-faq">Frequently asked questions about HIPA Masala as a manufacturer</h2>
+            <p>Straight answers for supermarkets, restaurants, distributors and exporters comparing masala manufacturers in Chennai.</p>
+          </div>
+          <div className="product-faq-list">
+            {page.faqs.map((faq, index) => (
+              <details key={faq.question} className="product-faq-item" open={index === 0}>
+                <summary>
+                  {faq.question}
+                  <ChevronDown size={16} />
+                </summary>
+                <p>{renderArticleInlineLinks(faq.answer, [])}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="b2b-enquiry-section" id="manufacturer-enquiry">
+        <div className="container b2b-enquiry-grid">
+          <div className="b2b-enquiry-copy">
+            <p className="eyebrow">Buy direct from the manufacturer</p>
+            <h2>Send your requirement to HIPA Masala</h2>
+            <p>Tell us your business type, the products and pack sizes you need, and your expected monthly volume. Pricing, minimum quantities and delivery are confirmed on enquiry.</p>
+            <aside className="article-related-links" aria-labelledby="manufacturer-guides">
+              <p className="eyebrow">Buyer guides</p>
+              <h3 id="manufacturer-guides">Read before you shortlist</h3>
+              <ul>
+                {manufacturerGuides.map((guide) => (
+                  <li key={guide.href}>
+                    <Link href={guide.href}>{guide.label}</Link>
+                    <span>{guide.detail}</span>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          </div>
+          <div className="contact-form-card b2b-enquiry-form">
+            <h2>Business enquiry</h2>
+            <p>Fields marked * are required. We reply during working hours, {siteIdentity.openingHours.label}.</p>
+            <EnquiryForm formId="manufacturer-enquiry-form" variant="distributor" />
+          </div>
+        </div>
+      </section>
     </>
   );
 }

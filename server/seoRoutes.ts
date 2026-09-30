@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { getIndexablePaths, products, siteIdentity } from "../shared/hipaContent";
+import { MANUFACTURER_PAGE_PATH } from "../shared/manufacturerPage";
 import { listPublishedBlogEntries, listPublishedBlogPosts } from "./db";
 
 const canonicalOrigin = (process.env.CANONICAL_ORIGIN || "https://www.hipamasalas.com").replace(/\/$/, "");
@@ -20,6 +21,10 @@ const legacyRoutes: Record<string, string> = {
   "/garam-masala.html": "/products/garam-masala",
   "/blog-details.html": "/blog",
   "/b2b-enquiry": "/b2b-enquiries",
+  // Six guides on "masala manufacturer in Chennai" were consolidated into three plus the pillar page (30 Sep 2026).
+  "/blog/how-to-choose-a-masala-manufacturer-in-chennai-for-your-business": "/blog/best-masala-manufacturer-in-chennai",
+  "/blog/what-makes-a-good-masala-manufacturer-8-things-buyers-should-check": "/blog/best-masala-manufacturer-in-chennai",
+  "/blog/masala-manufacturer-for-restaurants-retailers-chennai": MANUFACTURER_PAGE_PATH,
 };
 
 function xmlEscape(value: string) {
@@ -51,10 +56,7 @@ export type LlmsBlogPost = { slug: string; title: string; description: string };
 // Published guides that belong under a topical llms.txt section (only listed if actually published).
 const QUALITY_GUIDES = ["how-spice-quality-affects-food-taste", "what-makes-a-good-spice-powder", "how-to-read-a-spice-powder-label"];
 const BUSINESS_GUIDES = [
-  "how-to-choose-a-masala-manufacturer-in-chennai-for-your-business",
-  "what-makes-a-good-masala-manufacturer-8-things-buyers-should-check",
   "masala-manufacturer-vs-supplier-vs-distributor",
-  "masala-manufacturer-for-restaurants-retailers-chennai",
   "masala-supplier-for-supermarkets-in-chennai",
   "true-cost-of-your-spice-supplier",
 ];
@@ -97,11 +99,13 @@ export function buildLlmsTxt(origin = canonicalOrigin, posts: LlmsBlogPost[] = [
       ...guides(QUALITY_GUIDES),
     ]],
     ["Business / B2B", [
+      link(MANUFACTURER_PAGE_PATH, "Masala manufacturer in Chennai", "What HIPA manufactures, how it is made, FSSAI and GST details, bulk formats and who it supplies."),
       link("/b2b-enquiries", "B2B enquiries", "Wholesale, distribution, retail, hotel, restaurant and catering supply enquiries."),
       ...guides(BUSINESS_GUIDES),
     ]],
     ["Chennai / Pallavaram", [
       link("/contact", "Contact and location", `Office in Pallavaram, Chennai: ${siteIdentity.locationLabel}.`),
+      link(MANUFACTURER_PAGE_PATH, "Masala manufacturer in Zamin Pallavaram, Chennai", "Manufacturing base, delivery area across Chennai and Tamil Nadu, and how to enquire."),
       ...guides(CHENNAI_GUIDES),
     ]],
     ["Blog", [
@@ -109,7 +113,7 @@ export function buildLlmsTxt(origin = canonicalOrigin, posts: LlmsBlogPost[] = [
       ...posts.filter((post) => !listed.has(post.slug)).map((post) => link(`/blog/${post.slug}`, post.title, post.description)),
     ]],
     ["Contact", [
-      link("/contact", "Contact HIPA Masala", `Phone ${siteIdentity.phone}, email ${siteIdentity.email}, enquiry form and map.`),
+      link("/contact", "Contact HIPA Masala", `Phone ${siteIdentity.phone}, email ${siteIdentity.email}, open ${siteIdentity.openingHours.label}, FSSAI licence ${siteIdentity.fssaiLicence}, GSTIN ${siteIdentity.gstin}, enquiry form and map.`),
       link("/b2b-enquiries", "Business enquiry form", "For bulk, distributor and food-service requirements."),
     ]],
   ];
@@ -117,7 +121,7 @@ export function buildLlmsTxt(origin = canonicalOrigin, posts: LlmsBlogPost[] = [
   return [
     "# HIPA Masala",
     "",
-    "> HIPA Masala is an Indian spice brand by HIPA Enterprises, based in Pallavaram, Chennai, Tamil Nadu. It makes single-spice powders and traditional South Indian masala blends for home kitchens, retailers and food businesses.",
+    "> HIPA Masala is an Indian spice brand by HIPA Enterprises, an FSSAI-licensed, GST-registered masala manufacturer in Pallavaram, Chennai, Tamil Nadu. It makes single-spice powders and traditional South Indian masala blends for home kitchens, retailers and food businesses.",
     "",
     "This is an informational and enquiry website, not an online shop: pricing, availability, minimum order quantities and commercial terms are confirmed directly by HIPA Masala through the contact or B2B enquiry pages.",
     "",
