@@ -1206,6 +1206,9 @@ export function MasalaManufacturerChennaiPage() {
           ))}
         </ul>
       )}
+      {section.closing?.map((paragraph, index) => (
+        <p key={`${section.id}-c-${index}`} className="section-desc">{renderArticleInlineLinks(paragraph, [])}</p>
+      ))}
     </div>
   );
 

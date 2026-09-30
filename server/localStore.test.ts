@@ -20,7 +20,7 @@ describe("bundled local blog store", () => {
 
   it("can retrieve a bundled article by its public slug", () => {
     const newPost = getLocalBlogBySlug("best-masala-manufacturer-in-chennai");
-    expect(newPost?.title).toBe("Best Masala Manufacturer in Chennai? What Buyers Should Actually Check");
+    expect(newPost?.title).toBe("Best Masala Manufacturer in Chennai? What Buyers Should Check");
     expect(newPost?.coverImageUrl).toMatch(/^\/assets\//);
 
     const oldPost = getLocalBlogBySlug("how-to-choose-sambar-powder");
