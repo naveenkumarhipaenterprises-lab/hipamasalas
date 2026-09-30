@@ -16,6 +16,15 @@ function cleanText(value: string, max: number) {
   return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
 }
 
+// Long titles drop the "| Brand" suffix before being cut, so search results never show "… | HI…".
+function fitTitle(value: string, max: number) {
+  const text = value.replace(/\s+/g, " ").trim();
+  if (text.length <= max) return text;
+  const withoutBrand = text.replace(/\s*\|[^|]*$/, "").trim();
+  if (withoutBrand && withoutBrand.length <= max) return withoutBrand;
+  return cleanText(withoutBrand || text, max);
+}
+
 function toAbsoluteUrl(value?: string) {
   if (!value) return undefined;
   if (/^https?:\/\//i.test(value)) return value;
@@ -23,7 +32,7 @@ function toAbsoluteUrl(value?: string) {
 }
 
 function buildHead(head: PageHead) {
-  const title = escapeHtml(cleanText(head.title || siteName, 70));
+  const title = escapeHtml(fitTitle(head.title || siteName, 65));
   const description = escapeHtml(cleanText(head.description, 200));
   const canonical = head.canonicalPath && canonicalOrigin ? `${canonicalOrigin}${head.canonicalPath}` : undefined;
   const image = toAbsoluteUrl(head.ogImage);

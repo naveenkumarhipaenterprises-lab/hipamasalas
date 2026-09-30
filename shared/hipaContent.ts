@@ -1126,32 +1126,49 @@ export function getStructuredData(pathname: string, origin: string, articleOverr
     addressCountry: "IN",
   };
 
+  // Stable @ids let Google merge the Organization, LocalBusiness and WebSite nodes into one entity
+  // and let Product and BlogPosting point back at it instead of repeating the details.
+  const organizationId = absoluteUrl(origin, "/#organization");
+  const localBusinessId = absoluteUrl(origin, "/#localbusiness");
+  const websiteId = absoluteUrl(origin, "/#website");
+  const sameAs = [siteIdentity.facebook, siteIdentity.instagram];
+  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${siteIdentity.name}, ${siteIdentity.locationLabel}`)}`;
+
   const organization = {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": organizationId,
     name: siteIdentity.name,
+    alternateName: "HIPA Masalas",
     legalName: siteIdentity.legalName,
     url: absoluteUrl(origin, "/"),
-    logo: absoluteUrl(origin, siteIdentity.logo),
+    logo: { "@type": "ImageObject", url: absoluteUrl(origin, siteIdentity.logo), width: 389, height: 453 },
     description: "HIPA Masala is an Indian spice and masala brand owned by HIPA Enterprises, based in Pallavaram, Chennai, Tamil Nadu, India.",
     email: siteIdentity.email,
     telephone: siteIdentity.phone,
     address: postalAddress,
+    sameAs,
     areaServed: ["Chennai", "Tamil Nadu", "India", "International export enquiries"],
     knowsAbout: ["Indian spice powders", "masala blends", "distributor supply", "dealer enquiries", "wholesale enquiries", "export enquiries"],
-    contactPoint: { "@type": "ContactPoint", telephone: siteIdentity.phone, email: siteIdentity.email, contactType: "sales", areaServed: "IN" },
+    contactPoint: { "@type": "ContactPoint", telephone: siteIdentity.phone, email: siteIdentity.email, contactType: "sales", areaServed: "IN", availableLanguage: ["en", "ta"] },
   };
 
   const localBusiness = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
+    "@id": localBusinessId,
     name: siteIdentity.name,
+    alternateName: "HIPA Masalas",
     legalName: siteIdentity.legalName,
     image: absoluteUrl(origin, siteIdentity.logo),
     url: absoluteUrl(origin, "/"),
     telephone: siteIdentity.phone,
     email: siteIdentity.email,
     address: postalAddress,
+    hasMap: mapUrl,
+    sameAs,
+    areaServed: ["Chennai", "Tamil Nadu", "India"],
+    parentOrganization: { "@id": organizationId },
     priceRange: "₹₹",
   };
 
@@ -1159,8 +1176,12 @@ export function getStructuredData(pathname: string, origin: string, articleOverr
     schemas.push(organization, localBusiness, {
       "@context": "https://schema.org",
       "@type": "WebSite",
+      "@id": websiteId,
       name: siteIdentity.name,
+      alternateName: "HIPA Masalas",
       url: absoluteUrl(origin, "/"),
+      inLanguage: "en-IN",
+      publisher: { "@id": organizationId },
     });
   }
 
@@ -1182,7 +1203,10 @@ export function getStructuredData(pathname: string, origin: string, articleOverr
           image: [absoluteUrl(origin, product.image)],
           url: absoluteUrl(origin, path),
           brand: { "@type": "Brand", name: siteIdentity.name },
+          manufacturer: { "@id": organizationId },
+          countryOfOrigin: { "@type": "Country", name: "India" },
           category: "Spice powders and masala blends",
+          additionalProperty: product.packSizes.map((size) => ({ "@type": "PropertyValue", name: "Pack size", value: size })),
         }
       );
     }
@@ -1193,7 +1217,7 @@ export function getStructuredData(pathname: string, origin: string, articleOverr
   }
 
   if (path === "/contact" || path === "/about" || path === "/b2b-enquiries" || path === "/blog") {
-    schemas.push(breadcrumbSchema(origin, path, ["Home", path === "/contact" ? "Contact" : path === "/about" ? "About" : path === "/blog" ? "Journal" : "B2B Enquiries"]));
+    schemas.push(breadcrumbSchema(origin, path, ["Home", path === "/contact" ? "Contact" : path === "/about" ? "About" : path === "/blog" ? "Blog" : "B2B Enquiries"]));
     if (path === "/contact") {
       schemas.push(localBusiness);
     }
@@ -1204,15 +1228,17 @@ export function getStructuredData(pathname: string, origin: string, articleOverr
     const article = articleOverride?.slug === articleMatch[1] ? articleOverride : getArticle(articleMatch[1]);
     if (article) {
       schemas.push(
-        breadcrumbSchema(origin, path, ["Home", "Journal", article.title]),
+        breadcrumbSchema(origin, path, ["Home", "Blog", article.title]),
         {
           "@context": "https://schema.org",
           "@type": "BlogPosting",
           headline: article.title,
           description: article.description,
-          author: { "@type": "Organization", name: article.authorName, url: absoluteUrl(origin, "/") },
-          publisher: { "@type": "Organization", name: siteIdentity.name, logo: { "@type": "ImageObject", url: absoluteUrl(origin, siteIdentity.logo) } },
+          author: { "@type": "Organization", "@id": organizationId, name: article.authorName, url: absoluteUrl(origin, "/") },
+          publisher: { "@type": "Organization", "@id": organizationId, name: siteIdentity.name, logo: { "@type": "ImageObject", url: absoluteUrl(origin, siteIdentity.logo) } },
           mainEntityOfPage: { "@type": "WebPage", "@id": absoluteUrl(origin, path) },
+          isPartOf: { "@id": websiteId },
+          inLanguage: "en-IN",
           datePublished: article.publishedAt,
           ...(article.modifiedAt ? { dateModified: article.modifiedAt } : {}),
           ...(article.image ? { image: [absoluteUrl(origin, article.image)] } : {}),

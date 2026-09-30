@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { getIndexablePaths, siteIdentity } from "../shared/hipaContent";
-import { listPublishedBlogPaths } from "./db";
+import { listPublishedBlogEntries } from "./db";
 
 const canonicalOrigin = (process.env.CANONICAL_ORIGIN || "https://www.hipamasalas.com").replace(/\/$/, "");
 
@@ -26,9 +26,18 @@ function xmlEscape(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-export function buildSitemapXml(origin = canonicalOrigin, publishedBlogPaths: string[] = []) {
-  const urls = Array.from(new Set([...getIndexablePaths(), ...publishedBlogPaths]))
-    .map((path) => `<url><loc>${xmlEscape(`${origin}${path}`)}</loc></url>`)
+export type SitemapEntry = { path: string; lastmod?: string };
+
+export function buildSitemapXml(origin = canonicalOrigin, publishedBlogPaths: Array<string | SitemapEntry> = []) {
+  // Blog entries carry their real update date; static pages have none rather than a fake one.
+  const lastmodByPath = new Map<string, string | undefined>();
+  for (const path of getIndexablePaths()) lastmodByPath.set(path, undefined);
+  for (const entry of publishedBlogPaths) {
+    const { path, lastmod } = typeof entry === "string" ? { path: entry, lastmod: undefined } : entry;
+    lastmodByPath.set(path, lastmod ? lastmod.slice(0, 10) : lastmodByPath.get(path));
+  }
+  const urls = Array.from(lastmodByPath.entries())
+    .map(([path, lastmod]) => `<url><loc>${xmlEscape(`${origin}${path}`)}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ""}</url>`)
     .join("");
   return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`;
 }
@@ -51,9 +60,9 @@ export function registerSeoRoutes(app: Express) {
   });
 
   app.get("/sitemap.xml", async (_req, res) => {
-    let publishedBlogPaths: string[] = [];
+    let publishedBlogPaths: SitemapEntry[] = [];
     try {
-      publishedBlogPaths = await listPublishedBlogPaths();
+      publishedBlogPaths = await listPublishedBlogEntries();
     } catch (error) {
       console.warn("[SEO] Could not load blog paths for sitemap; serving static sitemap:", error);
     }
