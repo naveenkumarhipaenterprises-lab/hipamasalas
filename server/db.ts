@@ -59,6 +59,14 @@ export async function listPublishedBlogPaths(): Promise<string[]> {
   return posts.map((post) => `/blog/${post.slug}`);
 }
 
+export async function listPublishedBlogEntries(): Promise<Array<{ path: string; lastmod?: string }>> {
+  const posts = await listPublishedBlogPosts();
+  return posts.map((post) => ({
+    path: `/blog/${post.slug}`,
+    lastmod: (post.updatedAt ?? post.publishedAt ?? post.createdAt)?.toISOString(),
+  }));
+}
+
 export async function listProductAvailability(): Promise<ProductAvailability[]> {
   return listLocalAvailability();
 }
