@@ -51,6 +51,8 @@ describe("standalone SEO parity", () => {
     expect(sitemap).toContain("/about");
     expect(sitemap).not.toContain("/terms-of-service");
     expect(sitemap).toContain("/b2b-enquiries");
-    expect(buildLlmsTxt("https://www.hipamasalas.com")).toContain("distributor, wholesaler, retailer");
+    const llms = buildLlmsTxt("https://www.hipamasalas.com");
+    expect(llms).toContain("[B2B enquiries](https://www.hipamasalas.com/b2b-enquiries)");
+    expect(llms).toContain("[Sambar Powder](https://www.hipamasalas.com/products/sambar-powder)");
   });
 });
