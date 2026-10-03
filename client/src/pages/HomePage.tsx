@@ -208,7 +208,7 @@ export function HomePage() {
               <Link href="/products" className="btn btn-primary">
                 Explore Product Range <span className="arrow">→</span>
               </Link>
-              <Link href="/b2b-enquiries" className="btn btn-outline">
+              <Link href="/masala-manufacturer-in-chennai" className="btn btn-outline">
                 B2B &amp; Wholesale <span className="arrow">→</span>
               </Link>
               <a href="/assets/hipa-masalas-brochure.pdf" download="HIPA-Masala-Brochure.pdf" className="btn btn-brochure-download">

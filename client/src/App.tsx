@@ -26,7 +26,7 @@ function clientOnly(Page: ComponentType) {
 }
 
 /** A page from the lazily loaded HipaPages chunk (see routes.ts). */
-function secondary(name: "ProductsPage" | "AboutPage" | "ProductDetailPage" | "FaqPage" | "ContactPage" | "B2BEnquiriesPage" | "PrivacyPage" | "TermsOfServicePage" | "BlogPage" | "ArticlePage" | "NotFoundPage") {
+function secondary(name: "ProductsPage" | "AboutPage" | "ProductDetailPage" | "FaqPage" | "ContactPage" | "B2BEnquiriesPage" | "MasalaManufacturerChennaiPage" | "PrivacyPage" | "TermsOfServicePage" | "BlogPage" | "ArticlePage" | "NotFoundPage") {
   return function SecondaryPage() {
     const Page = readSecondaryPages()[name];
     return <Page />;
@@ -39,6 +39,7 @@ const ProductDetailPage = secondary("ProductDetailPage");
 const FaqPage = secondary("FaqPage");
 const ContactPage = secondary("ContactPage");
 const B2BEnquiriesPage = secondary("B2BEnquiriesPage");
+const MasalaManufacturerChennaiPage = secondary("MasalaManufacturerChennaiPage");
 const PrivacyPage = secondary("PrivacyPage");
 const TermsOfServicePage = secondary("TermsOfServicePage");
 const BlogPage = secondary("BlogPage");
@@ -61,6 +62,7 @@ function Router() {
       <Route path="/faq" component={FaqPage} />
       <Route path="/contact" component={ContactPage} />
       <Route path="/b2b-enquiries" component={B2BEnquiriesPage} />
+      <Route path="/masala-manufacturer-in-chennai" component={MasalaManufacturerChennaiPage} />
       <Route path="/privacy" component={PrivacyPage} />
       <Route path="/terms-of-service" component={TermsOfServicePage} />
       <Route path="/blog" component={BlogPage} />

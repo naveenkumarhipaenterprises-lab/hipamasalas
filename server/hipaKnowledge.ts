@@ -11,6 +11,11 @@ export const HIPA_KNOWLEDGE_BASE = {
     whatsapp: "+91 70580 53055",
     email: "info@hipamasalas.com",
     website: "https://www.hipamasalas.com/",
+    legalEntity: "HIPA Enterprises",
+    fssaiLicence: "22426423000366",
+    gstin: "33BVIPR5839J1Z1",
+    workingHours: "Monday to Saturday, 9:00 am to 5:30 pm",
+    manufacturerPage: "https://www.hipamasalas.com/masala-manufacturer-in-chennai",
     description: "Authentic South Indian spice powders and masalas prepared with premium traditional recipes at Old Pallavaram, Chennai, Tamil Nadu."
   },
   products: [
