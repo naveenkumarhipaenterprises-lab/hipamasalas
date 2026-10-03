@@ -91,6 +91,7 @@ const BLOG_COVERS = [
   "masala-manufacturer-vs-supplier-vs-distributor.webp",
   "how-to-evaluate-masala-manufacturer-in-chennai.webp",
   "masala-supplier-supermarkets-chennai-cover.jpg",
+  "how-to-store-indian-spice-powders.jpg",
   "hipa-original-good-spice-cover-web_caaa742d.webp",
   "hipa-original-supplier-cost-cover-web_493aea4d.webp",
   "hipa-original-lunch-box-cover-web_d0df26a5.webp",

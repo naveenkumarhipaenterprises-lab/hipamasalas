@@ -32,6 +32,7 @@ export const imageManifest: Record<string, ImageManifestRow> = {
   "/assets/masala-manufacturer-vs-supplier-vs-distributor.webp": [1678,937,[400,600,700,800,1280],0,0],
   "/assets/how-to-evaluate-masala-manufacturer-in-chennai.webp": [1672,941,[400,600,700,800,1280],0,0],
   "/assets/masala-supplier-supermarkets-chennai-cover.jpg": [1024,571,[400,600,700,800,1024],0,0],
+  "/assets/how-to-store-indian-spice-powders.jpg": [1376,768,[400,600,700,800,1280],0,0],
   "/assets/hipa-original-good-spice-cover-web_caaa742d.webp": [1280,853,[400,600,700,800,1280],0,0],
   "/assets/hipa-original-supplier-cost-cover-web_493aea4d.webp": [1280,720,[400,600,700,800,1280],0,0],
   "/assets/hipa-original-lunch-box-cover-web_d0df26a5.webp": [1280,720,[400,600,700,800,1280],0,0],

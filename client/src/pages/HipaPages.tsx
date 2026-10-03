@@ -17,6 +17,11 @@ type ArticleResource = {
 };
 
 const articleResourcesBySlug: Record<string, ArticleResource[]> = {
+  "how-to-store-indian-spice-powders": [
+    { href: "/products", label: "Browse Pure Spices & Blends", detail: "Explore the full HIPA Masala collection for home & food-business cooking." },
+    { href: "/b2b-enquiries", label: "Commercial Packaging & Bulk Supply", detail: "Learn about 500g, 1kg, and custom institutional packs with airtight seals." },
+    { href: "/contact", label: "Contact HIPA Masala", detail: "Connect with our team in Pallavaram, Chennai for product queries." },
+  ],
   "best-masala-manufacturer-in-chennai": [
     { href: MANUFACTURER_PAGE_PATH, label: "HIPA Masala: masala manufacturer in Chennai", detail: "What we make in Zamin Pallavaram, licence details, bulk formats and who we supply." },
     { href: "/products", label: "Browse HIPA Masala Product Range", detail: "Explore all pure spice powders and traditional South Indian blends." },
