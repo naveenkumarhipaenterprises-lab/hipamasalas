@@ -7,6 +7,7 @@ import superjson from "superjson";
 import { Router } from "wouter";
 import App from "./App";
 import { trpc } from "./lib/trpc";
+import { loadSecondaryPages } from "./routes";
 import { getPageHead, type Article, type PageHead } from "@shared/hipaContent";
 import type { BlogPost, ProductAvailability } from "../../drizzle/schema";
 import { getPublishedBlogPostBySlug, listProductAvailability, listPublishedBlogPosts } from "../../server/db";
@@ -51,6 +52,8 @@ function asArticle(post: BlogPost): Article {
 }
 
 export async function render(url: string, blogSource: BlogRenderSource = databaseBlogRenderSource, availabilitySource: ProductAvailabilityRenderSource = databaseProductAvailabilityRenderSource): Promise<RenderResult> {
+  // renderToString is synchronous: make sure the lazily loaded page chunk is resolved first.
+  await loadSecondaryPages();
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } } });
   const divider = url.indexOf("?");
   const ssrPath = divider === -1 ? url : url.slice(0, divider);

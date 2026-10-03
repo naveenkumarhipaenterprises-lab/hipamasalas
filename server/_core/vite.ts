@@ -61,6 +61,50 @@ function buildHead(head: PageHead) {
   return tags.join("\n");
 }
 
+/**
+ * Inlines the bundled stylesheet(s) into the HTML template.
+ * The site's single CSS bundle (~17 KB gzipped) was the only render-blocking request; the app
+ * navigates client-side after the first load, so the CSS is fetched once per visit either way.
+ * Inlining removes a network round-trip before first paint. Runs once per server instance.
+ */
+export function inlineStylesheets(template: string, assetRoot: string) {
+  return template.replace(/<link\b[^>]*\brel="stylesheet"[^>]*>/g, (tag) => {
+    const href = tag.match(/\bhref="(\/assets\/[^"]+\.css)"/)?.[1];
+    if (!href) return tag;
+    const file = path.join(assetRoot, href);
+    if (!fs.existsSync(file)) return tag;
+    const css = fs
+      .readFileSync(file, "utf-8")
+      .replace(/\/\*# sourceMappingURL=[^*]*\*\//g, "")
+      .replace(/<\/style/gi, "<\\/style");
+    return `<style data-href="${href}">${css}</style>`;
+  });
+}
+
+/**
+ * Server-rendered HTML is complete without JavaScript (JS only hydrates it), so the app bundle
+ * should not compete with the LCP hero image and web fonts for bandwidth on slow connections.
+ * Marks the entry module script and its modulepreloads as low fetch priority.
+ */
+export function deprioritizeAppScripts(template: string) {
+  return template.replace(/<(script|link)\b([^>]*)>/g, (tag, name: string, attrs: string) => {
+    const isEntry = name === "script" && /\btype="module"/.test(attrs) && /\bsrc="\/assets\//.test(attrs);
+    const isPreload = name === "link" && /\brel="modulepreload"/.test(attrs) && /\bhref="\/assets\//.test(attrs);
+    if ((!isEntry && !isPreload) || /\bfetchpriority=/.test(attrs)) return tag;
+    return `<${name}${attrs.replace(/\s*\/$/, "")} fetchpriority="low"${attrs.trimEnd().endsWith("/") ? " /" : ""}>`;
+  });
+}
+
+const templateCache = new Map<string, string>();
+async function loadTemplate(templatePath: string) {
+  const cached = templateCache.get(templatePath);
+  if (cached) return cached;
+  const raw = await fs.promises.readFile(templatePath, "utf-8");
+  const template = deprioritizeAppScripts(inlineStylesheets(raw, path.dirname(templatePath)));
+  templateCache.set(templatePath, template);
+  return template;
+}
+
 function composeHtml(template: string, appHtml: string, head: PageHead, dehydratedState: unknown) {
   const state = JSON.stringify(superjson.serialize(dehydratedState)).replace(/</g, "\\u003c");
   return template
@@ -90,14 +134,14 @@ export function serveStatic(app: Express) {
       return res.status(404).type("text/plain").send("Not found");
     }
     try {
-      const template = await fs.promises.readFile(templatePath, "utf-8");
+      const template = await loadTemplate(templatePath);
       const serverEntryPath = path.resolve(process.cwd(), "dist", "server-ssr", "entry-server.js");
       const { render } = await import(serverEntryPath);
       const { html, dehydratedState, head } = await render(req.originalUrl);
       res.status(head.notFound ? 404 : 200).set({ "Content-Type": "text/html", "Cache-Control": "no-cache" }).end(composeHtml(template, html, head, dehydratedState));
     } catch (error) {
       console.error("[SSR] render failed, serving shell:", error);
-      const template = await fs.promises.readFile(templatePath, "utf-8");
+      const template = await loadTemplate(templatePath);
       res.status(200).set({ "Content-Type": "text/html", "Cache-Control": "no-cache" }).end(template.replace("<!--app-head-->", () => buildHead({ title: siteName, description: "HIPA Masala product and enquiry information." })));
     }
   });
