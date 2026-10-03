@@ -16,7 +16,8 @@ function escapeHtml(value: string) {
 export function cleanText(value: string, max: number) {
   const text = value.replace(/\s+/g, " ").trim();
   if (text.length <= max) return text;
-  const hard = text.slice(0, max - 1);
+  // slice() counts UTF-16 units, so never end the hard cut on the first half of a surrogate pair (emoji etc.).
+  const hard = text.slice(0, max - 1).replace(/[\uD800-\uDBFF]$/, "");
   const lastSpace = hard.lastIndexOf(" ");
   const cut = lastSpace >= Math.floor((max - 1) * 0.66) ? hard.slice(0, lastSpace) : hard;
   return `${cut.replace(/[\s,;:–-]+$/, "")}…`;

@@ -86,10 +86,7 @@ const HERO_PACKS = [
 ];
 const BLOG_COVERS = [
   "best-masala-manufacturer-in-chennai.webp",
-  "how-to-choose-masala-manufacturer-in-chennai.webp",
-  "what-makes-a-good-masala-manufacturer.webp",
   "masala-manufacturer-vs-supplier-vs-distributor.webp",
-  "how-to-evaluate-masala-manufacturer-in-chennai.webp",
   "masala-supplier-supermarkets-chennai-cover.jpg",
   "how-to-store-indian-spice-powders.jpg",
   "hipa-original-good-spice-cover-web_caaa742d.webp",

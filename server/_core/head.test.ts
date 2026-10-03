@@ -22,6 +22,13 @@ describe("search-result title fitting", () => {
     expect(cleanText("a".repeat(80), 20)).toBe(`${"a".repeat(19)}…`);
   });
 
+  it("never splits an emoji or other astral character at the cut", () => {
+    const cut = cleanText(`Sambar ${"\u{1F336}".repeat(8)}`, 19);
+    expect(cut.isWellFormed()).toBe(true);
+    expect(cut.endsWith("…")).toBe(true);
+    expect(cut.length).toBeLessThanOrEqual(19);
+  });
+
   it("drops a dangling comma before the ellipsis", () => {
     expect(cleanText("Pure spice powders, masala blends, bulk packs, for restaurants and retailers in Chennai", 50)).toBe(
       "Pure spice powders, masala blends, bulk packs…",
