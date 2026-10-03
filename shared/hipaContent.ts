@@ -777,7 +777,7 @@ export const articles: Article[] = [
     ],
     "authorName": "HIPA Masala",
     "publishedAt": "2026-09-24T09:00:00.000Z",
-    "modifiedAt": "2026-09-30T10:47:29.000Z",
+    "modifiedAt": "2026-10-03T05:40:00.000Z",
     "image": "/assets/best-masala-manufacturer-in-chennai.webp",
     "imageAlt": "B2B buyer guide cover showing supplier comparison documents in a Chennai food-industry setting",
     "complete": true
