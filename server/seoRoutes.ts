@@ -54,7 +54,12 @@ export function buildRobotsTxt(origin = canonicalOrigin) {
 export type LlmsBlogPost = { slug: string; title: string; description: string };
 
 // Published guides that belong under a topical llms.txt section (only listed if actually published).
-const QUALITY_GUIDES = ["how-spice-quality-affects-food-taste", "what-makes-a-good-spice-powder", "how-to-read-a-spice-powder-label"];
+const QUALITY_GUIDES = [
+  "how-spice-quality-affects-food-taste",
+  "what-makes-a-good-spice-powder",
+  "how-to-read-a-spice-powder-label",
+  "how-to-store-indian-spice-powders",
+];
 const BUSINESS_GUIDES = [
   "masala-manufacturer-vs-supplier-vs-distributor",
   "masala-supplier-for-supermarkets-in-chennai",

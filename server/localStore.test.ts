@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { articles } from "../shared/hipaContent";
 import { getLocalBlogBySlug, listLocalBlogs, parseLocalState } from "./localStore";
 
 describe("bundled local blog store", () => {
@@ -16,6 +17,21 @@ describe("bundled local blog store", () => {
     expect(parsed.availability).toHaveLength(1);
     expect(parsed.availability[0]?.productSlug).toBe("sambar-powder");
     expect(parsed.availability[0]?.status).toBe("unavailable");
+  });
+
+  it("keeps the bundled article metadata (client titles, sitemap paths) in step with the published posts", () => {
+    // HeadManager and getIndexablePaths read shared/hipaContent.ts `articles`, while pages render
+    // from data/blog-posts.json, so a post that exists in only one list gets a stale title or a
+    // sitemap entry that redirects.
+    const published = new Map(listLocalBlogs().map((post) => [post.slug, post]));
+    const bundled = articles.filter((article) => article.complete);
+
+    expect(bundled.map((article) => article.slug).sort()).toEqual([...published.keys()].sort());
+    for (const article of bundled) {
+      const post = published.get(article.slug);
+      expect(article.title, article.slug).toBe(post?.title);
+      expect(article.description, article.slug).toBe(post?.description);
+    }
   });
 
   it("can retrieve a bundled article by its public slug", () => {

@@ -11,13 +11,19 @@ function escapeHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
-function cleanText(value: string, max: number) {
+// Cuts at a word boundary (when one exists in the last third) so a cut title never
+// ends in a half word like "Aroma a…"; a dangling comma or colon is dropped too.
+export function cleanText(value: string, max: number) {
   const text = value.replace(/\s+/g, " ").trim();
-  return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
+  if (text.length <= max) return text;
+  const hard = text.slice(0, max - 1);
+  const lastSpace = hard.lastIndexOf(" ");
+  const cut = lastSpace >= Math.floor((max - 1) * 0.66) ? hard.slice(0, lastSpace) : hard;
+  return `${cut.replace(/[\s,;:–-]+$/, "")}…`;
 }
 
 // Long titles drop the "| Brand" suffix before being cut, so search results never show "… | HI…".
-function fitTitle(value: string, max: number) {
+export function fitTitle(value: string, max: number) {
   const text = value.replace(/\s+/g, " ").trim();
   if (text.length <= max) return text;
   const withoutBrand = text.replace(/\s*\|[^|]*$/, "").trim();
