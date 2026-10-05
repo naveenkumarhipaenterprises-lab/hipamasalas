@@ -13,6 +13,7 @@ import "./styles/fonts.css";
 import "./styles/site-base.css";
 import "./index.css";
 import "./contact-navigation.css";
+import "./styles/effects.css";
 
 declare global {
   interface Window {

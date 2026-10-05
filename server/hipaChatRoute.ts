@@ -1,4 +1,5 @@
 import type { Express, Request, Response } from "express";
+import { answerLocally } from "./hipaAnswers";
 
 export const HIPA_SYSTEM_PROMPT = `You are a real human team member at HIPA Masala in Old Pallavaram, Chennai, Tamil Nadu. Talk warmly, naturally, and wittily to visitors on the official HIPA website like a friendly, helpful colleague chatting on WhatsApp.
 
@@ -88,25 +89,31 @@ function buildGeminiContents(
   return contents;
 }
 
+const GEMINI_TIMEOUT_MS = 6000; // per attempt
+const GEMINI_BUDGET_MS = 7000; // across all attempts, so the serverless function always answers in time
+
 async function callGeminiAPI(
   apiKey: string,
   userMessage: string,
   history: Array<{ role: string; content: string }> = []
 ): Promise<{ reply: string | null; error: string | null }> {
+  // Gemini 1.5 models were retired in 2025; try the configured model, then current Flash models.
   const candidateModels = Array.from(
     new Set([
       process.env.GEMINI_MODEL,
-      "gemini-1.5-flash",
+      "gemini-2.5-flash",
+      "gemini-2.5-flash-lite",
       "gemini-2.0-flash",
-      "gemini-2.0-flash-lite",
-      "gemini-1.5-flash-8b",
     ])
   ).filter(Boolean) as string[];
 
   const contents = buildGeminiContents(userMessage, history);
   const trimmedContents = contents.slice(-20);
+  const deadline = Date.now() + GEMINI_BUDGET_MS;
 
   for (const modelName of candidateModels) {
+    const remaining = deadline - Date.now();
+    if (remaining < 750) break; // out of time: let the local engine answer
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
     const payload = {
@@ -120,11 +127,16 @@ async function callGeminiAPI(
       },
     };
 
+    // The site runs as a serverless function with a short wall-clock budget, so each attempt is
+    // capped; on a timeout the local answer engine replies instead of leaving the visitor waiting.
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), Math.min(GEMINI_TIMEOUT_MS, remaining));
     try {
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
+        signal: controller.signal,
       });
 
       if (response.ok) {
@@ -139,58 +151,33 @@ async function callGeminiAPI(
       }
     } catch (err: any) {
       console.error(`[Gemini Exception] ${modelName}:`, err);
+      if (err?.name === "AbortError") break; // slow upstream: do not burn the budget on a second model
+    } finally {
+      clearTimeout(timer);
     }
   }
 
   return { reply: null, error: "Failed to get response from Gemini API" };
 }
 
+
+/**
+ * Answer used whenever the hosted model is not available (no key, quota, timeout, error).
+ * Delegates to the local answer engine, which reads the live product data and understands
+ * English, Tanglish and Tamil questions instead of returning one canned line.
+ */
 export function getIntelligentFallback(input: string, history: Array<{ role: string; content: string }> = []): string {
-  const msg = input.toLowerCase().trim();
-  const lastAssistantMsg = history.filter((h) => h.role === "assistant" || h.role === "model").pop()?.content.toLowerCase() || "";
-
-  // Greetings & Casual Conversation
-  if (msg.includes("epdi iruka") || msg.includes("epdi irukinga") || msg.includes("how are you")) {
-    return "Nalla iruken 😄 Neenga epdi irukinga? HIPA Masala website-ku welcome!";
-  }
-
-  if (msg === "hi" || msg === "hello" || msg === "hey" || msg === "vanakkam") {
-    return "Hey 👋 Welcome to HIPA Masala! Enna cooking or product help venum?";
-  }
-
-  if (msg.includes("saptiya") || msg.includes("saapadu")) {
-    return "Naan AI assistant 😄 sapda mudiyadhu! Neenga saptingala?";
-  }
-
-  if (msg.includes("thank") || msg.includes("nandri") || msg.includes("thx") || msg === "ok thankyou" || msg === "okay thankyou") {
-    return "Most welcome! 😊 Happy cooking with HIPA Masala! Vera edhavadhu help venum-na sollunga!";
-  }
-
-  // Bulk & Commercial Requirements
-  if (msg.includes("bulk") || msg.includes("hotel") || msg.includes("wholesale") || msg.includes("catering") || msg.includes("commercial") || msg.includes("supply")) {
-    return "Super! HIPA Masala-la hotel & commercial bulk orders supply panrom 🏨📦. Enna product & monthly quantity venum sollunga! Direct sales contact: +91 70580 53055 / info@hipamasalas.com";
-  }
-
-  // Product List
-  if (msg.includes("product") || msg.includes("list") || msg.includes("masala") || msg.includes("what do you have")) {
-    return "HIPA Masala offers authentic Sambar Powder, Rasam Powder, Garam Masala, Turmeric, Red Chilli, Thaniya (Coriander), Seeragam (Cumin) & Pepper powders! Order & product details-ku HIPA team contact: +91 70580 53055 / info@hipamasalas.com";
-  }
-
-  // Recipe Guidance
-  if (msg.includes("recipe") || msg.includes("sambar epdi") || msg.includes("rasam epdi")) {
-    return "Simple-a sollren 😄 HIPA Masala authentic traditional spices use panni easy-a cook pannalam! Sambar & Rasam powders 100g to 1kg packs-la kidaikudhu.";
-  }
-
-  return "Got it! 👍 HIPA Masala products, recipes, or bulk order details pathi edhavadhu kekka poringala? HIPA team direct contact: +91 70580 53055 / info@hipamasalas.com!";
+  return answerLocally(input, history);
 }
 
 export function registerHipaChatRoute(app: Express) {
   app.post("/api/chat", async (req: Request, res: Response) => {
     try {
-      const { message, history } = req.body || {};
+      const { message, history: rawHistory } = req.body || {};
       if (!message || typeof message !== "string" || !message.trim()) {
         return res.status(400).json({ error: "Message is required." });
       }
+      const history = Array.isArray(rawHistory) ? rawHistory : [];
 
       let reply: string | null = null;
       const apiKey =
@@ -216,7 +203,7 @@ export function registerHipaChatRoute(app: Express) {
     } catch (err) {
       console.error("[/api/chat Error]", err);
       return res.json({
-        reply: getIntelligentFallback(req.body?.message || "", req.body?.history || []),
+        reply: getIntelligentFallback(typeof req.body?.message === "string" ? req.body.message : "", Array.isArray(req.body?.history) ? req.body.history : []),
         role: "assistant",
       });
     }
@@ -235,7 +222,8 @@ export function registerHipaChatRoute(app: Express) {
       name: "HIPA Masala AI Assistant API",
       status: "ok",
       hasGeminiKey: Boolean(apiKey && apiKey !== "your_free_gemini_api_key_here"),
-      model: process.env.GEMINI_MODEL || "gemini-1.5-flash",
+      model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+      localEngine: true,
     });
   });
 }

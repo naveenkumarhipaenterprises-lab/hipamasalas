@@ -1,4 +1,4 @@
-import { Building2, ChevronDown, ChevronLeft, ChevronRight, Download, Leaf, MapPin, Package, ShieldCheck, Sparkles, Store, Utensils } from "lucide-react";
+import { Building2, ChevronDown, ChevronLeft, ChevronRight, Download, Leaf, MapPin, Package, ShieldCheck, ShoppingBag, Sparkles, Store, Utensils } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { NewsletterForm } from "@/components/NewsletterForm";
@@ -6,7 +6,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { ResponsiveImage } from "@/components/ResponsiveImage";
 import { trackEvent } from "@/lib/analytics";
 import { resolveImage } from "@/lib/imageManifest";
-import { faqs, products, siteIdentity } from "@shared/hipaContent";
+import { faqs, getShopHref, isExternalShop, products, siteIdentity } from "@shared/hipaContent";
 
 // The homepage ships in the main bundle (most visits land here); every other page lives in the
 // lazily loaded HipaPages chunk (see client/src/routes.ts).
@@ -31,6 +31,17 @@ const getItemsPerPage = () => (window.matchMedia("(max-width: 640px)").matches ?
 const DEFERRED_IMAGE = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 const heroPhoto = resolveImage(siteIdentity.heroImage);
 
+const TRUST_FACTS = [
+  "FSSAI Licensed · Lic. No. 22426423000366",
+  "No Artificial Colours",
+  "Low-Temperature Milled",
+  "Slow-Roasted Blends",
+  "8 Pure Spices & Masalas",
+  "Made in Pallavaram, Chennai",
+  "Home Packs 50g to 1kg",
+  "Bulk Supply for Hotels & Retail",
+];
+
 export function HomePage() {
   const [start, setStart] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(3);
@@ -41,16 +52,8 @@ export function HomePage() {
   const [pauseCarousel, setPauseCarousel] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
-  const heroPackAssets: Record<string, string> = {
-    "sambar-powder": "/assets/sambar-hero_ccdf8343.webp",
-    "rasam-powder": "/assets/rasam-hero_f1b93552.webp",
-    "turmeric-powder": "/assets/turmeric-hero_7640284b.webp",
-    "coriander-powder": "/assets/coriander-hero_80ecbf35.webp",
-    "cumin-powder": "/assets/cumin-hero_ca84a878.webp",
-    "pepper-powder": "/assets/pepper-hero_820e1b4a.webp",
-    "garam-masala": "/assets/garam-hero_d8754d54.webp",
-  };
-  const heroProducts = products.filter((product) => product.slug !== "red-chilli-powder").map((product) => ({ ...product, heroImage: heroPackAssets[product.slug] || product.image }));
+  // Every product (red chilli included) rides the carousel with its own pack shot.
+  const heroProducts = products.map((product) => ({ ...product, heroImage: product.image }));
   const carouselProducts = [...heroProducts, ...heroProducts.slice(0, 3)];
 
   useEffect(() => {
@@ -110,23 +113,7 @@ export function HomePage() {
     return () => window.clearTimeout(reset);
   }, [start, heroProducts.length]);
 
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const elements = Array.from(document.querySelectorAll<HTMLElement>(".home-page .reveal"));
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in-view");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12 }
-    );
-    elements.forEach((element) => observer.observe(element));
-    return () => observer.disconnect();
-  }, []);
+  // Reveal-on-scroll is handled for every page by <SiteShell>.
 
   const moveNext = () => {
     setStart((current) => (current < heroProducts.length ? current + 1 : current));
@@ -205,6 +192,15 @@ export function HomePage() {
               HIPA Masala is an Indian spice brand by HIPA Enterprises, based in Pallavaram, Chennai. We craft authentic single-origin spice powders and traditional South Indian masala blends for home kitchens, retail stores, catering services, and food businesses across Tamil Nadu and India.
             </p>
             <div className="hero-btns">
+              {isExternalShop() ? (
+                <a href={getShopHref()} target="_blank" rel="noreferrer" className="btn btn-gold" onClick={() => trackEvent("shop_now_click", { location: "hero" })}>
+                  <ShoppingBag size={16} aria-hidden="true" /> Shop Now
+                </a>
+              ) : (
+                <Link href={getShopHref()} className="btn btn-gold" onClick={() => trackEvent("shop_now_click", { location: "hero" })}>
+                  <ShoppingBag size={16} aria-hidden="true" /> Shop Now
+                </Link>
+              )}
               <Link href="/products" className="btn btn-primary">
                 Explore Product Range <span className="arrow">→</span>
               </Link>
@@ -251,7 +247,7 @@ export function HomePage() {
                               className="hero-carousel-img"
                               src={image?.src ?? product.heroImage}
                               srcSet={image?.srcSet}
-                              sizes={image ? "(max-width: 640px) 190px, 240px" : undefined}
+                              sizes={image ? "(max-width: 640px) 214px, (max-width: 1200px) 334px, 387px" : undefined}
                               width={image?.width}
                               height={image?.height}
                               alt={product.imageAlt}
@@ -290,9 +286,22 @@ export function HomePage() {
         </div>
       </section>
 
+      {/* TRUST TICKER: the brand facts that matter most, scrolling slowly (pauses on hover). */}
+      <div className="trust-ticker" aria-label="HIPA Masala highlights">
+        <div className="trust-ticker-track">
+        {[0, 1].map((copy) => (
+          <ul className="trust-ticker-group" key={copy} aria-hidden={copy === 1 ? true : undefined}>
+            {TRUST_FACTS.map((fact) => (
+              <li key={fact}>{fact}</li>
+            ))}
+          </ul>
+        ))}
+        </div>
+      </div>
+
       {/* VALUE HIGHLIGHTS */}
       <section className="features reveal">
-        <div className="container features-grid">
+        <div className="container features-grid reveal-stagger">
           <Feature icon={Leaf} title="Pure Spice Sourcing" copy="Whole spices selected for authentic aroma and natural essential oil retention." />
           <Feature icon={Sparkles} title="Traditional Blending" copy="Time-honoured South Indian culinary recipes for balanced daily cooking." />
           <Feature icon={ShieldCheck} title="Zero Adulteration" copy="No artificial food dyes, added MSG, synthetic preservatives, or starch fillers." />
@@ -319,7 +328,7 @@ export function HomePage() {
                 At HIPA Masala, we maintain the integrity of both single spices and traditional blends by focusing on pure milling, balanced roasting, and airtight barrier packaging.
               </p>
             </div>
-            <div className="editorial-cards">
+            <div className="editorial-cards reveal-stagger">
               <div className="editorial-card-item">
                 <div className="card-icon"><Leaf size={24} /></div>
                 <h3>Pure Single Spices</h3>
@@ -345,7 +354,7 @@ export function HomePage() {
               Discover our complete collection of 8 pure spice powders and authentic South Indian masala blends, crafted for home kitchens and food businesses.
             </p>
           </div>
-          <div className="product-grid product-grid-4cols">
+          <div className="product-grid product-grid-4cols reveal-stagger">
             {products.map((product) => (
               <ProductCard key={product.slug} product={product} />
             ))}
@@ -440,7 +449,7 @@ export function HomePage() {
               Whether you are seasoning a daily family meal or sourcing spices for a restaurant chain or supermarket shelf, HIPA Masala provides tailored packaging and reliable supply.
             </p>
           </div>
-          <div className="segments-grid">
+          <div className="segments-grid reveal-stagger">
             <div className="segment-card">
               <div className="segment-icon"><Utensils size={28} /></div>
               <h3>Home Kitchens</h3>

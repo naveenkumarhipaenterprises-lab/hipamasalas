@@ -84,6 +84,9 @@ export const siteIdentity = {
   googleBusinessProfile: "https://share.google/beobv5nq74J9DHZwm",
   whatsappHref:
     "https://wa.me/917058053055?text=Hi%20HIPA%20Masala%2C%20I%27d%20like%20to%20know%20more%20about%20your%20products.",
+  // Online store for the "Shop Now" buttons. Empty until the owner shares the e-commerce link;
+  // getShopHref() sends visitors to the product catalogue in the meantime.
+  shopUrl: "",
   fssaiLicence: "22426423000366",
   gstin: "33BVIPR5839J1Z1",
   openingHours: {
@@ -94,6 +97,16 @@ export const siteIdentity = {
   },
 } as const;
 
+/** Where "Shop Now" goes: the online store once configured, otherwise the product catalogue. */
+export function getShopHref(): string {
+  return siteIdentity.shopUrl || "/products";
+}
+
+/** True when "Shop Now" leaves the site (so links open in a new tab). */
+export function isExternalShop(): boolean {
+  return /^https?:\/\//.test(siteIdentity.shopUrl);
+}
+
 export const products: Product[] = [
   {
     slug: "sambar-powder",
@@ -103,7 +116,7 @@ export const products: Product[] = [
     shortDescription: "A South Indian spice blend crafted for everyday authentic sambar.",
     description:
       "HIPA Masala Sambar Powder is formulated with selected coriander seeds, dried red chillies, cumin, fenugreek, lentils and aromatic spices for a balanced, traditional South Indian flavour.",
-    image: "/assets/sambar_96379996.png",
+    image: "/assets/pack-sambar-powder.webp",
     imageAlt: "HIPA Masala Sambar Powder retail pack — South Indian sambar spice blend",
     highlights: [
       "Traditional South Indian recipe formulation",
@@ -178,7 +191,7 @@ export const products: Product[] = [
     shortDescription: "A fragrant South Indian spice blend crafted for light, aromatic everyday rasam.",
     description:
       "HIPA Masala Rasam Powder combines roasted cumin, whole black peppercorns, coriander seeds, lentils and red chillies for an authentic, soothing rasam experience.",
-    image: "/assets/rasam_b3831405.png",
+    image: "/assets/pack-rasam-powder.webp",
     imageAlt: "HIPA Masala Rasam Powder retail pack — South Indian rasam spice blend",
     highlights: [
       "Pepper and cumin-forward aromatic balance",
@@ -253,7 +266,7 @@ export const products: Product[] = [
     shortDescription: "Pure ground turmeric powder with natural golden colour and earthy aroma.",
     description:
       "HIPA Masala Turmeric Powder is processed from carefully chosen whole turmeric rhizomes, delivering a rich natural golden colour, warm earthy aroma, and pure culinary quality.",
-    image: "/assets/turmeric_1bd08fa7.png",
+    image: "/assets/pack-turmeric-powder.webp",
     imageAlt: "HIPA Masala Turmeric Powder retail pack — ground turmeric for Indian cooking",
     highlights: [
       "Vibrant natural golden yellow colour",
@@ -328,7 +341,7 @@ export const products: Product[] = [
     shortDescription: "Pure ground red chilli powder delivering balanced heat and rich culinary colour.",
     description:
       "HIPA Masala Red Chilli Powder is milled from selected sun-dried red chillies, offering an optimal balance of sharp pungency, deep natural red colour, and clean flavour.",
-    image: "/assets/hipa-red-chilli-powder-pack_2e2de7c8.webp",
+    image: "/assets/pack-red-chilli-powder.webp",
     imageAlt: "HIPA Masala Red Chilli Powder retail pack — ground red chilli for Indian cooking",
     highlights: [
       "Balanced pungency and vibrant natural red tone",
@@ -403,7 +416,7 @@ export const products: Product[] = [
     shortDescription: "Aromatic ground coriander powder providing mild citrusy notes and rich gravy body.",
     description:
       "HIPA Masala Coriander Powder is ground from cleaned whole coriander seeds (dhania), imparting a refreshing mild citrusy aroma and essential gravy consistency to everyday curries.",
-    image: "/assets/coriander_6db70131.png",
+    image: "/assets/pack-coriander-powder.webp",
     imageAlt: "HIPA Masala Coriander Powder retail pack — ground coriander for Indian cooking",
     highlights: [
       "Mild, cooling and subtly citrusy flavour profile",
@@ -478,7 +491,7 @@ export const products: Product[] = [
     shortDescription: "Aromatic ground cumin powder with intense earthy warmth and roasted notes.",
     description:
       "HIPA Masala Cumin Powder is milled from aromatic cumin seeds (jeera), offering an intense warm, nutty aroma and digestive benefits for both cooked dishes and finishing seasonings.",
-    image: "/assets/cumin_cd53cea5.png",
+    image: "/assets/pack-cumin-powder.webp",
     imageAlt: "HIPA Masala Cumin Powder retail pack — ground cumin for Indian cooking",
     highlights: [
       "Deeply roasted aroma and warm earthy notes",
@@ -553,7 +566,7 @@ export const products: Product[] = [
     shortDescription: "Pure ground black pepper powder with robust piperine heat and sharp woody aroma.",
     description:
       "HIPA Masala Black Pepper Powder is milled from premium sun-dried black peppercorns (Piper nigrum), providing a sharp, pungent bite and warm aroma for traditional South Indian and global recipes.",
-    image: "/assets/pepper_36d6b66d.png",
+    image: "/assets/pack-pepper-powder.webp",
     imageAlt: "HIPA Masala Pepper Powder retail pack — ground black pepper for cooking",
     highlights: [
       "Bold piperine heat and fresh peppery fragrance",
@@ -628,7 +641,7 @@ export const products: Product[] = [
     shortDescription: "An exquisite blend of aromatic whole spices for finishing curries, gravies and biryanis.",
     description:
       "HIPA Masala Garam Masala brings together cinnamon, cloves, cardamom, cumin, black pepper, and fragrant whole spices for a rich, regal aroma in royal Indian dishes.",
-    image: "/assets/garam-masala_6b465bcd.png",
+    image: "/assets/pack-garam-masala.webp",
     imageAlt: "HIPA Masala Garam Masala retail pack — aromatic Indian spice blend",
     highlights: [
       "Exquisite warm aromatic profile with cinnamon, clove & cardamom",

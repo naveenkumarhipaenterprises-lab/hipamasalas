@@ -1,0 +1,278 @@
+/* =========================================================
+   MOTION, TYPOGRAPHY AND INTERACTION POLISH
+   Loaded after site-base.css and index.css. Everything here is
+   progressive: the page reads the same without JavaScript or
+   with reduced motion; the extras only layer on top.
+   ========================================================= */
+
+:root {
+  --ease-out: cubic-bezier(.23, 1, .32, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --reveal-distance: 26px;
+  --reveal-duration: .75s;
+}
+
+/* -------------------- Typography -------------------- */
+body { line-height: 1.65; text-rendering: optimizeLegibility; }
+h1, h2, h3 { text-wrap: balance; letter-spacing: -.012em; }
+h1 { line-height: 1.08; }
+h2 { line-height: 1.14; }
+p, li { text-wrap: pretty; }
+.section-desc { font-size: 15.5px; }
+.hero-desc { font-size: clamp(15.5px, 1.25vw, 17px); }
+.eyebrow { letter-spacing: .01em; }
+
+/* A short brand rule under centred section headings. */
+.collection-head h2::after,
+.catalogue-head h1::after {
+  content: "";
+  display: block;
+  width: 58px;
+  height: 3px;
+  margin: 16px auto 0;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--green-600));
+}
+.collection-head h2, .catalogue-head h1 { margin-bottom: 18px; }
+
+/* Lead paragraph in long editorial copy breathes more (the eyebrow above the heading is untouched). */
+.editorial-copy > h2 + p { font-size: 16.5px; color: var(--ink); }
+
+/* -------------------- Reveal on scroll -------------------- */
+/* Hidden state only when JavaScript has loaded (html.js is set inline in <head>), so crawlers,
+   reader modes and failed scripts always see the full page. */
+html.js .reveal {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance));
+  transition: opacity var(--reveal-duration) var(--ease-out), transform var(--reveal-duration) var(--ease-out);
+  will-change: opacity, transform;
+}
+html.js .reveal.in-view { opacity: 1; transform: none; will-change: auto; }
+html:not(.js) .reveal { opacity: 1; transform: none; }
+/* Safety valve: if the app script has not run ~1.2s after parsing (slow network), show everything;
+   SiteShell removes the class once its observer is active. */
+html.reveal-late .reveal, html.reveal-late .reveal-stagger > * { opacity: 1; transform: none; translate: none; transition: none; animation: none; }
+
+/* Grids whose children appear one after another. A keyframe animation on `opacity` and `translate`
+   (not `transform`) is used so the delays never leak into the cards' own hover transitions. */
+html.js .reveal-stagger > * { opacity: 0; }
+html.js .reveal-stagger.in-view > * { animation: stagger-in .6s var(--ease-out) both; }
+.reveal-stagger.in-view > :nth-child(2) { animation-delay: .07s; }
+.reveal-stagger.in-view > :nth-child(3) { animation-delay: .14s; }
+.reveal-stagger.in-view > :nth-child(4) { animation-delay: .21s; }
+.reveal-stagger.in-view > :nth-child(5) { animation-delay: .28s; }
+.reveal-stagger.in-view > :nth-child(6) { animation-delay: .35s; }
+.reveal-stagger.in-view > :nth-child(7) { animation-delay: .42s; }
+.reveal-stagger.in-view > :nth-child(8) { animation-delay: .49s; }
+.reveal-stagger.in-view > :nth-child(n + 9) { animation-delay: .55s; }
+@keyframes stagger-in {
+  from { opacity: 0; translate: 0 18px; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+/* -------------------- Scroll progress bar -------------------- */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  z-index: 1100;
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+}
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    animation: scroll-progress-grow linear both;
+    animation-timeline: scroll(root);
+  }
+}
+@keyframes scroll-progress-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* -------------------- Hero depth -------------------- */
+/* The background photo drifts slower than the page (parallax) in browsers with scroll-driven
+   animations; elsewhere it simply stays put. `translate` is used so the existing hover
+   `transform` on the image is untouched. */
+@supports (animation-timeline: scroll()) {
+  .hero-bg-img {
+    animation: hero-parallax linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 120vh;
+  }
+}
+@keyframes hero-parallax {
+  from { translate: 0 0; }
+  to { translate: 0 18vh; }
+}
+/* The pack in the carousel floats gently. */
+.hero-carousel-card .hero-carousel-img { animation: pack-float 5.5s ease-in-out infinite; }
+.hero-carousel-item:nth-child(3n + 2) .hero-carousel-img { animation-delay: -1.8s; }
+.hero-carousel-item:nth-child(3n + 3) .hero-carousel-img { animation-delay: -3.6s; }
+@keyframes pack-float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -9px; }
+}
+
+/* -------------------- Trust ticker -------------------- */
+.trust-ticker {
+  --ticker-speed: 38s;
+  overflow: hidden;
+  background: var(--green-950);
+  color: #e9edde;
+  border-top: 1px solid rgba(201, 161, 61, .25);
+  border-bottom: 1px solid rgba(201, 161, 61, .25);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.trust-ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll var(--ticker-speed) linear infinite;
+}
+.trust-ticker:hover .trust-ticker-track { animation-play-state: paused; }
+.trust-ticker-group {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  flex: 0 0 auto;
+}
+.trust-ticker-group li {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 26px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.trust-ticker-group li::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201, 161, 61, .18);
+}
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* -------------------- Buttons -------------------- */
+/* The light sweep needs overflow:hidden, which would clip a long no-wrap label on a narrow phone,
+   so it only exists on devices with a real hover. */
+@media (hover: hover) and (pointer: fine) {
+  .btn { position: relative; overflow: hidden; isolation: isolate; }
+  .btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, .22) 50%, transparent 65%);
+    transform: translateX(-120%);
+    transition: transform .6s var(--ease-out);
+  }
+  .btn:hover::after, .btn:focus-visible::after { transform: translateX(120%); }
+}
+.btn-primary { background: linear-gradient(135deg, var(--green-700), var(--green-600)); }
+.btn-primary:hover { background: linear-gradient(135deg, var(--green-600), var(--green-500)); }
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold), #d9b45a);
+  color: var(--green-950);
+  box-shadow: 0 10px 24px rgba(201, 161, 61, .32);
+}
+.btn-gold:hover { background: linear-gradient(135deg, var(--gold-light), var(--gold)); color: var(--green-950); transform: translateY(-2px); box-shadow: 0 16px 32px rgba(201, 161, 61, .4); }
+.btn:focus-visible { outline: 3px solid rgba(201, 161, 61, .55); outline-offset: 2px; }
+
+/* Header "Shop Now": compact gold pill beside Enquire. */
+.header-actions .shop-now-btn { gap: 6px; }
+.header-actions .shop-now-btn svg { width: 15px; height: 15px; }
+@media (max-width: 900px) {
+  .header-actions .shop-now-btn { padding: 9px 14px; font-size: 11.5px; }
+  .header-actions .shop-now-btn span { display: none; }
+}
+/* On small phones the header row has no room for a third control; the menu carries Shop Now. */
+@media (max-width: 560px) {
+  .header-actions .shop-now-btn { display: none; }
+}
+/* Shop Now inside the mobile menu. */
+.main-nav .nav-shop-now { display: none; }
+@media (max-width: 900px) {
+  .main-nav .nav-shop-now { display: block; margin-top: 18px; }
+  .main-nav .nav-shop-now .btn { width: 100%; justify-content: center; }
+}
+
+/* -------------------- Navigation -------------------- */
+@media (min-width: 901px) {
+  .main-nav > ul > li > a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .3s var(--ease-out);
+  }
+  .main-nav > ul > li > a:hover::after, .main-nav > ul > li > a.active::after { transform: scaleX(1); }
+}
+.site-header { transition: box-shadow .3s ease, background .3s ease, height .3s ease; }
+@media (min-width: 901px) {
+  .site-header.scrolled { height: 72px; }
+}
+
+/* -------------------- Cards -------------------- */
+.product-card { transition: transform .4s var(--ease-out), box-shadow .4s var(--ease-out), border-color .3s ease; }
+.product-card:hover { border-color: rgba(201, 161, 61, .45); }
+.product-media { position: relative; }
+.product-media::before {
+  content: "";
+  position: absolute;
+  inset: auto 14% 10%;
+  height: 34%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(201, 161, 61, .28), transparent 70%);
+  opacity: 0;
+  transition: opacity .4s ease;
+  pointer-events: none;
+}
+.product-card:hover .product-media::before { opacity: 1; }
+.product-media img { transition: transform .45s var(--ease-out); position: relative; }
+.product-card:hover .product-media img { transform: translateY(-6px) scale(1.05); }
+.catalogue-product-media img { transition: transform .45s var(--ease-out); }
+.catalogue-product-card:hover .catalogue-product-media img { transform: translateY(-6px) scale(1.05); }
+.catalogue-product-card { transition: transform .4s var(--ease-out), box-shadow .4s var(--ease-out); }
+.catalogue-product-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(37, 54, 27, .14); }
+.feature-icon, .segment-icon, .card-icon { transition: transform .4s var(--ease-spring), background .3s ease; }
+.feature:hover .feature-icon, .segment-card:hover .segment-icon, .editorial-card-item:hover .card-icon { transform: translateY(-4px) rotate(-6deg); }
+.product-replica-image img { animation: pack-float 6s ease-in-out infinite; }
+.product-replica-image { transition: box-shadow .4s ease; }
+
+/* Footer social icons */
+.social-row a { transition: transform .3s var(--ease-spring), background .2s ease, color .2s ease; }
+.social-row a:hover { transform: translateY(-3px) scale(1.08); }
+
+/* -------------------- Reduced motion -------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html.js .reveal, html.js .reveal-stagger > * { opacity: 1; transform: none; translate: none; transition: none; animation: none; }
+  .scroll-progress { display: none; }
+  .hero-bg-img, .hero-carousel-card .hero-carousel-img, .product-replica-image img { animation: none !important; }
+  .trust-ticker-track { animation: none; flex-wrap: wrap; width: auto; }
+  .trust-ticker-group:last-child { display: none; }
+  .trust-ticker { mask-image: none; -webkit-mask-image: none; }
+  .btn::after { display: none; }
+  .product-card, .catalogue-product-card, .product-media img, .catalogue-product-media img, .feature-icon, .segment-icon, .card-icon, .social-row a { transition: none; }
+}
