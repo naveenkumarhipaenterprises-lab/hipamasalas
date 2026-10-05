@@ -753,7 +753,7 @@ export const articles: Article[] = [
   {
     "slug": "how-to-store-indian-spice-powders",
     "title": "How to Store Indian Spice Powders to Preserve Freshness, Aroma and Essential Oils",
-    "description": "Learn practical ways to store Indian spice powders and masala blends. Protect natural volatile oils, prevent clumping and maintain authentic flavour in your kitchen.",
+    "description": "Practical ways to store Indian spice powders and masala blends: protect the volatile oils, prevent clumping and keep authentic flavour in your kitchen.",
     "body": [
       "Indian cooking relies heavily on the vibrant fragrance and potency of ground spice powders and traditional masala blends. However, ground spices are delicate: their flavour and aroma come from volatile essential oils (such as curcumin in turmeric, piperine in black pepper, linalool in coriander, and cuminaldehyde in cumin) that degrade quickly when exposed to environmental elements.",
       "## The Four Enemies of Spice Freshness",

@@ -74,20 +74,6 @@ export const HIPA_KNOWLEDGE_BASE = {
       tamilName: "மிளகு தூள்",
       description: "Freshly ground black pepper powder with intense warmth and medicinal goodness.",
       bestFor: "Pepper rasam, pepper chicken, omelettes, soups, and vada."
-    },
-    {
-      id: "garlic-podi",
-      name: "HIPA Garlic Podi",
-      tamilName: "பூண்டு பொடி",
-      description: "Flavorful roasted garlic spice powder blended with roasted lentils and spices.",
-      bestFor: "Hot rice with ghee/sesame oil, idli, dosa, and tiffin seasoning."
-    },
-    {
-      id: "paruppu-podi",
-      name: "HIPA Paruppu Podi",
-      tamilName: "பருப்பு பொடி",
-      description: "Traditional roasted lentil spice powder packed with protein and comforting taste.",
-      bestFor: "Hot steaming rice with a dollop of ghee."
     }
   ],
   b2b: {

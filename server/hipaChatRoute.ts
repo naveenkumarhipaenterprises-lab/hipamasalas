@@ -5,7 +5,7 @@ export const HIPA_SYSTEM_PROMPT = `You are a real human team member at HIPA Masa
 IDENTITY & BRAND VALUES:
 - Brand Name: HIPA Masala (Taste of Tradition), a unit of HIPA Enterprises.
 - Location: Plot No. 10, (Highway Colony), 5th Main Road, Zamin Pallavaram, Highway Nagar, Perumal Nagar, Old Pallavaram, Chennai – 600117, Tamil Nadu, India.
-- Pillars: Traditional stone-ground processing, farm-to-factory quality control, no artificial colours, no unnecessary additives.
+- Pillars: Whole spices selected and cleaned before milling, controlled low-temperature milling, slow-roasted blends, FSSAI-licensed (Lic. No. 22426423000366), no artificial colours, no unnecessary additives.
 - Contact: Phone/WhatsApp: +91 70580 53055 | Email: info@hipamasalas.com | Website: https://www.hipamasalas.com
 
 PRODUCT CATALOGUE:
@@ -17,8 +17,7 @@ PRODUCT CATALOGUE:
 6. Thaniya / Coriander Powder (Mild, aromatic for gravy bases)
 7. Seeragam / Cumin Powder (Warm, digestive & aromatic)
 8. Pepper Powder (Sharp, warming for rasam & seasoning)
-9. Garlic Podi (Flavorful garlic rice podi)
-10. Paruppu Podi (Traditional lentil podi for rice)
+These eight are the only products HIPA Masala makes. In Tamil "podi" simply means powder, so "sambar podi", "rasam podi" or "milagai podi" mean the Sambar, Rasam and Red Chilli Powders above. Rice-mix podis (garlic podi, paruppu podi, idli podi), pastes, pickles and whole spices are not in the range today: say so politely and suggest the closest product above.
 
 HOW TO ANSWER VISITORS (HUMAN TALKING RULES):
 1. THINK BEFORE RESPONDING:
@@ -146,7 +145,7 @@ async function callGeminiAPI(
   return { reply: null, error: "Failed to get response from Gemini API" };
 }
 
-function getIntelligentFallback(input: string, history: Array<{ role: string; content: string }> = []): string {
+export function getIntelligentFallback(input: string, history: Array<{ role: string; content: string }> = []): string {
   const msg = input.toLowerCase().trim();
   const lastAssistantMsg = history.filter((h) => h.role === "assistant" || h.role === "model").pop()?.content.toLowerCase() || "";
 
@@ -174,12 +173,12 @@ function getIntelligentFallback(input: string, history: Array<{ role: string; co
 
   // Product List
   if (msg.includes("product") || msg.includes("list") || msg.includes("masala") || msg.includes("what do you have")) {
-    return "HIPA Masala offers authentic Sambar Powder, Rasam Powder, Garam Masala, Turmeric, Red Chilli, Thaniya, Seeragam, Pepper, Garlic Podi & Paruppu Podi! Order & product details-ku HIPA team contact: +91 70580 53055 / info@hipamasalas.com";
+    return "HIPA Masala offers authentic Sambar Powder, Rasam Powder, Garam Masala, Turmeric, Red Chilli, Thaniya (Coriander), Seeragam (Cumin) & Pepper powders! Order & product details-ku HIPA team contact: +91 70580 53055 / info@hipamasalas.com";
   }
 
   // Recipe Guidance
   if (msg.includes("recipe") || msg.includes("sambar epdi") || msg.includes("rasam epdi")) {
-    return "Simple-a sollren 😄 HIPA Masala authentic traditional spices use panni easy-a cook pannalam! Sambar & Rasam powders 50g to 1kg packs-la kidaikudhu.";
+    return "Simple-a sollren 😄 HIPA Masala authentic traditional spices use panni easy-a cook pannalam! Sambar & Rasam powders 100g to 1kg packs-la kidaikudhu.";
   }
 
   return "Got it! 👍 HIPA Masala products, recipes, or bulk order details pathi edhavadhu kekka poringala? HIPA team direct contact: +91 70580 53055 / info@hipamasalas.com!";
