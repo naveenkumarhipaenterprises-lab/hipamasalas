@@ -109,6 +109,44 @@ html.js .reveal-stagger.in-view > * { animation: stagger-in .6s var(--ease-out) 
   from { translate: 0 0; }
   to { translate: 0 18vh; }
 }
+/* Background video: sits exactly over the poster still and fades in once it is really playing,
+   so slow connections never see a black box. */
+.hero-bg-video { opacity: 0; transition: opacity .9s var(--ease-out), transform 1.2s var(--ease-out); background: transparent; }
+.hero-bg-video.is-visible { opacity: 1; }
+.hero-video-toggle {
+  position: absolute;
+  left: clamp(14px, 2.4vw, 28px);
+  bottom: clamp(14px, 2.4vw, 24px);
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .55);
+  border-radius: 50%;
+  background: rgba(23, 37, 18, .55);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background .2s ease, transform .2s ease;
+}
+.hero-video-toggle svg { width: 15px; height: 15px; }
+.hero-video-toggle:hover { background: rgba(23, 37, 18, .8); transform: scale(1.06); }
+.hero-video-toggle:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+/* The moving footage is brighter and busier than the old still photo, so the cream wash behind
+   the copy is stronger (and the body copy darker) to keep the text easy to read; the right-hand
+   side, behind the pack carousel, stays vivid. */
+.hero::after {
+  background: linear-gradient(90deg, rgba(248, 241, 226, .9) 0%, rgba(248, 241, 226, .8) 30%, rgba(248, 241, 226, .45) 48%, rgba(248, 241, 226, .1) 70%, rgba(248, 241, 226, 0) 100%);
+}
+.hero .hero-desc { color: #33402f; }
+@media (max-width: 900px) {
+  /* Single column: the copy sits over the full width, the carousel below it. */
+  .hero::after { background: linear-gradient(180deg, rgba(248, 241, 226, .86) 0%, rgba(248, 241, 226, .8) 50%, rgba(248, 241, 226, .5) 68%, rgba(248, 241, 226, .38) 100%); }
+}
+
 /* The pack in the carousel floats gently. */
 .hero-carousel-card .hero-carousel-img { animation: pack-float 5.5s ease-in-out infinite; }
 .hero-carousel-item:nth-child(3n + 2) .hero-carousel-img { animation-delay: -1.8s; }
@@ -270,6 +308,7 @@ html.js .reveal-stagger.in-view > * { animation: stagger-in .6s var(--ease-out) 
   html.js .reveal, html.js .reveal-stagger > * { opacity: 1; transform: none; translate: none; transition: none; animation: none; }
   .scroll-progress { display: none; }
   .hero-bg-img, .hero-carousel-card .hero-carousel-img, .product-replica-image img { animation: none !important; }
+  .hero-bg-video { transition: none; }
   .trust-ticker-track { animation: none; flex-wrap: wrap; width: auto; }
   .trust-ticker-group:last-child { display: none; }
   .trust-ticker { mask-image: none; -webkit-mask-image: none; }

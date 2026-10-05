@@ -12,7 +12,7 @@ export const imageManifest: Record<string, ImageManifestRow> = {
   "/assets/pack-cumin-powder.webp": [795,1193,[160,200,256,280,320,420,480,600,720],0,0],
   "/assets/pack-pepper-powder.webp": [902,1353,[160,200,256,280,320,420,480,600,720],0,0],
   "/assets/pack-garam-masala.webp": [933,1400,[160,200,256,280,320,420,480,600,720],0,0],
-  "/assets/hero-spices_8241cadf.webp": [1440,810,[960,1440],1,720],
+  "/assets/hero-video-poster_e92afce6.webp": [1440,810,[960,1440],1,720],
   "/assets/story-spice-mortar_d4ded661.jpg": [1200,776,[480,720,960],0,0],
   "/assets/best-masala-manufacturer-in-chennai.webp": [1288,719,[400,600,700,800,1280],0,0],
   "/assets/masala-manufacturer-vs-supplier-vs-distributor.webp": [1678,937,[400,600,700,800,1280],0,0],

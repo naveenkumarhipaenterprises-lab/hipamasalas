@@ -1,4 +1,4 @@
-import { Building2, ChevronDown, ChevronLeft, ChevronRight, Download, Leaf, MapPin, Package, ShieldCheck, ShoppingBag, Sparkles, Store, Utensils } from "lucide-react";
+import { Building2, ChevronDown, ChevronLeft, ChevronRight, Download, Leaf, MapPin, Package, Pause, Play, ShieldCheck, ShoppingBag, Sparkles, Store, Utensils } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { NewsletterForm } from "@/components/NewsletterForm";
@@ -30,6 +30,110 @@ const getItemsPerPage = () => (window.matchMedia("(max-width: 640px)").matches ?
 /** 1×1 transparent GIF used as a <source> to hold back a carousel slide's download until it is needed. */
 const DEFERRED_IMAGE = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 const heroPhoto = resolveImage(siteIdentity.heroImage);
+
+type HeroVideoState = "off" | "loading" | "playing" | "paused";
+
+/**
+ * Muted, looping background video behind the hero copy. The server renders only the poster
+ * image underneath it (the LCP element), and the video file is requested after the page has
+ * finished loading, so it never delays first paint. Visitors who ask for reduced motion or
+ * data saving keep the still image and can start the video with the button. It pauses itself
+ * while scrolled out of view.
+ */
+function HeroVideo() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const userPausedRef = useRef(false);
+  const [state, setState] = useState<HeroVideoState>("off");
+  const [visible, setVisible] = useState(false);
+
+  const load = (video: HTMLVideoElement) => {
+    if (video.getAttribute("src")) return;
+    const phone = window.matchMedia("(max-width: 900px)").matches;
+    const h264 = video.canPlayType('video/mp4; codecs="avc1.640028"') !== "";
+    const { desktop, mobile, desktopWebm, mobileWebm } = siteIdentity.heroVideo;
+    video.muted = true;
+    video.src = h264 ? (phone ? mobile : desktop) : phone ? mobileWebm : desktopWebm;
+  };
+  const play = (video: HTMLVideoElement) => {
+    load(video);
+    setState((current) => (current === "playing" ? current : "loading"));
+    video.play().catch(() => setState("paused"));
+  };
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const onPlaying = () => {
+      setVisible(true);
+      setState("playing");
+    };
+    const onPause = () => setState("paused");
+    video.addEventListener("playing", onPlaying);
+    video.addEventListener("pause", onPause);
+
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    const holdBack = window.matchMedia("(prefers-reduced-motion: reduce)").matches || Boolean(connection?.saveData) || /(^|-)2g$/.test(connection?.effectiveType ?? "");
+    let started = false;
+    const start = () => {
+      started = true;
+      if (holdBack) setState("paused");
+      else play(video);
+    };
+    if (document.readyState === "complete") start();
+    else window.addEventListener("load", start, { once: true });
+
+    // Save battery and data while the hero is off screen.
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!started || !video.getAttribute("src") || userPausedRef.current) return;
+      if (entry.isIntersecting) video.play().catch(() => undefined);
+      else video.pause();
+    });
+    observer.observe(video);
+
+    return () => {
+      window.removeEventListener("load", start);
+      observer.disconnect();
+      video.removeEventListener("playing", onPlaying);
+      video.removeEventListener("pause", onPause);
+    };
+  }, []);
+
+  const toggle = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (state === "playing" || state === "loading") {
+      userPausedRef.current = true;
+      video.pause();
+      trackEvent("hero_video_pause");
+    } else {
+      userPausedRef.current = false;
+      play(video);
+      trackEvent("hero_video_play");
+    }
+  };
+  const running = state === "playing" || state === "loading";
+
+  return (
+    <>
+      <video
+        ref={videoRef}
+        className={`hero-bg-img hero-bg-video${visible ? " is-visible" : ""}`}
+        muted
+        loop
+        playsInline
+        preload="none"
+        disablePictureInPicture
+        aria-hidden="true"
+        tabIndex={-1}
+      />
+      {state !== "off" && (
+        <button className="hero-video-toggle" type="button" onClick={toggle} aria-label={running ? "Pause background video" : "Play background video"}>
+          {running ? <Pause aria-hidden="true" /> : <Play aria-hidden="true" />}
+        </button>
+      )}
+    </>
+  );
+}
 
 const TRUST_FACTS = [
   "FSSAI Licensed · Lic. No. 22426423000366",
@@ -163,8 +267,9 @@ export function HomePage() {
     <div className="home-page">
       {/* SECTION 1: HERO & INTRODUCTION */}
       <section className="hero" id="home">
-        {/* LCP image. ≤900px the hero is a tall column that only shows the photo's centre strip,
-            so phones get a native-resolution centre crop (visually identical, far fewer bytes). */}
+        {/* LCP image: the first frame of the background video, shown until the video plays (and
+            instead of it for reduced motion or data saving). ≤900px the hero is a tall column that
+            only shows the centre strip, so phones get a native-resolution centre crop. */}
         <picture>
           {heroPhoto?.mobile?.avifSrc && <source media="(max-width: 900px)" type="image/avif" srcSet={heroPhoto.mobile.avifSrc} width={heroPhoto.mobile.width} height={heroPhoto.mobile.height} />}
           {heroPhoto?.mobile && <source media="(max-width: 900px)" type="image/webp" srcSet={heroPhoto.mobile.src} width={heroPhoto.mobile.width} height={heroPhoto.mobile.height} />}
@@ -182,6 +287,7 @@ export function HomePage() {
             decoding="async"
           />
         </picture>
+        <HeroVideo />
         <div className="container hero-inner">
           <div className="hero-copy hero-copy-enter">
             <p className="eyebrow">Pallavaram, Chennai · Pure Spices &amp; Traditional Masalas</p>

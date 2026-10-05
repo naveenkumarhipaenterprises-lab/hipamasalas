@@ -90,8 +90,8 @@ const BLOG_COVERS = [
 
 const JOBS = [
   ...PRODUCT_IMAGES.map((file) => ({ file, role: "pack", quality: 84 })),
-  // The hero photo is the LCP element, so it also gets an AVIF set (~35% smaller at equal visual quality).
-  { file: "hero-spices_8241cadf.webp", role: "heroPhoto", quality: 76, mobileCrop: true, avifQuality: 50 },
+  // The hero poster (first frame of the background video) is the LCP element, so it also gets an AVIF set.
+  { file: "hero-video-poster_e92afce6.webp", role: "heroPhoto", quality: 76, mobileCrop: true, avifQuality: 50 },
   { file: "story-spice-mortar_d4ded661.jpg", role: "editorial", quality: 78 },
   ...BLOG_COVERS.map((file) => ({ file, role: "blogCover", quality: 78 })),
   { file: "logo_a24808ac.png", role: "logo", quality: 90 },
