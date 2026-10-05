@@ -31,6 +31,56 @@ describe("product pack photos", () => {
   });
 });
 
+describe("home page background video", () => {
+  const publicDir = path.join(projectRoot, "client", "public");
+  const home = fs.readFileSync(path.join(projectRoot, "client", "src", "pages", "HomePage.tsx"), "utf8");
+
+  it("ships light, streamable, silent video files", () => {
+    const { desktop, mobile, desktopWebm, mobileWebm } = siteIdentity.heroVideo;
+    for (const src of [desktop, mobile, desktopWebm, mobileWebm]) {
+      const file = path.join(publicDir, src);
+      expect(fs.existsSync(file), src).toBe(true);
+      // Budget: the owner's 33 MB original must never be committed as is.
+      expect(fs.statSync(file).size, src).toBeLessThan(3 * 1024 * 1024);
+      // WebM (EBML) header for the fallback copies.
+      if (src.endsWith(".webm")) expect(fs.readFileSync(file).subarray(0, 4).toString("hex"), src).toBe("1a45dfa3");
+    }
+    for (const src of [desktop, mobile]) {
+      const bytes = fs.readFileSync(path.join(publicDir, src));
+      expect(bytes.subarray(4, 8).toString("latin1"), src).toBe("ftyp");
+      // "faststart": the index (moov) comes before the media (mdat) so playback starts while downloading.
+      expect(bytes.indexOf("moov"), src).toBeLessThan(bytes.indexOf("mdat"));
+      // No sound track: the video is decorative and plays muted.
+      expect(bytes.includes("soun"), src).toBe(false);
+    }
+  });
+
+  it("uses the video's first frame as the hero image and drops the old photo", () => {
+    expect(siteIdentity.heroImage).toMatch(/^\/assets\/hero-video-poster_[0-9a-f]{8}\.webp$/);
+    const row = imageManifest[siteIdentity.heroImage];
+    expect(row, "poster missing from the image manifest").toBeDefined();
+    expect(row[3], "poster AVIF set").toBe(1);
+    expect(row[4], "poster mobile crop").toBeGreaterThan(0);
+    expect(fs.existsSync(path.join(publicDir, "assets", "hero-spices_8241cadf.webp"))).toBe(false);
+    expect(Object.keys(imageManifest).some((key) => key.includes("hero-spices"))).toBe(false);
+  });
+
+  it("plays muted and inline, loads after the page, and can be paused", () => {
+    expect(home).toMatch(/<video[\s\S]*?muted[\s\S]*?loop[\s\S]*?playsInline[\s\S]*?preload="none"/);
+    expect(home).toContain("video.muted = true");
+    expect(home).toContain('window.addEventListener("load", start, { once: true })');
+    expect(home).toContain("prefers-reduced-motion: reduce");
+    expect(home).toContain('"Pause background video"');
+    expect(home).not.toMatch(/<video[^>]*\bautoPlay\b/);
+  });
+
+  it("caches the video files for a year", () => {
+    const vercel = JSON.parse(fs.readFileSync(path.join(projectRoot, "vercel.json"), "utf8"));
+    const rule = vercel.headers.find((entry: { source: string }) => entry.source === "/assets/video/(.*)");
+    expect(rule?.headers?.[0]?.value).toContain("immutable");
+  });
+});
+
 describe("shop link and navigation", () => {
   it("keeps the shop URL empty or an https address and falls back to the catalogue", () => {
     expect(siteIdentity.shopUrl === "" || /^https:\/\//.test(siteIdentity.shopUrl)).toBe(true);

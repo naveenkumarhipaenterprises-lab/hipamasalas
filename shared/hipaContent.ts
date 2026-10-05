@@ -75,7 +75,18 @@ export const siteIdentity = {
     addressCountry: "India",
   },
   logo: "/assets/logo_a24808ac.png",
-  heroImage: "/assets/hero-spices_8241cadf.webp",
+  // Still of the home-page background video's first frame: the hero's LCP image, the video's
+  // placeholder while it loads, and the social preview image.
+  heroImage: "/assets/hero-video-poster_e92afce6.webp",
+  // Background video for the home-page hero (owner's footage, 5 Oct 2026), muted and looping.
+  // Phones get a centre crop that matches the hero's mobile poster crop. MP4 (H.264) plays everywhere
+  // with hardware decoding; the WebM copies cover browsers built without H.264.
+  heroVideo: {
+    desktop: "/assets/video/hero-spices-loop_248e3a02.mp4",
+    mobile: "/assets/video/hero-spices-loop-mobile_fbded111.mp4",
+    desktopWebm: "/assets/video/hero-spices-loop_f5522ae3.webm",
+    mobileWebm: "/assets/video/hero-spices-loop-mobile_9f105300.webm",
+  },
   facebook: "https://www.facebook.com/profile.php?id=61592093192345",
   instagram: "https://www.instagram.com/hipa_masala/",
   // Google lists this channel for the brand search; LinkedIn is left out until the company page URL is confirmed.
