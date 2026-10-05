@@ -775,7 +775,7 @@ function InfoCard({ icon: Icon, title, children }: { icon: typeof MapPin; title:
 }
 
 export function ContactPage() {
-  const cityMapUrl = `https://www.google.com/maps?q=${encodeURIComponent(siteIdentity.locationLabel)}`;
+  const cityMapUrl = siteIdentity.googleBusinessProfile;
   const cityMapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(siteIdentity.locationLabel)}&output=embed`;
 
   return (
