@@ -36,6 +36,17 @@ describe("standalone SEO parity", () => {
     expect(getStructuredData("/", "https://www.hipamasalas.com").map((schema) => schema["@type"])).toContain("Organization");
   });
 
+  it("links the business entity to its confirmed profiles and a real map URL", () => {
+    const homeSchemas = getStructuredData("/", "https://www.hipamasalas.com");
+    const organization = homeSchemas.find((schema) => schema["@type"] === "Organization") as Record<string, unknown>;
+    const localBusiness = homeSchemas.find((schema) => schema["@type"] === "LocalBusiness") as Record<string, unknown>;
+    const expectedProfiles = [siteIdentity.facebook, siteIdentity.instagram, siteIdentity.youtube, siteIdentity.googleBusinessProfile];
+    expect(organization.sameAs).toEqual(expectedProfiles);
+    expect(localBusiness.sameAs).toEqual(expectedProfiles);
+    for (const url of expectedProfiles) expect(url).toMatch(/^https:\/\//);
+    expect(localBusiness.hasMap).toMatch(/^https:\/\/www\.google\.com\/maps\/search\/\?api=1&query=/);
+  });
+
   it("permits public crawling while excluding the private admin section", () => {
     expect(buildRobotsTxt("https://www.hipamasalas.com")).toContain("User-agent: *\nAllow: /\nDisallow: /admin");
   });

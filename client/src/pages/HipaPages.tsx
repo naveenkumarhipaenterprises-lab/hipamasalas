@@ -823,6 +823,7 @@ export function ContactPage() {
                 <p><strong>Working hours:</strong> {siteIdentity.openingHours.label}</p>
                 <p><strong>FSSAI Lic. No.:</strong> {siteIdentity.fssaiLicence} · <strong>GSTIN:</strong> {siteIdentity.gstin}</p>
                 <a className="map-open-link" href={cityMapUrl} target="_blank" rel="noreferrer">Open in Google Maps</a>
+                <a className="map-open-link" href={siteIdentity.googleBusinessProfile} target="_blank" rel="noreferrer">View our Google Business Profile</a>
               </div>
             </div>
             <div className="whatsapp-cta">
