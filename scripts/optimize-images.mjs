@@ -42,13 +42,9 @@ const manifestPath = path.join(root, "client/src/lib/imageManifest.generated.ts"
 
 // Width sets per image role (CSS px × DPR, capped at the source width).
 const ROLE_WIDTHS = {
-  // product packs: cards (~130px wide), catalogue (~150px), product hero (~235px)
+  // product packs: cards (~130px wide), catalogue (~150px), product hero (~190px), home carousel (~235px)
   // (finer steps so 1.75x/2.625x DPR phones get a close fit, not the next size up)
   pack: [160, 200, 256, 280, 320, 420, 480, 600, 720],
-  // "-collection" pack shots used only in product cards
-  packCard: [160, 256, 384],
-  // hero carousel packs: 175–240px wide slots
-  heroPack: [240, 360, 480],
   // full-bleed hero photograph
   heroPhoto: [960, 1440],
   // editorial photo: 320–720px wide
@@ -59,30 +55,16 @@ const ROLE_WIDTHS = {
 };
 
 const PRODUCT_IMAGES = [
-  "sambar_96379996.png",
-  "rasam_b3831405.png",
-  "turmeric_1bd08fa7.png",
-  "hipa-red-chilli-powder-pack_2e2de7c8.webp",
-  "coriander_6db70131.png",
-  "cumin_cd53cea5.png",
-  "pepper_36d6b66d.png",
-  "garam-masala_6b465bcd.png",
-];
-const COLLECTION_IMAGES = [
-  "sambar-collection_1befbb00.webp",
-  "rasam-collection_9ee665cf.webp",
-  "garam-collection_bf93a09b.webp",
-  "coriander-collection_65f09b3e.webp",
-  "pepper-collection_62ecec6f.webp",
-];
-const HERO_PACKS = [
-  "sambar-hero_ccdf8343.webp",
-  "rasam-hero_f1b93552.webp",
-  "turmeric-hero_7640284b.webp",
-  "coriander-hero_80ecbf35.webp",
-  "cumin-hero_ca84a878.webp",
-  "pepper-hero_820e1b4a.webp",
-  "garam-hero_d8754d54.webp",
+  // One transparent pack shot per product (uniform 2:3 canvas) feeds every slot: cards, catalogue,
+  // product hero and the home carousel. Sources are the owner's October 2026 pack photos.
+  "pack-sambar-powder.webp",
+  "pack-rasam-powder.webp",
+  "pack-turmeric-powder.webp",
+  "pack-red-chilli-powder.webp",
+  "pack-coriander-powder.webp",
+  "pack-cumin-powder.webp",
+  "pack-pepper-powder.webp",
+  "pack-garam-masala.webp",
 ];
 const BLOG_COVERS = [
   "best-masala-manufacturer-in-chennai.webp",
@@ -107,9 +89,7 @@ const BLOG_COVERS = [
 ];
 
 const JOBS = [
-  ...PRODUCT_IMAGES.map((file) => ({ file, role: "pack", quality: 82 })),
-  ...COLLECTION_IMAGES.map((file) => ({ file, role: "packCard", quality: 82 })),
-  ...HERO_PACKS.map((file) => ({ file, role: "heroPack", quality: 82 })),
+  ...PRODUCT_IMAGES.map((file) => ({ file, role: "pack", quality: 84 })),
   // The hero photo is the LCP element, so it also gets an AVIF set (~35% smaller at equal visual quality).
   { file: "hero-spices_8241cadf.webp", role: "heroPhoto", quality: 76, mobileCrop: true, avifQuality: 50 },
   { file: "story-spice-mortar_d4ded661.jpg", role: "editorial", quality: 78 },

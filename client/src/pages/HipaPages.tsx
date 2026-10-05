@@ -1,14 +1,32 @@
-import { ArrowRight, Building2, Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Download, FileText, Heart, HelpCircle, Info, Leaf, Mail, MapPin, Package, Phone, ShieldCheck, Sparkles, Store, Truck, Utensils, Zap } from "lucide-react";
+import { ArrowRight, Building2, Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Download, FileText, Heart, HelpCircle, Info, Leaf, Mail, MapPin, Package, Phone, ShieldCheck, ShoppingBag, Sparkles, Store, Truck, Utensils, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useRoute } from "wouter";
 import { EnquiryForm } from "@/components/EnquiryForm";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { packSizes, ProductAvailabilityLabel, ProductCard } from "@/components/ProductCard";
 import { ResponsiveImage } from "@/components/ResponsiveImage";
-import { faqs, getProduct, getProductFaqs, products, siteIdentity } from "@shared/hipaContent";
+import { faqs, getProduct, getProductFaqs, getShopHref, isExternalShop, products, siteIdentity } from "@shared/hipaContent";
 import { MANUFACTURER_PAGE_PATH, manufacturerPage } from "@shared/manufacturerPage";
 import { trackEvent } from "@/lib/analytics";
 import { trpc } from "@/lib/trpc";
+
+/** "Shop Now" link: the online store when configured, otherwise the product catalogue. */
+function ShopNowLink({ className, location, product }: { className: string; location: string; product?: string }) {
+  const href = getShopHref();
+  const onClick = () => trackEvent("shop_now_click", { location, ...(product ? { product } : {}) });
+  if (isExternalShop()) {
+    return (
+      <a href={href} target="_blank" rel="noreferrer" className={className} onClick={onClick}>
+        <ShoppingBag size={16} aria-hidden="true" /> Shop Now
+      </a>
+    );
+  }
+  return (
+    <Link href={href} className={className} onClick={onClick}>
+      <ShoppingBag size={16} aria-hidden="true" /> Shop Now
+    </Link>
+  );
+}
 
 type ArticleResource = {
   href: string;
@@ -247,12 +265,13 @@ function CatalogueProductCard({ product }: { product: (typeof products)[number] 
         )}
         <ProductAvailabilityLabel slug={product.slug} />
         <div className="catalogue-product-actions">
+          <ShopNowLink className="btn btn-gold btn-sm" location="catalogue" product={product.name} />
           <Link href={`/products/${product.slug}`} className="btn btn-primary btn-sm">
             Product Details <span className="arrow">→</span>
           </Link>
           <a
             href={`/products/${product.slug}#product-enquiry`}
-            className="btn btn-outline btn-sm"
+            className="btn btn-outline btn-sm catalogue-enquire-link"
             onClick={() => trackEvent("product_enquiry_cta", { product: product.name, location: "catalogue" })}
           >
             Enquire Now
@@ -297,7 +316,7 @@ export function ProductsPage() {
       </section>
 
       {/* B2B / DISTRIBUTOR CALLOUT */}
-      <section className="catalogue-enquiry-section" id="distributor-enquiry">
+      <section className="catalogue-enquiry-section reveal" id="distributor-enquiry">
         <div className="container catalogue-enquiry-grid">
           <div className="catalogue-enquiry-copy">
             <p className="eyebrow">Trade &amp; Business Orders</p>
@@ -324,7 +343,7 @@ export function ProductsPage() {
       </section>
 
       {/* PRODUCT FAQs */}
-      <section className="catalogue-faq-section">
+      <section className="catalogue-faq-section reveal">
         <div className="container">
           <div className="collection-head">
             <p className="eyebrow">Common Questions</p>
@@ -401,6 +420,7 @@ export function ProductDetailPage() {
             )}
 
             <div className="replica-product-actions">
+              <ShopNowLink className="btn btn-gold" location="product" product={product.name} />
               <a href="#product-enquiry" className="btn btn-primary" onClick={() => trackEvent("product_enquiry_cta", { product: product.name })}>
                 Enquire About This Product <span className="arrow">↓</span>
               </a>
@@ -413,7 +433,7 @@ export function ProductDetailPage() {
       </section>
 
       {/* 2. DEEP SEARCH INTENT SECTIONS (700-1000 words per product) */}
-      <section className="product-deep-content">
+      <section className="product-deep-content reveal">
         <div className="container product-content-container">
 
           {/* WHAT IS THIS PRODUCT */}
@@ -507,7 +527,7 @@ export function ProductDetailPage() {
       </section>
 
       {/* 3. PRODUCT FAQS */}
-      <section className="product-faq-section">
+      <section className="product-faq-section reveal">
         <div className="container">
           <div className="product-faq-heading">
             <p className="eyebrow">Product Questions</p>
@@ -530,10 +550,10 @@ export function ProductDetailPage() {
 
       {/* 4. RELATED PRODUCTS */}
       {relatedProducts.length > 0 && (
-        <section className="related-products">
+        <section className="related-products reveal">
           <div className="container">
             <h2>Related Spice Powders &amp; Masalas</h2>
-            <div className="product-grid product-grid-3cols">
+            <div className="product-grid product-grid-3cols reveal-stagger">
               {relatedProducts.map((item) => (
                 <ProductCard key={item.slug} product={item} />
               ))}
@@ -543,7 +563,7 @@ export function ProductDetailPage() {
       )}
 
       {/* 5. INLINE PRODUCT ENQUIRY FORM */}
-      <section className="product-enquiry-section" id="product-enquiry">
+      <section className="product-enquiry-section reveal" id="product-enquiry">
         <div className="container product-enquiry-grid">
           <div className="product-enquiry-copy">
             <p className="eyebrow">Direct Enquiry</p>
@@ -701,7 +721,7 @@ export function FaqPage() {
         </div>
       </section>
 
-      <section className="faq-shell">
+      <section className="faq-shell reveal">
         <div className="faq-container">
 
           {/* CLUSTER 1 */}
@@ -791,7 +811,7 @@ export function ContactPage() {
         </div>
       </section>
 
-      <section className="info-cards-section">
+      <section className="info-cards-section reveal">
         <div className="container info-cards-row">
           <InfoCard icon={MapPin} title="Official Address">
             {siteIdentity.locationLabel}
@@ -807,7 +827,7 @@ export function ContactPage() {
         </div>
       </section>
 
-      <section className="contact-main" id="enquire">
+      <section className="contact-main reveal" id="enquire">
         <div className="container contact-grid">
           <div className="contact-form-card">
             <h2>Send Us an Enquiry</h2>
@@ -854,7 +874,7 @@ export function B2BEnquiriesPage() {
         </div>
       </section>
 
-      <section className="b2b-enquiry-section">
+      <section className="b2b-enquiry-section reveal">
         <div className="container b2b-enquiry-grid">
           <div className="b2b-enquiry-copy">
             <p className="eyebrow">Partnership Opportunities</p>
@@ -1002,7 +1022,7 @@ export function BlogPage() {
           </label>
         </div>
       </section>
-      <section className="blog-live-collection">
+      <section className="blog-live-collection reveal">
         <div className="container">
           {publishedPosts.isLoading ? (
             <div className="blog-live-empty">
@@ -1051,7 +1071,7 @@ export function BlogPage() {
           )}
         </div>
       </section>
-      <section className="blog-live-newsletter">
+      <section className="blog-live-newsletter reveal">
         <div className="container blog-live-newsletter-inner">
           <div>
             <h2>Stay Updated with HIPA Masala</h2>
@@ -1272,7 +1292,7 @@ export function MasalaManufacturerChennaiPage() {
         </div>
       </section>
 
-      <section className="product-faq-section" aria-labelledby="manufacturer-faq">
+      <section className="product-faq-section reveal" aria-labelledby="manufacturer-faq">
         <div className="container">
           <div className="product-faq-heading">
             <p className="eyebrow">Buyer questions</p>
@@ -1293,7 +1313,7 @@ export function MasalaManufacturerChennaiPage() {
         </div>
       </section>
 
-      <section className="b2b-enquiry-section" id="manufacturer-enquiry">
+      <section className="b2b-enquiry-section reveal" id="manufacturer-enquiry">
         <div className="container b2b-enquiry-grid">
           <div className="b2b-enquiry-copy">
             <p className="eyebrow">Buy direct from the manufacturer</p>

@@ -9,6 +9,22 @@ export interface Message {
   content: string;
 }
 
+const LINK_PATTERN = /(https?:\/\/[^\s)]+|\+91 \d{5} \d{5}|[\w.+-]+@[\w-]+\.[\w.]+)/g;
+
+/** Turns URLs, the phone number and e-mail addresses inside an answer into tappable links. */
+function renderWithLinks(text: string) {
+  return text.split(LINK_PATTERN).map((part, index) => {
+    if (!part) return null;
+    if (/^https?:\/\//.test(part)) {
+      const label = part.replace(/^https?:\/\/(www\.)?/, "");
+      return <a key={index} href={part} target="_blank" rel="noreferrer" style={{ color: "#8B2C1F", fontWeight: 600, wordBreak: "break-all" }}>{label}</a>;
+    }
+    if (/^\+91 /.test(part)) return <a key={index} href={`tel:${part.replace(/\s+/g, "")}`} style={{ color: "#8B2C1F", fontWeight: 600 }}>{part}</a>;
+    if (/@/.test(part)) return <a key={index} href={`mailto:${part}`} style={{ color: "#8B2C1F", fontWeight: 600 }}>{part}</a>;
+    return <React.Fragment key={index}>{part}</React.Fragment>;
+  });
+}
+
 const INITIAL_WELCOME: Message = {
   id: "welcome-1",
   role: "assistant",
@@ -16,10 +32,11 @@ const INITIAL_WELCOME: Message = {
 };
 
 const QUICK_CHIPS = [
+  { label: "Products 📦", text: "What products do you have?" },
+  { label: "Price & Order 🛒", text: "How do I order and what is the price?" },
   { label: "Sambar Recipe 🍲", text: "Sambar powder epdi use panradhu?" },
-  { label: "Products List 📦", text: "What products do you have?" },
   { label: "Hotel / Bulk 🏨", text: "I need bulk masala supply for my hotel" },
-  { label: "Tanglish Help 💬", text: "epdi iruka bro?" },
+  { label: "Where are you? 📍", text: "Where are you located?" },
 ];
 
 /**
@@ -249,7 +266,7 @@ export default function HipaChatPanel({ open, onClose }: { open: boolean; onClos
                       border: isUser ? "none" : "1px solid #e5e7eb",
                     }}
                   >
-                    {msg.content}
+                    {renderWithLinks(msg.content)}
                   </div>
                 </div>
               );

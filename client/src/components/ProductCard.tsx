@@ -12,14 +12,6 @@ export function ProductAvailabilityLabel({ slug }: { slug: string }) {
   return <p className={`product-availability ${status}`}>{status === "available" ? "Active Product" : "Available on Request"}</p>;
 }
 
-const sourceCollectionAssets: Record<string, string> = {
-  "sambar-powder": "/assets/sambar-collection_1befbb00.webp",
-  "rasam-powder": "/assets/rasam-collection_9ee665cf.webp",
-  "garam-masala": "/assets/garam-collection_bf93a09b.webp",
-  "coriander-powder": "/assets/coriander-collection_65f09b3e.webp",
-  "pepper-powder": "/assets/pepper-collection_62ecec6f.webp",
-};
-
 /**
  * `sizes` for a pack shot that is height-constrained with object-fit: contain:
  * the rendered width is (slot height × aspect ratio), not the slot width.
@@ -32,7 +24,7 @@ export function packSizes(src: string, slots: Array<[string | null, number]>) {
 }
 
 export function ProductCard({ product, compact = false }: { product: (typeof products)[number]; compact?: boolean }) {
-  const src = sourceCollectionAssets[product.slug] || product.image;
+  const src = product.image;
   return (
     <article className={`product-card ${compact ? "product-card-compact" : ""}`}>
       <Link href={`/products/${product.slug}`} className="product-media">
