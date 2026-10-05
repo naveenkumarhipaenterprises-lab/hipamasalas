@@ -78,9 +78,9 @@ export const siteIdentity = {
   heroImage: "/assets/hero-spices_8241cadf.webp",
   facebook: "https://www.facebook.com/profile.php?id=61592093192345",
   instagram: "https://www.instagram.com/hipa_masala/",
+  // Google lists this channel for the brand search; LinkedIn is left out until the company page URL is confirmed.
   youtube: "https://www.youtube.com/@HIPAMasala",
-  linkedin: "https://www.linkedin.com/company/hipa-masalas",
-  // Google Business Profile share link (from sham, 2026-10-05): the listing itself, not an address search.
+  // Google Business Profile share link supplied by the owner on 2026-10-05.
   googleBusinessProfile: "https://share.google/beobv5nq74J9DHZwm",
   whatsappHref:
     "https://wa.me/917058053055?text=Hi%20HIPA%20Masala%2C%20I%27d%20like%20to%20know%20more%20about%20your%20products.",
@@ -1124,8 +1124,9 @@ export function getStructuredData(pathname: string, origin: string, articleOverr
   const organizationId = absoluteUrl(origin, "/#organization");
   const localBusinessId = absoluteUrl(origin, "/#localbusiness");
   const websiteId = absoluteUrl(origin, "/#website");
-  const sameAs = [siteIdentity.facebook, siteIdentity.instagram, siteIdentity.youtube, siteIdentity.linkedin, siteIdentity.googleBusinessProfile];
-  const mapUrl = siteIdentity.googleBusinessProfile;
+  const sameAs = [siteIdentity.facebook, siteIdentity.instagram, siteIdentity.youtube, siteIdentity.googleBusinessProfile];
+  // hasMap stays a real Google Maps URL; the share link identifies the listing in sameAs instead.
+  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${siteIdentity.name}, ${siteIdentity.locationLabel}`)}`;
   // Registration numbers and hours are shown on the About and Contact pages, so the schema repeats visible facts.
   const businessIdentifiers = [
     { "@type": "PropertyValue", propertyID: "FSSAI licence number", value: siteIdentity.fssaiLicence },
