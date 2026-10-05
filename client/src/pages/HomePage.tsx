@@ -247,7 +247,7 @@ export function HomePage() {
                               className="hero-carousel-img"
                               src={image?.src ?? product.heroImage}
                               srcSet={image?.srcSet}
-                              sizes={image ? "(max-width: 640px) 190px, 240px" : undefined}
+                              sizes={image ? "(max-width: 640px) 214px, (max-width: 1200px) 334px, 387px" : undefined}
                               width={image?.width}
                               height={image?.height}
                               alt={product.imageAlt}

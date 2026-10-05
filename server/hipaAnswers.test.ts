@@ -1,8 +1,23 @@
 import { describe, expect, it } from "vitest";
-import { answerLocally, detectIntents, detectProducts, detectTanglish, normalise } from "./hipaAnswers";
+import { answerLocally, detectIntents, detectProducts, detectTanglish, normalise, previousTurns } from "./hipaAnswers";
 import { products, siteIdentity } from "../shared/hipaContent";
 
 const ask = (message: string, history: Array<{ role: string; content: string }> = []) => answerLocally(message, history);
+
+/** Builds the history exactly as the website sends it: earlier turns plus the message being asked. */
+const conversation = (...questions: string[]) => {
+  const history: Array<{ role: string; content: string }> = [];
+  for (const question of questions.slice(0, -1)) {
+    history.push({ role: "user", content: question });
+    history.push({ role: "assistant", content: answerLocally(question, [...history, { role: "user", content: question }]) });
+  }
+  const current = questions[questions.length - 1];
+  return { current, history: [...history, { role: "user", content: current }] };
+};
+const askInConversation = (...questions: string[]) => {
+  const { current, history } = conversation(...questions);
+  return answerLocally(current, history);
+};
 
 describe("local chat answers differ by question", () => {
   it("gives distinct answers to distinct everyday questions", () => {
@@ -120,35 +135,79 @@ describe("answers stay truthful to the site data", () => {
     expect(answer).toContain("Zamin Pallavaram");
     expect(answer).toContain("google.com/maps");
   });
+
+  it("does not mistake everyday ingredients in a product question for products we do not make", () => {
+    const notInRange = /isn't in the HIPA range|aren't in the HIPA range/;
+    for (const message of ["does sambar powder contain dal", "rasam powder la salt irukka?", "sambar powder for rice", "how much oil should i add to the sambar"]) {
+      expect(ask(message), message).not.toMatch(notInRange);
+    }
+    expect(ask("does sambar powder contain dal")).toContain("Fenugreek");
+    expect(ask("rasam powder la salt irukka?")).toContain("Rasam Powder");
+    expect(ask("do you have whole spices like cardamom")).toMatch(notInRange);
+    expect(ask("do you sell pickles")).toMatch(/Pickles aren't in the HIPA range/);
+  });
+
+  it("treats a missing order as a complaint, not as a new order", () => {
+    for (const message of ["I haven't received my order", "where is my order", "order placed last week still not received"]) {
+      const answer = ask(message);
+      expect(answer, message).toMatch(/sorry/i);
+      expect(answer, message).not.toContain("orders are taken directly");
+    }
+  });
+
+  it("reads 'enna irukku' after a product as an ingredients question", () => {
+    const answer = ask("Garam masala la enna enna irukku?");
+    expect(answer).toContain("Ingredients:");
+    expect(answer).not.toContain("8 products");
+  });
+
+  it("does not state policies the website does not", () => {
+    const unsupported = /stockist|supermarket|UPI|next working day|two to three months|no fixed minimum|samples? (?:are|for trade buyers are) arranged/i;
+    for (const message of ["where can I buy your masala?", "how long can I store turmeric powder", "what are your timings", "payment options?", "talk to a human", "minimum order quantity for distributors", "can I get samples for my shop"]) {
+      expect(ask(message), message).not.toMatch(unsupported);
+    }
+    expect(ask("how to use rasam powder")).not.toMatch(/teaspoons? of Rasam Powder/);
+    expect(ask("how do I cook with your powders")).toContain("1 tablespoon of Rasam Powder");
+  });
 });
 
 describe("short follow-ups use the previous turn", () => {
+  it("drops the website's copy of the current message from the history", () => {
+    const turns = previousTurns([{ role: "user", content: "hi" }, { role: "assistant", content: "Hello" }, { role: "user", content: " price? " }], "price?");
+    expect(turns).toEqual([{ role: "user", content: "hi" }, { role: "assistant", content: "Hello" }]);
+    expect(previousTurns([{ role: "user", content: "price?" }], "price?")).toEqual([]);
+  });
+
   it("carries the product into a one-word price question", () => {
-    const history = [
-      { role: "user", content: "tell me about cumin powder" },
-      { role: "assistant", content: ask("tell me about cumin powder") },
-    ];
-    const answer = ask("price?", history);
+    const answer = askInConversation("tell me about cumin powder", "price?");
     expect(answer).toContain("Cumin Powder");
     expect(answer).toContain(siteIdentity.phone);
   });
 
   it("carries the question onto a one-word product reply", () => {
-    const history = [
-      { role: "user", content: "what pack sizes do you have for" },
-      { role: "assistant", content: ask("what pack sizes do you have for") },
-    ];
-    const answer = ask("pepper", history);
+    const answer = askInConversation("what pack sizes do you have for", "pepper");
     expect(answer).toContain("Pepper Powder");
     expect(answer).toContain("50g");
   });
 
-  it("treats a bare quantity as a bulk follow-up", () => {
-    const history = [
-      { role: "user", content: "bulk supply for my hotel" },
-      { role: "assistant", content: ask("bulk supply for my hotel") },
-    ];
-    expect(ask("50kg", history)).toContain("quantity: 50kg");
+  it("treats a bare quantity as a bulk follow-up and keeps the product", () => {
+    expect(askInConversation("bulk supply for my hotel", "50kg")).toContain("quantity: 50kg");
+    const answer = askInConversation("I need rasam powder for my restaurant", "50kg");
+    expect(answer).toContain("quantity: 50kg");
+    expect(answer).toContain("Rasam Powder");
+  });
+
+  it("does not carry a product the visitor never named out of a generic answer", () => {
+    const answer = askInConversation("do you sponsor television programmes", "ok what is the price");
+    expect(answer).not.toContain("Sambar Powder");
+    expect(answer).toContain(siteIdentity.phone);
+  });
+
+  it("survives a malformed history instead of throwing", () => {
+    expect(() => answerLocally("price?", "nonsense" as unknown as [])).not.toThrow();
+    expect(() => answerLocally("price?", { role: "user" } as unknown as [])).not.toThrow();
+    expect(answerLocally("hi", [null, 5, { role: "model" }, { role: "user", content: 7 }] as unknown as [])).toMatch(/welcome|assistant/i);
+    expect(answerLocally(undefined as unknown as string, [])).toContain("HIPA Masala");
   });
 
   it("answers small talk warmly without a sales pitch", () => {

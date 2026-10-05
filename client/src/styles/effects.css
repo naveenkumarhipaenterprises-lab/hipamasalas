@@ -35,8 +35,8 @@ p, li { text-wrap: pretty; }
 }
 .collection-head h2, .catalogue-head h1 { margin-bottom: 18px; }
 
-/* Lead paragraph in long editorial copy breathes more. */
-.editorial-copy > p:first-of-type { font-size: 16.5px; color: var(--ink); }
+/* Lead paragraph in long editorial copy breathes more (the eyebrow above the heading is untouched). */
+.editorial-copy > h2 + p { font-size: 16.5px; color: var(--ink); }
 
 /* -------------------- Reveal on scroll -------------------- */
 /* Hidden state only when JavaScript has loaded (html.js is set inline in <head>), so crawlers,
@@ -51,23 +51,24 @@ html.js .reveal.in-view { opacity: 1; transform: none; will-change: auto; }
 html:not(.js) .reveal { opacity: 1; transform: none; }
 /* Safety valve: if the app script has not run ~1.2s after parsing (slow network), show everything;
    SiteShell removes the class once its observer is active. */
-html.reveal-late .reveal, html.reveal-late .reveal-stagger > * { opacity: 1; transform: none; transition: none; }
+html.reveal-late .reveal, html.reveal-late .reveal-stagger > * { opacity: 1; transform: none; translate: none; transition: none; animation: none; }
 
-/* Grids whose children appear one after another. */
-html.js .reveal-stagger > * {
-  opacity: 0;
-  transform: translateY(18px);
-  transition: opacity .6s var(--ease-out), transform .6s var(--ease-out);
+/* Grids whose children appear one after another. A keyframe animation on `opacity` and `translate`
+   (not `transform`) is used so the delays never leak into the cards' own hover transitions. */
+html.js .reveal-stagger > * { opacity: 0; }
+html.js .reveal-stagger.in-view > * { animation: stagger-in .6s var(--ease-out) both; }
+.reveal-stagger.in-view > :nth-child(2) { animation-delay: .07s; }
+.reveal-stagger.in-view > :nth-child(3) { animation-delay: .14s; }
+.reveal-stagger.in-view > :nth-child(4) { animation-delay: .21s; }
+.reveal-stagger.in-view > :nth-child(5) { animation-delay: .28s; }
+.reveal-stagger.in-view > :nth-child(6) { animation-delay: .35s; }
+.reveal-stagger.in-view > :nth-child(7) { animation-delay: .42s; }
+.reveal-stagger.in-view > :nth-child(8) { animation-delay: .49s; }
+.reveal-stagger.in-view > :nth-child(n + 9) { animation-delay: .55s; }
+@keyframes stagger-in {
+  from { opacity: 0; translate: 0 18px; }
+  to { opacity: 1; translate: 0 0; }
 }
-html.js .reveal-stagger.in-view > * { opacity: 1; transform: none; }
-.reveal-stagger.in-view > :nth-child(2) { transition-delay: .07s; }
-.reveal-stagger.in-view > :nth-child(3) { transition-delay: .14s; }
-.reveal-stagger.in-view > :nth-child(4) { transition-delay: .21s; }
-.reveal-stagger.in-view > :nth-child(5) { transition-delay: .28s; }
-.reveal-stagger.in-view > :nth-child(6) { transition-delay: .35s; }
-.reveal-stagger.in-view > :nth-child(7) { transition-delay: .42s; }
-.reveal-stagger.in-view > :nth-child(8) { transition-delay: .49s; }
-.reveal-stagger.in-view > :nth-child(n + 9) { transition-delay: .55s; }
 
 /* -------------------- Scroll progress bar -------------------- */
 .scroll-progress {
@@ -168,17 +169,21 @@ html.js .reveal-stagger.in-view > * { opacity: 1; transform: none; }
 }
 
 /* -------------------- Buttons -------------------- */
-.btn { position: relative; overflow: hidden; isolation: isolate; }
-.btn::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, .22) 50%, transparent 65%);
-  transform: translateX(-120%);
-  transition: transform .6s var(--ease-out);
+/* The light sweep needs overflow:hidden, which would clip a long no-wrap label on a narrow phone,
+   so it only exists on devices with a real hover. */
+@media (hover: hover) and (pointer: fine) {
+  .btn { position: relative; overflow: hidden; isolation: isolate; }
+  .btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, .22) 50%, transparent 65%);
+    transform: translateX(-120%);
+    transition: transform .6s var(--ease-out);
+  }
+  .btn:hover::after, .btn:focus-visible::after { transform: translateX(120%); }
 }
-.btn:hover::after, .btn:focus-visible::after { transform: translateX(120%); }
 .btn-primary { background: linear-gradient(135deg, var(--green-700), var(--green-600)); }
 .btn-primary:hover { background: linear-gradient(135deg, var(--green-600), var(--green-500)); }
 .btn-gold {
@@ -195,6 +200,10 @@ html.js .reveal-stagger.in-view > * { opacity: 1; transform: none; }
 @media (max-width: 900px) {
   .header-actions .shop-now-btn { padding: 9px 14px; font-size: 11.5px; }
   .header-actions .shop-now-btn span { display: none; }
+}
+/* On small phones the header row has no room for a third control; the menu carries Shop Now. */
+@media (max-width: 560px) {
+  .header-actions .shop-now-btn { display: none; }
 }
 /* Shop Now inside the mobile menu. */
 .main-nav .nav-shop-now { display: none; }
@@ -258,7 +267,7 @@ html.js .reveal-stagger.in-view > * { opacity: 1; transform: none; }
 
 /* -------------------- Reduced motion -------------------- */
 @media (prefers-reduced-motion: reduce) {
-  html.js .reveal, html.js .reveal-stagger > * { opacity: 1; transform: none; transition: none; }
+  html.js .reveal, html.js .reveal-stagger > * { opacity: 1; transform: none; translate: none; transition: none; animation: none; }
   .scroll-progress { display: none; }
   .hero-bg-img, .hero-carousel-card .hero-carousel-img, .product-replica-image img { animation: none !important; }
   .trust-ticker-track { animation: none; flex-wrap: wrap; width: auto; }

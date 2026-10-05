@@ -89,7 +89,8 @@ function buildGeminiContents(
   return contents;
 }
 
-const GEMINI_TIMEOUT_MS = 6000;
+const GEMINI_TIMEOUT_MS = 6000; // per attempt
+const GEMINI_BUDGET_MS = 7000; // across all attempts, so the serverless function always answers in time
 
 async function callGeminiAPI(
   apiKey: string,
@@ -108,8 +109,11 @@ async function callGeminiAPI(
 
   const contents = buildGeminiContents(userMessage, history);
   const trimmedContents = contents.slice(-20);
+  const deadline = Date.now() + GEMINI_BUDGET_MS;
 
   for (const modelName of candidateModels) {
+    const remaining = deadline - Date.now();
+    if (remaining < 750) break; // out of time: let the local engine answer
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
     const payload = {
@@ -126,7 +130,7 @@ async function callGeminiAPI(
     // The site runs as a serverless function with a short wall-clock budget, so each attempt is
     // capped; on a timeout the local answer engine replies instead of leaving the visitor waiting.
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
+    const timer = setTimeout(() => controller.abort(), Math.min(GEMINI_TIMEOUT_MS, remaining));
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -169,10 +173,11 @@ export function getIntelligentFallback(input: string, history: Array<{ role: str
 export function registerHipaChatRoute(app: Express) {
   app.post("/api/chat", async (req: Request, res: Response) => {
     try {
-      const { message, history } = req.body || {};
+      const { message, history: rawHistory } = req.body || {};
       if (!message || typeof message !== "string" || !message.trim()) {
         return res.status(400).json({ error: "Message is required." });
       }
+      const history = Array.isArray(rawHistory) ? rawHistory : [];
 
       let reply: string | null = null;
       const apiKey =
@@ -198,7 +203,7 @@ export function registerHipaChatRoute(app: Express) {
     } catch (err) {
       console.error("[/api/chat Error]", err);
       return res.json({
-        reply: getIntelligentFallback(req.body?.message || "", req.body?.history || []),
+        reply: getIntelligentFallback(typeof req.body?.message === "string" ? req.body.message : "", Array.isArray(req.body?.history) ? req.body.history : []),
         role: "assistant",
       });
     }

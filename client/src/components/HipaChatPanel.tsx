@@ -9,7 +9,7 @@ export interface Message {
   content: string;
 }
 
-const LINK_PATTERN = /(https?:\/\/[^\s)]+|\+91 \d{5} \d{5}|[\w.+-]+@[\w-]+\.[\w.]+)/g;
+const LINK_PATTERN = /(https?:\/\/[^\s)]+|\+91 \d{5} \d{5}|[\w.+-]+@[\w-]+(?:\.[\w-]+)*\.[A-Za-z]{2,})/g;
 
 /** Turns URLs, the phone number and e-mail addresses inside an answer into tappable links. */
 function renderWithLinks(text: string) {

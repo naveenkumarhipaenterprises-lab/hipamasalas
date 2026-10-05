@@ -62,17 +62,21 @@ const PRODUCT_ALIASES: Record<string, string[]> = {
   "garam-masala": ["garam masala", "garam", "biryani masala", "kurma masala", "briyani masala", "கரம் மசாலா", "கரம்"],
 };
 
-/** Things people ask for that HIPA does not make, with the closest product to suggest. */
-const NOT_IN_RANGE: Array<{ terms: string[]; label: string; closest: string[] }> = [
-  { terms: ["garlic podi", "poondu podi"], label: "Garlic podi", closest: ["red-chilli-powder", "pepper-powder"] },
-  { terms: ["paruppu podi", "parupu podi", "dal podi"], label: "Paruppu podi", closest: ["sambar-powder", "rasam-powder"] },
-  { terms: ["idli podi", "idly podi", "gun powder", "gunpowder", "idli milagai podi"], label: "Idli podi", closest: ["red-chilli-powder", "pepper-powder"] },
-  { terms: ["pickle", "pickles", "oorugai", "achar"], label: "Pickles", closest: ["red-chilli-powder", "turmeric-powder"] },
-  { terms: ["ginger garlic paste", "paste", "pastes"], label: "Pastes", closest: ["garam-masala"] },
-  { terms: ["whole spices", "whole spice", "cardamom", "elakkai", "cinnamon", "pattai", "cloves", "kirambu", "star anise", "bay leaf", "mustard", "kadugu", "fenugreek seeds", "vendhayam"], label: "Whole spices", closest: ["garam-masala", "pepper-powder"] },
-  { terms: ["chicken masala", "mutton masala", "fish masala", "fish fry masala", "egg masala", "meat masala", "chicken 65"], label: "Meat-specific masalas", closest: ["garam-masala", "red-chilli-powder"] },
-  { terms: ["chaat masala", "pav bhaji", "kitchen king", "chole masala", "pani puri", "tea masala", "chai masala", "sabji masala", "kashmiri"], label: "North Indian specialty masalas", closest: ["garam-masala"] },
-  { terms: ["tea", "coffee", "oil", "ghee", "rice", "dal", "flour", "atta", "salt", "sugar", "papad", "appalam"], label: "Groceries like that", closest: ["sambar-powder", "turmeric-powder"] },
+/**
+ * Things people ask for that HIPA does not make, with the closest product to suggest. Only
+ * phrases that name a product someone might shop for: single everyday words such as salt,
+ * oil or rice appear in ordinary cooking and ingredient questions and must not match.
+ */
+const NOT_IN_RANGE: Array<{ terms: string[]; label: string; plural: boolean; closest: string[] }> = [
+  { terms: ["garlic podi", "poondu podi"], label: "Garlic podi", plural: false, closest: ["red-chilli-powder", "pepper-powder"] },
+  { terms: ["paruppu podi", "parupu podi", "dal podi"], label: "Paruppu podi", plural: false, closest: ["sambar-powder", "rasam-powder"] },
+  { terms: ["idli podi", "idly podi", "gun powder", "gunpowder", "idli milagai podi"], label: "Idli podi", plural: false, closest: ["red-chilli-powder", "pepper-powder"] },
+  { terms: ["pickle", "pickles", "oorugai", "achar"], label: "Pickles", plural: true, closest: ["red-chilli-powder", "turmeric-powder"] },
+  { terms: ["ginger garlic paste", "curry paste", "masala paste", "ready paste", "ready pastes"], label: "Pastes", plural: true, closest: ["garam-masala"] },
+  { terms: ["whole spices", "whole spice", "whole cardamom", "whole cinnamon", "whole cloves", "whole pepper", "whole chilli", "whole chillies", "star anise", "bay leaf", "bay leaves", "fenugreek seeds", "mustard seeds", "cumin seeds", "coriander seeds"], label: "Whole spices", plural: true, closest: ["garam-masala", "pepper-powder"] },
+  { terms: ["chicken masala", "mutton masala", "fish masala", "fish fry masala", "egg masala", "meat masala", "chicken 65 masala", "chicken 65"], label: "Meat-specific masalas", plural: true, closest: ["garam-masala", "red-chilli-powder"] },
+  { terms: ["chaat masala", "pav bhaji masala", "pav bhaji", "kitchen king", "chole masala", "pani puri masala", "tea masala", "chai masala", "sabji masala", "kashmiri chilli", "kashmiri mirch"], label: "North Indian specialty masalas", plural: true, closest: ["garam-masala"] },
+  { terms: ["tea powder", "coffee powder", "filter coffee", "cooking oil", "gingelly oil", "rice flour", "wheat flour", "atta", "maida", "papad", "papads", "appalam", "vadagam"], label: "Papads and other groceries", plural: true, closest: ["sambar-powder", "turmeric-powder"] },
 ];
 
 /** Keyword and phrase cues for each intent (matched against the normalised message). */
@@ -84,10 +88,10 @@ const INTENT_CUES: Record<Exclude<Intent, "greeting" | "yes" | "no">, string[]> 
   human: ["talk to human", "talk to a person", "speak to someone", "speak to a person", "real person", "customer care", "customer support", "call me", "call back", "callback", "connect me", "manager", "sales team", "agent"],
   products: ["product", "products", "product list", "list", "what do you have", "what do you sell", "what you sell", "what all", "range", "catalogue", "catalog", "items", "varieties", "variety", "enna irukku", "enna iruku", "enna enna", "menu", "collection", "all masala", "masalas", "spices", "powders", "types", "பொருட்கள்", "என்ன இருக்கு", "என்னென்ன"],
   price: ["price", "prices", "pricing", "priced", "cost", "costs", "rate", "rates", "mrp", "how much", "evlo", "evvalavu", "yevlo", "vilai", "velai", "rupees", "rs", "₹", "cheap", "cheapest", "expensive", "discount", "offer", "offers", "deal", "budget", "quote", "quotation", "விலை", "எவ்வளவு", "ரேட்"],
-  buy: ["buy", "buying", "order", "ordering", "purchase", "shop", "shopping", "online", "amazon", "flipkart", "swiggy", "zepto", "blinkit", "bigbasket", "where can i get", "where to get", "where do i get", "where can i buy", "available", "availability", "near me", "nearby", "store", "stores", "supermarket", "kadai", "vanga", "vangalam", "vanganum", "vaanga", "get it", "stock", "in stock", "sell", "website", "வாங்க", "வாங்கலாம்", "கிடைக்கும்", "கிடைக்குமா", "ஆர்டர்"],
+  buy: ["buy", "buying", "order", "ordering", "purchase", "shop", "shopping", "online", "amazon", "flipkart", "swiggy", "zepto", "blinkit", "bigbasket", "where can i get", "where to get", "where do i get", "where can i buy", "available", "availability", "near me", "nearby", "store", "stores", "supermarket", "kadai", "vanga", "vangalam", "vanganum", "vaanga", "get it", "stock", "in stock", "sell", "வாங்க", "வாங்கலாம்", "கிடைக்கும்", "கிடைக்குமா", "ஆர்டர்"],
   delivery: ["delivery", "deliver", "delivered", "shipping", "ship", "courier", "cash on delivery", "cod", "how many days", "dispatch", "all india", "pan india", "outside tamil nadu", "international", "abroad", "overseas", "usa", "dubai", "singapore", "malaysia", "uk", "pin code", "pincode"],
   packs: ["pack", "packs", "packet", "packets", "pack size", "pack sizes", "size", "sizes", "gram", "grams", "gms", "gm", "100g", "200g", "500g", "1kg", "1 kg", "50g", "weight", "pouch", "sachet", "how big", "quantities"],
-  ingredients: ["ingredient", "ingredients", "contain", "contains", "containing", "made of", "made from", "what is in", "whats in", "what s in", "composition", "added salt", "salt", "msg", "preservative", "preservatives", "colour", "color", "colours", "colors", "artificial", "additive", "additives", "pure", "purity", "adulteration", "adulterated", "100", "natural", "organic", "gluten", "allergen", "allergy", "vegan", "vegetarian", "veg", "halal", "sugar", "chemical", "chemicals", "healthy", "health", "side effects", "safe", "சேர்க்கை", "கலப்படம்"],
+  ingredients: ["ingredient", "ingredients", "contain", "contains", "containing", "made of", "made from", "what is in", "whats in", "what s in", "composition", "added salt", "salt", "msg", "preservative", "preservatives", "colour", "color", "colours", "colors", "artificial", "additive", "additives", "pure", "purity", "adulteration", "adulterated", "100 pure", "100 natural", "100 percent", "hundred percent", "natural", "organic", "gluten", "allergen", "allergy", "vegan", "vegetarian", "veg", "halal", "sugar", "chemical", "chemicals", "healthy", "health", "side effects", "safe", "சேர்க்கை", "கலப்படம்"],
   usage: ["recipe", "recipes", "how to use", "how to make", "how do i make", "how to cook", "how to prepare", "use panradhu", "use pannuvanga", "use panna", "epdi use", "eppadi use", "epdi panradhu", "eppadi seiyanum", "epdi seiyanum", "seiyarathu", "cook", "cooking", "prepare", "how much to add", "how much to use", "quantity per", "spoon", "spoons", "tablespoon", "teaspoon", "tsp", "tbsp", "dish", "dishes", "biryani", "kurma", "curry", "gravy", "idli", "dosa", "poriyal", "kootu", "chicken", "mutton", "fish", "egg", "paneer", "tiffin", "sambar epdi", "rasam epdi", "serving", "servings", "tips", "best for", "used for", "uses", "use", "good for", "எப்படி", "செய்முறை", "சமையல்"],
   storage: ["store", "storage", "storing", "shelf life", "shelf", "expiry", "expire", "expires", "expiration", "best before", "fridge", "refrigerate", "refrigerator", "how long", "last", "lasts", "keep", "fresh", "freshness", "moisture", "clump", "clumping", "airtight", "container"],
   bulk: ["bulk", "wholesale", "whole sale", "hotel", "hotels", "restaurant", "restaurants", "catering", "caterer", "caterers", "canteen", "mess", "cloud kitchen", "commercial", "supply", "supplier", "distributor", "distributors", "distributorship", "dealer", "dealers", "dealership", "franchise", "retailer", "retailers", "reseller", "private label", "white label", "own brand", "oem", "contract manufacturing", "kgs", "kilo", "kilos", "tonne", "ton", "tons", "monthly", "institutional", "b2b", "margin", "margins", "trade price", "export", "exporter", "exports", "import", "importer", "minimum order", "moq", "sample", "samples", "business", "shop owner", "my shop", "my store", "my hotel", "my restaurant", "tender", "corporate", "gst invoice", "invoice", "bill", "மொத்த", "மொத்தமாக", "ஹோட்டல்"],
@@ -97,7 +101,7 @@ const INTENT_CUES: Record<Exclude<Intent, "greeting" | "yes" | "no">, string[]> 
   quality: ["fssai", "licence", "license", "licensed", "certified", "certificate", "certification", "iso", "quality", "hygiene", "hygienic", "lab", "tested", "testing", "gst", "gstin", "standard", "standards", "authentic", "genuine", "original", "fake", "trust", "trusted", "process", "processed", "how do you make", "how is it made", "manufacturing", "manufacture", "manufacturer", "manufactured", "roasted", "milled", "grind", "ground", "grinding", "machine made", "homemade", "home made", "fresh ground"],
   about: ["about", "about you", "about hipa", "company", "brand", "who owns", "owner", "founder", "founded", "started", "history", "hipa means", "hipa enterprises", "established", "since", "tell me about", "what is hipa", "who is hipa", "introduce", "background", "story"],
   jobs: ["job", "jobs", "career", "careers", "vacancy", "vacancies", "hiring", "recruit", "recruitment", "work with you", "employment", "internship", "salary", "opening for"],
-  complaint: ["complaint", "complain", "problem", "issue", "damaged", "damage", "spoiled", "spoilt", "refund", "return", "replace", "replacement", "not good", "worst", "expired", "fungus", "insects", "worms", "smell", "stale", "leak", "leaking", "wrong product", "missing", "not received", "not delivered", "cheated", "disappointed"],
+  complaint: ["complaint", "complain", "problem", "issue", "damaged", "damage", "spoiled", "spoilt", "refund", "return", "replace", "replacement", "not good", "worst", "expired", "fungus", "insects", "worms", "smell", "stale", "leak", "leaking", "wrong product", "missing", "not received", "not delivered", "cheated", "disappointed", "my order", "order status", "track", "tracking", "havent received", "have not received", "not yet received", "still not received", "where is my order", "not arrived", "hasnt arrived", "didnt receive", "didnt get", "never came", "never arrived"],
   not_in_range: [],
   blog: ["blog", "article", "articles", "guide", "guides", "read"],
   payment: ["payment", "payments", "pay", "paying", "upi", "gpay", "google pay", "phonepe", "paytm", "card", "credit card", "debit card", "net banking", "bank transfer", "neft", "emi", "advance"],
@@ -178,7 +182,11 @@ export function detectIntents(text: string): Set<Intent> {
   if (intents.has("location") && intents.has("buy") && !hasPhrase(text, "address") && !hasPhrase(text, "visit") && !hasPhrase(text, "factory") && !hasPhrase(text, "office")) intents.delete("location");
   if (intents.has("hours") && hasPhrase(text, "time") && !/\b(what time|open|close|timing|hours|sunday|saturday|holiday)\b/.test(text)) intents.delete("hours");
   if (intents.has("contact") && hasPhrase(text, "number") && (hasPhrase(text, "fssai") || hasPhrase(text, "licence") || hasPhrase(text, "license") || hasPhrase(text, "gst"))) intents.delete("contact");
-  if (intents.has("ingredients") && hasPhrase(text, "100") && (hasPhrase(text, "100g") || hasPhrase(text, "100 g") || hasPhrase(text, "100 gram"))) intents.delete("ingredients");
+  // "Where is my order?" is a complaint about an existing order, not a request to place one.
+  if (intents.has("complaint") && /\b(my order|order status|track|tracking|received|arrived|didnt (?:receive|get)|never came)\b/.test(text)) {
+    intents.delete("buy");
+    intents.delete("delivery");
+  }
   if (intents.has("compare") && hasPhrase(text, "or") && !/\b(difference|different|vs|versus|compare|better|which)\b/.test(text)) intents.delete("compare");
   if (intents.has("usage") && (hasPhrase(text, "use") || hasPhrase(text, "uses")) && intents.has("buy") && !/\b(recipe|cook|how to use|how to make)\b/.test(text)) intents.delete("usage");
   if (intents.has("storage") && hasPhrase(text, "store") && (intents.has("buy") || hasPhrase(text, "near me") || hasPhrase(text, "which store"))) intents.delete("storage");
@@ -231,8 +239,8 @@ function answerBuy(selected: Product[], voice: Voice) {
   }
   return [
     t(voice, `Right now orders are taken directly by the HIPA team: WhatsApp ${PHONE} with the product and quantity, or email ${EMAIL}.`, `Ippo order direct-a HIPA team edukkuranga: product and quantity ${PHONE}-ku WhatsApp pannunga, illa ${EMAIL}-ku mail pannunga.`),
-    t(voice, `Home packs${selected.length === 1 ? ` of ${name}` : ""} also reach select grocers and supermarkets in and around Chennai. Ask the team for the nearest stockist, and tell me your area if you'd like a quick pointer.`, `Home packs${selected.length === 1 ? ` (${name})` : ""} Chennai-la select grocery shops and supermarkets-layum kidaikum. Nearest stockist-ku team-a kelunga.`),
-    t(voice, `Online shopping on the website is coming soon; the Shop Now button will take you there once it is live.`, `Website-la online shopping seekiram varudhu; Shop Now button adhuku link aagum.`),
+    t(voice, `Tell the team your area when you message${selected.length === 1 ? ` about ${name}` : ""} and they'll confirm the quickest way to get it to you.`, `Message panna podhu ungal area-vum sollunga${selected.length === 1 ? ` (${name})` : ""}, seekiram epdi kidaikum-nu team confirm pannuvanga.`),
+    t(voice, `An online store link is on its way to the Shop Now button; until then the team takes every order directly.`, `Shop Now button-ku online store link seekiram varudhu; adhu varaikkum team direct-a order edukkuranga.`),
   ].join("\n\n");
 }
 
@@ -267,7 +275,7 @@ function answerUsage(selected: Product[], voice: Voice, text: string) {
   if (!selected.length) {
     return [
       t(voice, `Happy to help you cook. Tell me the dish or the powder (sambar, rasam, garam masala, turmeric, red chilli, coriander, cumin or pepper) and I'll share how much to use and when to add it.`, `Cooking help panren 😄 Edha dish illa edha powder-nu sollunga (sambar, rasam, garam masala, turmeric, red chilli, coriander, cumin, pepper), evlo use pannanum and eppo add pannanum sollren.`),
-      t(voice, `Quick starters: 1.5 to 2 tablespoons of Sambar Powder for a family-size sambar, 1 to 1.5 teaspoons of Rasam Powder per batch of rasam, and half a teaspoon of Garam Masala to finish a gravy. Sambar and Rasam powders come in 100g to 1kg packs.`, `Quick tips: family-size sambar-ku 1.5 to 2 tablespoon Sambar Powder, oru batch rasam-ku 1 to 1.5 teaspoon Rasam Powder, gravy finish panna half teaspoon Garam Masala. Sambar and Rasam powders 100g to 1kg packs-la kidaikum.`),
+      t(voice, `Quick starters: 1.5 to 2 tablespoons of Sambar Powder for a family-size sambar, 1 tablespoon of Rasam Powder for a pot of tomato-tamarind rasam, and half a teaspoon of Garam Masala to finish a gravy. Sambar and Rasam powders come in 100g to 1kg packs.`, `Quick tips: family-size sambar-ku 1.5 to 2 tablespoon Sambar Powder, oru pot rasam-ku 1 tablespoon Rasam Powder, gravy finish panna half teaspoon Garam Masala. Sambar and Rasam powders 100g to 1kg packs-la kidaikum.`),
     ].join("\n\n");
   }
   return selected
@@ -284,7 +292,7 @@ function answerStorage(selected: Product[], voice: Voice) {
   const product = selected[0] ?? productBySlug("sambar-powder");
   const tips = product.storageGuidance.slice(0, 2).join(" ");
   const shelf = spec(product, "Shelf Life") ?? "12 Months from manufacture";
-  return `${selected.length ? `${product.name}: ` : ""}${t(voice, `Shelf life is ${shelf.toLowerCase()} when unopened.`, `Shelf life ${shelf.toLowerCase()} (unopened).`)} ${tips}\n\n${t(voice, "Once opened, finish it within two to three months for the best aroma, and always use a dry spoon.", "Open panna apram 2-3 months-kulla use pannidunga, aroma nalla irukkum. Dry spoon mattum use pannunga.")}`;
+  return `${selected.length ? `${product.name}: ` : ""}${t(voice, `Shelf life is ${shelf.toLowerCase()} when unopened.`, `Shelf life ${shelf.toLowerCase()} (unopened).`)} ${tips}\n\n${t(voice, "Once opened, keep it in an airtight container away from heat and steam, use a dry spoon every time, and use it well within the best-before date on the pack.", "Open panna apram airtight container-la, heat and steam-ku thalli vechukkonga, dry spoon mattum use pannunga, pack-la irukkura best-before date-kulla use pannidunga.")}`;
 }
 
 function answerBulk(selected: Product[], voice: Voice, text: string) {
@@ -298,9 +306,9 @@ function answerBulk(selected: Product[], voice: Voice, text: string) {
     : t(voice, `To get a quote quickly, send the product, approximate monthly quantity in kg and your city to WhatsApp ${PHONE} or ${EMAIL}.`, `Quote seekiram venum-na, product, approx monthly quantity (kg) and city ${PHONE}-ku WhatsApp illa ${EMAIL}-ku anuppunga.`);
   const extras: string[] = [];
   if (/\b(private label|white label|own brand|oem|contract manufacturing)\b/.test(text)) extras.push(t(voice, "Private-label and contract-manufacturing requests are reviewed case by case by the team; mention it in your message.", "Private label / contract manufacturing team case-by-case paarpanga; message-la mention pannunga."));
-  if (/\b(sample|samples)\b/.test(text)) extras.push(t(voice, "Samples for trade buyers are arranged by the team once they know the product and expected volume.", "Trade buyers-ku samples team arrange pannuvanga; product and expected volume sollunga."));
+  if (/\b(sample|samples)\b/.test(text)) extras.push(t(voice, "Ask the team about samples in the same message, with the product and the volume you have in mind.", "Samples pathi adhe message-la kelunga, product and expected volume-um sollunga."));
   if (/\b(export|exporter|exports|import|importer|international|abroad|overseas)\b/.test(text)) extras.push(t(voice, "Export enquiries are welcome; we work with merchant exporters and regional distributors outside Tamil Nadu.", "Export enquiries welcome; merchant exporters and other-state distributors koodavum work pannurom."));
-  if (/\b(minimum order|moq)\b/.test(text)) extras.push(t(voice, "There is no fixed minimum for retailers; distributors and private-label runs are quoted on volume.", "Retailers-ku fixed minimum illa; distributors and private label volume-ai poruthu quote."));
+  if (/\b(minimum order|moq)\b/.test(text)) extras.push(t(voice, "Minimum quantities depend on the product and pack format, so ask the team when you share your volume.", "Minimum quantity product and pack format-ai poruthu irukkum; volume sollum podhu team-a kelunga."));
   return [opening, formats, ask, ...extras].join("\n\n");
 }
 
@@ -321,7 +329,7 @@ function answerLocation(voice: Voice) {
 }
 
 function answerHours(voice: Voice) {
-  return t(voice, `We're open ${siteIdentity.openingHours.label}, and closed on Sundays. WhatsApp messages sent outside these hours are answered the next working day.`, `Open ${siteIdentity.openingHours.label}; Sunday leave. Hours-ku veliya WhatsApp panninaa next working day reply varum.`);
+  return t(voice, `We're open ${siteIdentity.openingHours.label}, and closed on Sundays. Messages sent outside these hours are picked up when the team is back.`, `Open ${siteIdentity.openingHours.label}; Sunday leave. Hours-ku veliya message panninaa team thirumba vandhadhum reply pannuvanga.`);
 }
 
 function answerQuality(voice: Voice) {
@@ -351,10 +359,11 @@ function answerProducts(voice: Voice) {
 function answerNotInRange(text: string, voice: Voice) {
   const entries = detectNotInRange(text);
   const label = entries[0]?.label ?? "That";
+  const plural = entries[0]?.plural ?? false;
   const closest = Array.from(new Set(entries.flatMap((entry) => entry.closest))).slice(0, 2).map((slug) => productBySlug(slug).name);
   return t(
     voice,
-    `${label} ${label.endsWith("s") ? "aren't" : "isn't"} in the HIPA range today. We make eight products: Sambar Powder, Rasam Powder, Garam Masala, Turmeric, Red Chilli, Coriander, Cumin and Pepper powders. The closest match would be ${joinList(closest)}.`,
+    `${label} ${plural ? "aren't" : "isn't"} in the HIPA range today. We make eight products: Sambar Powder, Rasam Powder, Garam Masala, Turmeric, Red Chilli, Coriander, Cumin and Pepper powders. The closest match would be ${joinList(closest)}.`,
     `${label} ippo HIPA range-la illa. Naanga 8 products pannurom: Sambar Powder, Rasam Powder, Garam Masala, Turmeric, Red Chilli, Coriander, Cumin and Pepper powders. Closest match: ${joinList(closest)}.`,
   );
 }
@@ -400,7 +409,7 @@ function answerJobs(voice: Voice) {
 }
 
 function answerPayment(voice: Voice) {
-  return t(voice, `Payment options (UPI, bank transfer and others) are confirmed by the team when you place the order on WhatsApp ${PHONE} or by email, along with the delivery charge for your pin code.`, `Payment options (UPI, bank transfer, etc.) order place pannum podhu team confirm pannuvanga: ${PHONE}-la WhatsApp illa mail pannunga, delivery charge-um sollitu varanga.`);
+  return t(voice, `The team confirms the payment method when you place the order on WhatsApp ${PHONE} or by email at ${EMAIL}, along with the delivery charge for your pin code.`, `Payment method order place pannum podhu team confirm pannuvanga: ${PHONE}-la WhatsApp illa ${EMAIL}-ku mail pannunga, delivery charge-um sollitu varanga.`);
 }
 
 function answerBlog(voice: Voice) {
@@ -408,7 +417,7 @@ function answerBlog(voice: Voice) {
 }
 
 function answerHuman(voice: Voice) {
-  return t(voice, `Of course. The HIPA team is on ${PHONE} (call or WhatsApp) ${siteIdentity.openingHours.label}, or email ${EMAIL} any time and they'll reply on the next working day.`, `Kandippa. HIPA team ${PHONE}-la (call or WhatsApp) ${siteIdentity.openingHours.label} irupanga; illa ${EMAIL}-ku eppo venaalum mail pannunga, next working day reply pannuvanga.`);
+  return t(voice, `Of course. The HIPA team is on ${PHONE} (call or WhatsApp) ${siteIdentity.openingHours.label}, or email ${EMAIL} any time and they'll reply when they're back.`, `Kandippa. HIPA team ${PHONE}-la (call or WhatsApp) ${siteIdentity.openingHours.label} irupanga; illa ${EMAIL}-ku eppo venaalum mail pannunga, thirumba vandhadhum reply pannuvanga.`);
 }
 
 function answerBotIdentity(voice: Voice) {
@@ -441,8 +450,22 @@ export function findFaq(text: string, selected: Product[]): { question: string; 
 }
 
 function lastTurn(history: ChatTurn[], role: "user" | "assistant") {
-  const turns = history.filter((turn) => turn && typeof turn.content === "string" && (role === "user" ? turn.role === "user" : turn.role === "assistant" || turn.role === "model"));
+  const turns = history.filter((turn) => (role === "user" ? turn.role === "user" : turn.role === "assistant" || turn.role === "model"));
   return turns[turns.length - 1]?.content ?? "";
+}
+
+/**
+ * Accepts whatever the client sent as history and returns the clean earlier turns. The website
+ * sends the conversation including the message being answered, so that trailing copy is dropped;
+ * anything that is not a {role, content} pair is ignored rather than allowed to throw.
+ */
+export function previousTurns(history: unknown, message: string): ChatTurn[] {
+  const turns = (Array.isArray(history) ? history : []).filter(
+    (turn): turn is ChatTurn => Boolean(turn) && typeof turn === "object" && typeof (turn as ChatTurn).role === "string" && typeof (turn as ChatTurn).content === "string",
+  );
+  const last = turns[turns.length - 1];
+  if (last && last.role === "user" && last.content.trim() === message.trim()) turns.pop();
+  return turns;
 }
 
 const PRIORITY: Intent[] = ["complaint", "not_in_range", "bulk", "price", "buy", "delivery", "payment", "packs", "ingredients", "usage", "storage", "compare", "taste", "products", "quality", "about", "location", "hours", "contact", "human", "blog", "jobs", "bot_identity"];
@@ -451,8 +474,9 @@ const PRIORITY: Intent[] = ["complaint", "not_in_range", "bulk", "price", "buy",
  * Answers a visitor message from local knowledge. `history` is the conversation so far
  * (oldest first, without the welcome message) and is used only to resolve short follow-ups.
  */
-export function answerLocally(message: string, history: ChatTurn[] = []): string {
-  const raw = (message ?? "").trim();
+export function answerLocally(message: string, history: ChatTurn[] | unknown = []): string {
+  const raw = (typeof message === "string" ? message : "").trim();
+  const turns = previousTurns(history, raw);
   const voice: Voice = { tanglish: detectTanglish(raw) };
   if (!raw) return t(voice, "Ask me anything about HIPA Masala products, bulk supply or how to reach the team.", "HIPA Masala products, bulk supply, contact: edhu venum-naalum kelunga 😊");
 
@@ -460,8 +484,17 @@ export function answerLocally(message: string, history: ChatTurn[] = []): string
   const seed = seedOf(text);
   let selected = detectProducts(text);
   const intents = detectIntents(text);
-  const previousUser = normalise(lastTurn(history, "user"));
-  const previousAssistant = normalise(lastTurn(history, "assistant"));
+  const previousUser = normalise(lastTurn(turns, "user"));
+  const previousAssistant = normalise(lastTurn(turns, "assistant"));
+
+  // "Garam masala-la enna irukku?" asks what is inside a named product, not for the product list.
+  if (selected.length && intents.has("products") && ["enna irukku", "enna iruku", "enna enna", "என்ன இருக்கு", "என்னென்ன"].some((cue) => hasPhrase(text, cue))) {
+    intents.delete("products");
+    intents.add("ingredients");
+  }
+  // A real product, an ingredient question or a cooking question wins over a look-alike we do not
+  // make ("does sambar powder contain dal", "how much oil should I add").
+  if (intents.has("not_in_range") && (selected.length || intents.has("ingredients") || intents.has("usage"))) intents.delete("not_in_range");
 
   // Pure small talk first, so "hi" never turns into a product pitch.
   const onlySmallTalk = (intent: Intent) => intents.has(intent) && !selected.length && Array.from(intents).every((item) => ["greeting", "how_are_you", "thanks", "bye", "bot_identity", "yes", "no", "human"].includes(item));
@@ -491,7 +524,10 @@ export function answerLocally(message: string, history: ChatTurn[] = []): string
   if (!selected.length && previousUser) {
     const previousProducts = detectProducts(previousUser);
     const assistantProducts = detectProducts(previousAssistant);
-    const contextProducts = previousProducts.length ? previousProducts : assistantProducts.length === 1 ? assistantProducts : [];
+    // Only an answer that was about one product (it opens with the name) carries that product forward;
+    // an answer that merely mentions a product as an example does not.
+    const assistantLed = assistantProducts.length === 1 && previousAssistant.startsWith(normalise(assistantProducts[0].name));
+    const contextProducts = previousProducts.length ? previousProducts : assistantLed ? assistantProducts : [];
     if (contextProducts.length && intents.size && !Array.from(intents).some((intent) => ["products", "about", "location", "contact", "hours", "greeting"].includes(intent))) selected = contextProducts;
   }
   if (selected.length && !intents.size && previousUser) {
