@@ -135,16 +135,29 @@ html.js .reveal-stagger.in-view > * { animation: stagger-in .6s var(--ease-out) 
 .hero-video-toggle:hover { background: rgba(23, 37, 18, .8); transform: scale(1.06); }
 .hero-video-toggle:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 
-/* The moving footage is brighter and busier than the old still photo, so the cream wash behind
-   the copy is stronger (and the body copy darker) to keep the text easy to read; the right-hand
-   side, behind the pack carousel, stays vivid. */
-.hero::after {
-  background: linear-gradient(90deg, rgba(248, 241, 226, .9) 0%, rgba(248, 241, 226, .8) 30%, rgba(248, 241, 226, .45) 48%, rgba(248, 241, 226, .1) 70%, rgba(248, 241, 226, 0) 100%);
+/* The owner wants the footage crystal clear, with no wash over it (5 Oct 2026). The text sits on
+   its own cream card instead, so it stays easy to read over the bright, moving footage while the
+   video around it (and behind the pack carousel) is untouched. */
+.hero::after { display: none; }
+.hero-copy {
+  max-width: 600px;
+  padding: clamp(24px, 2.6vw, 38px);
+  border: 1px solid rgba(213, 174, 67, .4);
+  border-radius: 22px;
+  background: rgba(255, 251, 242, .95);
+  box-shadow: 0 22px 54px rgba(20, 30, 15, .24);
 }
-.hero .hero-desc { color: #33402f; }
+.hero-copy .eyebrow { font-size: clamp(20px, 1.7vw, 24px); line-height: 1.35; margin-bottom: 10px; }
+.hero-copy h1 { font-size: clamp(32px, 3.5vw, 46px); margin-bottom: 16px; }
+.hero .hero-desc { color: #33402f; max-width: none; margin-bottom: 26px; }
+.hero-btns { gap: 12px; }
 @media (max-width: 900px) {
-  /* Single column: the copy sits over the full width, the carousel below it. */
-  .hero::after { background: linear-gradient(180deg, rgba(248, 241, 226, .86) 0%, rgba(248, 241, 226, .8) 50%, rgba(248, 241, 226, .5) 68%, rgba(248, 241, 226, .38) 100%); }
+  /* Single column: the card is centred above the carousel. */
+  .hero-copy { margin-inline: auto; }
+}
+@media (max-width: 560px) {
+  .hero-copy { padding: 22px 18px; border-radius: 18px; }
+  .hero-copy h1 { font-size: 28px; }
 }
 
 /* The pack in the carousel floats gently. */
