@@ -16,10 +16,28 @@ describe("chat assistant stays in step with the product catalogue", () => {
   });
 
   it("does not offer products or processes the site does not have", () => {
-    for (const text of [HIPA_SYSTEM_PROMPT, getIntelligentFallback("product list"), getIntelligentFallback("what do you have")]) {
-      expect(text).not.toMatch(/podi\b/i);
-      expect(text).not.toMatch(/stone[- ]ground/i);
+    // "podi" is simply Tamil for powder, so the prompt may explain it; only the catalogue lines and the
+    // fallback answers must stay free of it, and the two retired rice podis must not reappear anywhere.
+    const fallbacks = [getIntelligentFallback("product list"), getIntelligentFallback("what do you have")];
+    const explanationLine = HIPA_SYSTEM_PROMPT.split("\n").find((line) => line.startsWith("These eight are the only products"));
+    expect(explanationLine).toContain("not in the range");
+    const promptWithoutExplanation = HIPA_SYSTEM_PROMPT.split("\n").filter((line) => line !== explanationLine).join("\n");
+    for (const text of [promptWithoutExplanation, ...fallbacks]) {
+      expect(text).not.toMatch(/podi/i);
     }
+    for (const text of [HIPA_SYSTEM_PROMPT, ...fallbacks]) {
+      expect(text).not.toMatch(/stone[- ]ground/i);
+      expect(text).not.toMatch(/farm[- ]to[- ]factory/i);
+    }
+  });
+
+  it("quotes pack sizes that match the product pages", () => {
+    const sambar = products.find((p) => p.slug === "sambar-powder");
+    const rasam = products.find((p) => p.slug === "rasam-powder");
+    expect(sambar?.packSizes).not.toContain("50g");
+    expect(rasam?.packSizes).not.toContain("50g");
+    expect(getIntelligentFallback("recipe")).not.toMatch(/\b50g\b/);
+    expect(getIntelligentFallback("recipe")).toContain("100g to 1kg");
   });
 
   it("keeps the knowledge base to the same eight products", () => {
