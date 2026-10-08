@@ -35,7 +35,9 @@ try {
   }
 }
 
-const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
+import { fileURLToPath } from "node:url";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const assetsDir = path.join(root, "client/public/assets");
 const outDir = path.join(assetsDir, "img");
 const manifestPath = path.join(root, "client/src/lib/imageManifest.generated.ts");

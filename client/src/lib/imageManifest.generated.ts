@@ -5,12 +5,12 @@ export type ImageManifestRow = readonly [number, number, readonly number[], 0 | 
 
 export const imageManifest: Record<string, ImageManifestRow> = {
   "/assets/pack-sambar-powder.webp": [933,1400,[160,200,256,280,320,420,480,600,720],0,0],
-  "/assets/pack-rasam-powder.webp": [407,611,[160,200,256,280,320,407],0,0],
-  "/assets/pack-turmeric-powder.webp": [868,1302,[160,200,256,280,320,420,480,600,720],0,0],
+  "/assets/pack-rasam-powder.webp": [933,1400,[160,200,256,280,320,420,480,600,720],0,0],
+  "/assets/pack-turmeric-powder.webp": [933,1400,[160,200,256,280,320,420,480,600,720],0,0],
   "/assets/pack-red-chilli-powder.webp": [933,1400,[160,200,256,280,320,420,480,600,720],0,0],
   "/assets/pack-coriander-powder.webp": [933,1400,[160,200,256,280,320,420,480,600,720],0,0],
-  "/assets/pack-cumin-powder.webp": [795,1193,[160,200,256,280,320,420,480,600,720],0,0],
-  "/assets/pack-pepper-powder.webp": [902,1353,[160,200,256,280,320,420,480,600,720],0,0],
+  "/assets/pack-cumin-powder.webp": [933,1400,[160,200,256,280,320,420,480,600,720],0,0],
+  "/assets/pack-pepper-powder.webp": [933,1400,[160,200,256,280,320,420,480,600,720],0,0],
   "/assets/pack-garam-masala.webp": [933,1400,[160,200,256,280,320,420,480,600,720],0,0],
   "/assets/hero-video-poster_e92afce6.webp": [1440,810,[960,1440],1,720],
   "/assets/story-spice-mortar_d4ded661.jpg": [1200,776,[480,720,960],0,0],
