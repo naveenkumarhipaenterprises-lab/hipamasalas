@@ -67,6 +67,14 @@ const PRODUCT_IMAGES = [
   "pack-cumin-powder.webp",
   "pack-pepper-powder.webp",
   "pack-garam-masala.webp",
+  "pack-sambar-powder-v2.webp",
+  "pack-rasam-powder-v2.webp",
+  "pack-turmeric-powder-v2.webp",
+  "pack-red-chilli-powder-v2.webp",
+  "pack-coriander-powder-v2.webp",
+  "pack-cumin-powder-v2.webp",
+  "pack-pepper-powder-v2.webp",
+  "pack-garam-masala-v2.webp",
 ];
 const BLOG_COVERS = [
   "best-masala-manufacturer-in-chennai.webp",

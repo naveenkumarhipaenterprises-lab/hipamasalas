@@ -376,7 +376,7 @@ export function ProductDetailPage() {
   const product = getProduct(params?.slug || "");
   if (!product) return <NotFoundPage />;
 
-  const [selectedPack, setSelectedPack] = useState<string>("500g");
+  const [selectedPack, setSelectedPack] = useState<string>("200g");
   const currentImage = productPackImages[product.slug]?.[selectedPack] || product.image;
 
   const relatedProducts = (product.relatedProductSlugs || [])
