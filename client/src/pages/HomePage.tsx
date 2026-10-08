@@ -347,21 +347,13 @@ export function HomePage() {
                         style={{ flex: `0 0 ${100 / itemsPerPage}%`, width: `${100 / itemsPerPage}%`, maxWidth: `${100 / itemsPerPage}%` }}
                       >
                         <Link href={`/products/${product.slug}`} className="hero-carousel-card" tabIndex={isClone ? -1 : undefined}>
-                          <picture>
-                            {deferMedia && <source media={deferMedia} srcSet={DEFERRED_IMAGE} />}
-                            <img
-                              className="hero-carousel-img"
-                              src={image?.src ?? product.heroImage}
-                              srcSet={image?.srcSet}
-                              sizes={image ? "(max-width: 640px) 214px, (max-width: 1200px) 334px, 387px" : undefined}
-                              width={image?.width}
-                              height={image?.height}
-                              alt={product.imageAlt}
-                              // below the fold on phones; on desktop the browser still fetches in-view slides right after layout
-                              loading="lazy"
-                              decoding="async"
-                            />
-                          </picture>
+                          <ResponsiveImage
+                            className="hero-carousel-img"
+                            src={product.image}
+                            alt={product.imageAlt}
+                            sizes="(max-width: 640px) 214px, (max-width: 1200px) 334px, 387px"
+                            priority={index < 3}
+                          />
                           <span className="hero-carousel-title">{product.name}</span>
                         </Link>
                       </div>
