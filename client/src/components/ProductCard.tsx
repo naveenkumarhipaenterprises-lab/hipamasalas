@@ -3,6 +3,8 @@ import { ResponsiveImage } from "@/components/ResponsiveImage";
 import { resolveImage } from "@/lib/imageManifest";
 import { trpc } from "@/lib/trpc";
 import type { products } from "@shared/hipaContent";
+import { openComingSoonModal } from "@/components/ComingSoonModal";
+import { ShoppingBag } from "lucide-react";
 
 export function ProductAvailabilityLabel({ slug }: { slug: string }) {
   const availability = trpc.productAvailability.publicList.useQuery(undefined, { staleTime: 30_000, refetchOnWindowFocus: false });
@@ -28,7 +30,6 @@ export function ProductCard({ product, compact = false }: { product: (typeof pro
   return (
     <article className={`product-card ${compact ? "product-card-compact" : ""}`}>
       <Link href={`/products/${product.slug}`} className="product-media">
-        {/* .product-media: 150px tall (8px padding) ≤560px, otherwise 220px (14px padding) */}
         <ResponsiveImage src={src} alt={product.imageAlt} sizes={packSizes(src, [["(max-width: 560px)", 134], [null, 192]])} />
       </Link>
       <h3 className="product-name">{product.name}</h3>
@@ -36,9 +37,18 @@ export function ProductCard({ product, compact = false }: { product: (typeof pro
         <>
           <p className="product-card-short-desc">{product.shortDescription}</p>
           <ProductAvailabilityLabel slug={product.slug} />
-          <Link href={`/products/${product.slug}`} className="btn btn-outline btn-sm">
-            View Details <span className="arrow">→</span>
-          </Link>
+          <div className="product-card-actions">
+            <button
+              type="button"
+              className="btn btn-primary btn-sm btn-card-shop"
+              onClick={openComingSoonModal}
+            >
+              <ShoppingBag size={14} /> Shop Now
+            </button>
+            <Link href={`/products/${product.slug}`} className="btn btn-outline btn-sm">
+              Details <span className="arrow">→</span>
+            </Link>
+          </div>
         </>
       )}
     </article>

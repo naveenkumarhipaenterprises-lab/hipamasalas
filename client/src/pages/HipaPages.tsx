@@ -5,26 +5,22 @@ import { EnquiryForm } from "@/components/EnquiryForm";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { packSizes, ProductAvailabilityLabel, ProductCard } from "@/components/ProductCard";
 import { ResponsiveImage } from "@/components/ResponsiveImage";
-import { faqs, getProduct, getProductFaqs, getShopHref, isExternalShop, products, siteIdentity } from "@shared/hipaContent";
+import { openComingSoonModal } from "@/components/ComingSoonModal";
+import { faqs, getProduct, getProductFaqs, getShopHref, isExternalShop, productPackImages, products, siteIdentity } from "@shared/hipaContent";
 import { MANUFACTURER_PAGE_PATH, manufacturerPage } from "@shared/manufacturerPage";
 import { trackEvent } from "@/lib/analytics";
 import { trpc } from "@/lib/trpc";
 
 /** "Shop Now" link: the online store when configured, otherwise the product catalogue. */
 function ShopNowLink({ className, location, product }: { className: string; location: string; product?: string }) {
-  const href = getShopHref();
-  const onClick = () => trackEvent("shop_now_click", { location, ...(product ? { product } : {}) });
-  if (isExternalShop()) {
-    return (
-      <a href={href} target="_blank" rel="noreferrer" className={className} onClick={onClick}>
-        <ShoppingBag size={16} aria-hidden="true" /> Shop Now
-      </a>
-    );
-  }
+  const onClick = () => {
+    trackEvent("shop_now_click", { location, ...(product ? { product } : {}) });
+    openComingSoonModal();
+  };
   return (
-    <Link href={href} className={className} onClick={onClick}>
+    <button type="button" className={className} onClick={onClick}>
       <ShoppingBag size={16} aria-hidden="true" /> Shop Now
-    </Link>
+    </button>
   );
 }
 
@@ -265,9 +261,17 @@ function CatalogueProductCard({ product }: { product: (typeof products)[number] 
         )}
         <ProductAvailabilityLabel slug={product.slug} />
         <div className="catalogue-product-actions">
-          <ShopNowLink className="btn btn-gold btn-sm" location="catalogue" product={product.name} />
-          <Link href={`/products/${product.slug}`} className="btn btn-primary btn-sm">
-            Product Details <span className="arrow">→</span>
+          <button
+            type="button"
+            className="btn btn-gold btn-sm"
+            onClick={() => {
+              trackEvent("shop_now_click", { location: "catalogue", product: product.name });
+              openComingSoonModal();
+            }}
+          >
+            <ShoppingBag size={14} /> Shop Now
+          </button>
+          <Link href={`/products/${product.slug}`} className="btn btn-primary btn-sm">            Product Details <span className="arrow">→</span>
           </Link>
           <a
             href={`/products/${product.slug}#product-enquiry`}
@@ -372,6 +376,9 @@ export function ProductDetailPage() {
   const product = getProduct(params?.slug || "");
   if (!product) return <NotFoundPage />;
 
+  const [selectedPack, setSelectedPack] = useState<string>("500g");
+  const currentImage = productPackImages[product.slug]?.[selectedPack] || product.image;
+
   const relatedProducts = (product.relatedProductSlugs || [])
     .map((slug) => getProduct(slug))
     .filter((p): p is (typeof products)[number] => Boolean(p));
@@ -387,13 +394,7 @@ export function ProductDetailPage() {
       <section className="product-replica">
         <div className="container product-replica-grid">
           <div className="product-replica-image product-detail-enter">
-            <ResponsiveImage
-              src={product.image}
-              alt={product.imageAlt}
-              priority
-              sizes={packSizes(product.image, [["(max-width: 560px)", 350], ["(max-width: 900px)", 270], [null, 280]])}
-            />
-          </div>
+<img key={currentImage} src={currentImage} alt={`${product.name} ${selectedPack} pack — ${product.imageAlt}`} fetchPriority="high" decoding="async" />          </div>
           <div className="product-replica-copy product-detail-enter">
             <p className="eyebrow">HIPA MASALA · PALLAVARAM, CHENNAI</p>
             <h1>{product.name}</h1>
@@ -410,19 +411,34 @@ export function ProductDetailPage() {
 
             {product.packSizes && (
               <div className="replica-packs-wrap">
-                <span className="packs-title">Available Pack Sizes:</span>
+                <span className="packs-title">Available Pack Sizes (Click to preview):</span>
                 <div className="replica-packs" aria-label={`${product.name} pack sizes`}>
                   {product.packSizes.map((size) => (
-                    <span key={size}>{size}</span>
+                    <button
+                      key={size}
+                      type="button"
+                      className={`replica-pack-btn ${selectedPack === size ? "is-selected" : ""}`}
+                      onClick={() => setSelectedPack(size)}
+                    >
+                      {size}
+                    </button>
                   ))}
                 </div>
               </div>
             )}
 
             <div className="replica-product-actions">
-              <ShopNowLink className="btn btn-gold" location="product" product={product.name} />
-              <a href="#product-enquiry" className="btn btn-primary" onClick={() => trackEvent("product_enquiry_cta", { product: product.name })}>
-                Enquire About This Product <span className="arrow">↓</span>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => {
+                  trackEvent("shop_now_click", { location: "product_detail", product: product.name });
+                  openComingSoonModal();
+                }}
+              >
+                <ShoppingBag size={18} /> Shop Online <span className="arrow">→</span>
+              </button>
+              <a href="#product-enquiry" className="btn btn-outline" onClick={() => trackEvent("product_enquiry_cta", { product: product.name })}>                Enquire About This Product <span className="arrow">↓</span>
               </a>
               <a href={siteIdentity.whatsappHref} target="_blank" rel="noreferrer" className="btn btn-whatsapp-live" onClick={() => trackEvent("whatsapp_click", { product: product.name })}>
                 WhatsApp Enquiry
@@ -910,6 +926,12 @@ export function B2BEnquiriesPage() {
               <p>
                 <strong>Direct Business Hotline:</strong> Call <a href={siteIdentity.phoneHref}>{siteIdentity.phone}</a> or email <a href={`mailto:${siteIdentity.email}`}>{siteIdentity.email}</a> for immediate bulk quotations.
               </p>
+              <div style={{ marginTop: 14 }}>
+                <a href="/assets/hipa-masalas-brochure.pdf" download="HIPA-Masala-Brochure.pdf" className="btn btn-brochure-download btn-sm">
+                  <Download size={15} aria-hidden="true" />
+                  Download Product Brochure (PDF)
+                </a>
+              </div>
             </div>
           </div>
 

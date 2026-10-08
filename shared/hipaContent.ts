@@ -1288,3 +1288,55 @@ export function getStructuredData(pathname: string, origin: string, articleOverr
 
   return schemas;
 }
+
+export const productPackImages: Record<string, Record<string, string>> = {
+  "sambar-powder": {
+    "100g": "/assets/products/sambar-powder-100g.png",
+    "200g": "/assets/products/sambar-powder-200g.png",
+    "500g": "/assets/products/sambar-powder-500g.png",
+    "1kg": "/assets/products/sambar-powder-1kg.png",
+  },
+  "rasam-powder": {
+    "100g": "/assets/products/rasam-powder-100g.png",
+    "200g": "/assets/products/rasam-powder-200g.png",
+    "500g": "/assets/products/rasam-powder-500g.png",
+    "1kg": "/assets/products/rasam-powder-1kg.png",
+  },
+  "turmeric-powder": {
+    "100g": "/assets/products/turmeric-powder-100g.png",
+    "200g": "/assets/products/turmeric-powder-200g.png",
+    "500g": "/assets/products/turmeric-powder-500g.png",
+    "1kg": "/assets/products/turmeric-powder-1kg.png",
+  },
+  "red-chilli-powder": {
+    "100g": "/assets/products/red-chilli-powder-100g.png",
+    "200g": "/assets/products/red-chilli-powder-200g.png",
+    "500g": "/assets/products/red-chilli-powder-500g.png",
+    "1kg": "/assets/products/red-chilli-powder-1kg.png",
+  },
+  "coriander-powder": {
+    "100g": "/assets/products/coriander-powder-100g.png",
+    "200g": "/assets/products/coriander-powder-200g.png",
+    "500g": "/assets/products/coriander-powder-500g.png",
+    "1kg": "/assets/products/coriander-powder-1kg.png",
+  },
+  "cumin-powder": {
+    "100g": "/assets/products/cumin-powder-100g.png",
+    "200g": "/assets/products/cumin-powder-200g.png",
+    "500g": "/assets/products/cumin-powder-500g.png",
+    "1kg": "/assets/products/cumin-powder-1kg.png",
+  },
+  "pepper-powder": {
+    "50g": "/assets/products/pepper-powder-100g.png",
+    "100g": "/assets/products/pepper-powder-100g.png",
+    "200g": "/assets/products/pepper-powder-200g.png",
+    "500g": "/assets/products/pepper-powder-500g.png",
+    "1kg": "/assets/products/pepper-powder-1kg.png",
+  },
+  "garam-masala": {
+    "100g": "/assets/products/garam-masala-100g.png",
+    "200g": "/assets/products/garam-masala-200g.png",
+    "500g": "/assets/products/garam-masala-500g.png",
+    "1kg": "/assets/products/garam-masala-1kg.png",
+  },
+};
