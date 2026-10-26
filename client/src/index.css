@@ -1214,3 +1214,103 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* B2B Trust Points & Overflow Prevention */
+.b2b-trust-points {
+  display: grid;
+  gap: 13px;
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+  max-width: 500px;
+}
+.b2b-trust-points li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #3f4e3c;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.b2b-trust-points li::before {
+  content: "✓";
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #59744e;
+  border-radius: 50%;
+  color: #355d2e;
+  font-size: 11px;
+  font-weight: 800;
+  margin-top: 2px;
+  background: #f1f8ee;
+}
+
+/* Blog Pagination Styling */
+.blog-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 48px;
+  padding-top: 20px;
+}
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1.5px solid #dcd2be;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--green-900, #173c17);
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(20, 30, 15, 0.05);
+}
+.pagination-btn:hover:not(:disabled) {
+  border-color: #173c17;
+  background: #fdfaf2;
+  transform: translateY(-1px);
+}
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.pagination-numbers {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pagination-num {
+  min-width: 40px;
+  height: 40px;
+  border: 1.5px solid #dcd2be;
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--green-900, #173c17);
+  font-size: 14px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(20, 30, 15, 0.05);
+}
+.pagination-num:hover:not(.is-active) {
+  border-color: #173c17;
+  background: #fdfaf2;
+  transform: translateY(-1px);
+}
+.pagination-num.is-active {
+  background: #173c17;
+  border-color: #173c17;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(23, 60, 23, 0.25);
+  transform: translateY(-1px);
+}

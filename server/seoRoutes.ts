@@ -21,6 +21,8 @@ const legacyRoutes: Record<string, string> = {
   "/garam-masala.html": "/products/garam-masala",
   "/blog-details.html": "/blog",
   "/b2b-enquiry": "/b2b-enquiries",
+  "/how-to-make-sambar-hipa-sambar-powder": "/blog/how-to-make-sambar-hipa-sambar-powder",
+  "/how-to-make-sambar-hipa-sambar-powder/": "/blog/how-to-make-sambar-hipa-sambar-powder",
   // Six guides on "masala manufacturer in Chennai" were consolidated into three plus the pillar page (30 Sep 2026).
   "/blog/how-to-choose-a-masala-manufacturer-in-chennai-for-your-business": "/blog/best-masala-manufacturer-in-chennai",
   "/blog/what-makes-a-good-masala-manufacturer-8-things-buyers-should-check": "/blog/best-masala-manufacturer-in-chennai",

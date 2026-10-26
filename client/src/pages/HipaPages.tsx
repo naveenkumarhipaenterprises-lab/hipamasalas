@@ -1016,11 +1016,23 @@ export function TermsOfServicePage() {
   );
 }
 
+const POSTS_PER_PAGE = 6;
+
 export function BlogPage() {
   const [query, setQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const publishedPosts = trpc.blog.publishedList.useQuery();
   const normalizedQuery = query.trim().toLowerCase();
   const visibleArticles = (publishedPosts.data || []).filter((article) => !normalizedQuery || `${article.title} ${article.description}`.toLowerCase().includes(normalizedQuery));
+
+  const totalPages = Math.ceil(visibleArticles.length / POSTS_PER_PAGE) || 1;
+  const activePage = Math.min(currentPage, totalPages);
+  const paginatedArticles = visibleArticles.slice((activePage - 1) * POSTS_PER_PAGE, activePage * POSTS_PER_PAGE);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    document.getElementById("blog-collection")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <>
@@ -1039,12 +1051,21 @@ export function BlogPage() {
           </div>
           <label className="blog-search-field">
             <span className="sr-only">Search blog articles</span>
-            <input value={query} type="search" name="blog-query" placeholder="Search blog articles..." onChange={(event) => setQuery(event.target.value)} />
+            <input
+              value={query}
+              type="search"
+              name="blog-query"
+              placeholder="Search blog articles..."
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setCurrentPage(1);
+              }}
+            />
             <span aria-hidden="true">⌕</span>
           </label>
         </div>
       </section>
-      <section className="blog-live-collection reveal">
+      <section className="blog-live-collection reveal" id="blog-collection">
         <div className="container">
           {publishedPosts.isLoading ? (
             <div className="blog-live-empty">
@@ -1059,31 +1080,68 @@ export function BlogPage() {
               <p>Please try again shortly.</p>
             </div>
           ) : visibleArticles.length ? (
-            <div className="blog-live-grid">
-              {visibleArticles.map((article, index) => (
-                <article className="blog-live-card" key={article.slug}>
-                  {article.coverImageUrl ? (
-                    <ResponsiveImage
-                      className="blog-live-card-cover"
-                      src={article.coverImageUrl}
-                      alt={article.coverImageAlt || ""}
-                      sizes="(max-width: 640px) calc(100vw - 36px), 400px"
-                      // first card is the LCP element; the rest of the first row is also above the fold
-                      priority={index === 0}
-                      loading={index < 3 ? "eager" : "lazy"}
-                    />
-                  ) : null}
-                  <div className="blog-live-card-copy">
-                    <p className="eyebrow">HIPA Journal</p>
-                    <h2>{article.title}</h2>
-                    <p>{article.description}</p>
-                    <Link href={`/blog/${article.slug}`} className="btn btn-outline btn-sm">
-                      Read Article <span className="arrow">→</span>
-                    </Link>
+            <>
+              <div className="blog-live-grid">
+                {paginatedArticles.map((article, index) => (
+                  <article className="blog-live-card" key={article.slug}>
+                    {article.coverImageUrl ? (
+                      <ResponsiveImage
+                        className="blog-live-card-cover"
+                        src={article.coverImageUrl}
+                        alt={article.coverImageAlt || ""}
+                        sizes="(max-width: 640px) calc(100vw - 36px), 400px"
+                        // first card is the LCP element; the rest of the first row is also above the fold
+                        priority={index === 0 && activePage === 1}
+                        loading={index < 3 ? "eager" : "lazy"}
+                      />
+                    ) : null}
+                    <div className="blog-live-card-copy">
+                      <p className="eyebrow">HIPA Journal</p>
+                      <h2>{article.title}</h2>
+                      <p>{article.description}</p>
+                      <Link href={`/blog/${article.slug}`} className="btn btn-outline btn-sm">
+                        Read Article <span className="arrow">→</span>
+                      </Link>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              {totalPages > 1 && (
+                <nav className="blog-pagination" aria-label="Blog pages">
+                  <button
+                    type="button"
+                    className="pagination-btn pagination-prev"
+                    disabled={activePage === 1}
+                    onClick={() => handlePageChange(Math.max(1, activePage - 1))}
+                    aria-label="Previous page"
+                  >
+                    <ChevronLeft size={16} /> Prev
+                  </button>
+                  <div className="pagination-numbers">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                      <button
+                        key={pageNum}
+                        type="button"
+                        className={`pagination-num ${activePage === pageNum ? "is-active" : ""}`}
+                        onClick={() => handlePageChange(pageNum)}
+                        aria-current={activePage === pageNum ? "page" : undefined}
+                      >
+                        {pageNum}
+                      </button>
+                    ))}
                   </div>
-                </article>
-              ))}
-            </div>
+                  <button
+                    type="button"
+                    className="pagination-btn pagination-next"
+                    disabled={activePage === totalPages}
+                    onClick={() => handlePageChange(Math.min(totalPages, activePage + 1))}
+                    aria-label="Next page"
+                  >
+                    Next <ChevronRight size={16} />
+                  </button>
+                </nav>
+              )}
+            </>
           ) : (
             <div className="blog-live-empty">
               <span aria-hidden="true">▤</span>
@@ -1341,18 +1399,12 @@ export function MasalaManufacturerChennaiPage() {
             <p className="eyebrow">Buy direct from the manufacturer</p>
             <h2>Send your requirement to HIPA Masala</h2>
             <p>Tell us your business type, the products and pack sizes you need, and your expected monthly volume. Pricing, minimum quantities and delivery are confirmed on enquiry.</p>
-            <aside className="article-related-links" aria-labelledby="manufacturer-guides">
-              <p className="eyebrow">Buyer guides</p>
-              <h3 id="manufacturer-guides">Read before you shortlist</h3>
-              <ul>
-                {manufacturerGuides.map((guide) => (
-                  <li key={guide.href}>
-                    <Link href={guide.href}>{guide.label}</Link>
-                    <span>{guide.detail}</span>
-                  </li>
-                ))}
-              </ul>
-            </aside>
+            <ul className="b2b-trust-points">
+              <li>Direct manufacturer supply &amp; bulk commercial packaging (500g to 1kg pouches &amp; master cartons)</li>
+              <li>FSSAI-licensed facility in Pallavaram, Chennai with rigorous batch testing</li>
+              <li>Low-temperature milled pure spices with 100% natural aroma and zero fillers</li>
+              <li>Dependable doorstep logistics for retail stores, hotels, caterers &amp; institutional buyers</li>
+            </ul>
           </div>
           <div className="contact-form-card b2b-enquiry-form">
             <h2>Business enquiry</h2>
