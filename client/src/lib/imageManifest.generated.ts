@@ -50,4 +50,5 @@ export const imageManifest: Record<string, ImageManifestRow> = {
   "/assets/hipa-original-sambar-blog-cover-web.webp": [1280,853,[400,600,700,800,1280],0,0],
   "/assets/logo_a24808ac.png": [389,453,[48,96,144],0,0],
   "/assets/garam-masala-ingredients-aroma-uses.webp": [1536,1024,[400,600,700,800,1280],0,0],
+  "/assets/scaling-indian-restaurant-authentic-flavour.webp": [4800,2700,[400,600,700,800,1280],0,0],
 };
