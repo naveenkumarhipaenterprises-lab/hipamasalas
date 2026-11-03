@@ -1770,6 +1770,45 @@ export const articles: Article[] = [
     "image": "/assets/black-pepper-powder-chennai-uses.webp",
     "imageAlt": "Fine black pepper powder in a wooden bowl with whole dried black peppercorns",
     "complete": true
+  },
+  {
+    "slug": "turmeric-powder-chennai-uses",
+    "title": "Turmeric Powder: Uses, Colour, and How to Choose HIPA Turmeric in Chennai",
+    "description": "Learn why turmeric powder is yellow, how to choose a colour, ways to use it in everyday cooking, and where to find HIPA Turmeric Powder in Chennai.",
+    "body": [
+      "Turmeric powder is a familiar ingredient in many Indian kitchens. Its earthy flavor and golden colour make it a useful addition to dals, vegetables, curries, rice dishes, and marinades.",
+      "This guide answers common questions about turmeric powder and introduces [[HIPA Turmeric Powder|/products/turmeric-powder]], which the company lists as made from selected dried turmeric rhizomes.",
+      "## Is turmeric powder a medicine?",
+      "Turmeric is widely used as a food ingredient and has a place in traditional practices, but turmeric powder should not be presented as a medicine or substitute for medical care. For health conditions, supplements, or dietary advice, consult a qualified health professional.",
+      "## Why does turmeric look yellow?",
+      "Turmeric’s yellow-to-golden colour comes from natural compounds in the turmeric rhizome, including curcuminoids. The shade can vary depending on the variety, growing conditions, processing, and storage.",
+      "HIPA describes its turmeric powder as having a natural golden colour. Check the [[HIPA Turmeric Powder product page|/products/turmeric-powder]] for the current ingredient and product details.",
+      "## Which turmeric is best: dark yellow or light yellow?",
+      "Colour alone does not prove that turmeric powder is better or purer. Natural turmeric can vary in shade. When choosing a product, check the ingredients, packaging, seller information, and any quality details provided by the brand. Avoid judging turmeric only by whether it looks especially bright or dark.",
+      "HIPA lists its Turmeric Powder ingredient as 100% selected dried turmeric rhizomes. Refer to the product label and official product information for details.",
+      "## Where is turmeric harvested in India?",
+      "Turmeric is cultivated in several parts of India, with growing locations and harvest seasons varying by region. HIPA’s product page identifies the brand’s location as Pallavaram, Chennai, Tamil Nadu; this is the company location and should not be confused with a stated turmeric farm origin. For the product’s sourcing details, check the packaging or ask the company directly.",
+      "## Is turmeric powder good for health?",
+      "Turmeric powder is commonly used to season food. Its role in a meal depends on the quantity used and the overall recipe. Avoid claims that turmeric powder prevents or treats disease unless supported by appropriate evidence and permitted for the product. Speak with a qualified health professional about personal health questions.",
+      "## What foods taste good with HIPA Turmeric Powder?",
+      "Turmeric can be used in both vegetarian and non-vegetarian cooking. In vegetarian dishes, it can season dals, vegetable stir-fries, rice, [[sambar|/products/sambar-powder]], and curries. In non-vegetarian cooking, it is often added to fish, chicken, and meat marinades or curries.",
+      "The best use depends on your recipe and taste preference. HIPA lists dals, rice preparations, sambar, kootu, vegetable dishes, gravies, and marinades among the uses for its [[Turmeric Powder|/products/turmeric-powder]].",
+      "## Is HIPA Turmeric Powder home-made style?",
+      "“Home-made style” can mean different things to different cooks. HIPA describes its turmeric powder as made from selected whole turmeric rhizomes and finely milled. To decide whether it suits your preferences, review the ingredient list and product details, then try it in a familiar dish.",
+      "## How to find turmeric powder near you in Chennai",
+      "If you’re searching for “best turmeric powder near me” or “best turmeric powder in Chennai,” compare ingredient information, pack sizes, storage guidance, and seller location. “Best” depends on what you need and prefer.",
+      "HIPA Masala is based in Pallavaram, Chennai. Its Turmeric Powder is listed in 100 g, 200 g, 500 g, and 1 kg packs. Check the [[HIPA Turmeric Powder page|/products/turmeric-powder]] for current product information, or contact the team through the [[official contact page|/contact]] to ask about availability.",
+      "## Add turmeric to your everyday cooking",
+      "Turmeric powder can bring colour and earthy flavor to familiar dishes. Choose it based on clear product information, store it according to the label, and use an amount that suits your recipe.",
+      "Explore [[HIPA Turmeric Powder|/products/turmeric-powder]] or browse the [[full HIPA Masala product range|/products]].",
+      "How do you use turmeric most often—in dal, vegetables, rice, or a marinade?"
+    ],
+    "authorName": "HIPA Masala",
+    "publishedAt": "2026-11-03T08:30:00.000Z",
+    "modifiedAt": "2026-11-03T08:30:00.000Z",
+    "image": "/assets/turmeric-powder-chennai-uses.webp",
+    "imageAlt": "Pure ground turmeric powder in bowls with dried whole turmeric rhizomes",
+    "complete": true
   }
 ];
 
