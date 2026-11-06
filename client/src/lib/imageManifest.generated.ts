@@ -55,4 +55,5 @@ export const imageManifest: Record<string, ImageManifestRow> = {
   "/assets/cumin-powder-uses-chennai.webp": [1536,1024,[400,600,700,800,1280],0,0],
   "/assets/black-pepper-powder-chennai-uses.webp": [4800,2700,[400,600,700,800,1280],0,0],
   "/assets/turmeric-powder-chennai-uses.webp": [4800,2700,[400,600,700,800,1280],0,0],
+  "/assets/indian-spices-everyday-cooking.webp": [4800,2700,[400,600,700,800,1280],0,0],
 };
